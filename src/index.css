@@ -2,151 +2,124 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Nunu Design System - Soft, nurturing colors inspired by small animals and gentle motherhood
-All colors MUST be HSL for proper theming.
-*/
-
 @layer base {
   :root {
-    /* Base colors - warm, comforting cream background */
-    --background: 40 20% 98%;
-    --foreground: 25 15% 25%;
+    /* Base colors - soft, calming neutrals */
+    --background: 248 250 252; /* Soft off-white with blue hint */
+    --foreground: 51 65 85; /* Soft slate for text */
 
-    /* Card system - soft, elevated surfaces */
-    --card: 0 0% 100%;
-    --card-foreground: 25 15% 25%;
+    /* Primary brand colors - inspired by sky and calm waters */
+    --primary: 147 197 253; /* Soft sky blue */
+    --primary-foreground: 15 23 42; /* Dark slate for contrast */
+    --primary-soft: 147 197 253 / 0.1; /* Ultra soft version */
+    --primary-glow: 165 207 255; /* Lighter glow version */
 
-    /* Popover system */
-    --popover: 0 0% 100%;
-    --popover-foreground: 25 15% 25%;
+    /* Nunu brand colors - soft, pastel palette */
+    --nunu-sky: 196 224 255; /* Soft sky blue */
+    --nunu-blush: 251 207 232; /* Gentle blush */
+    --nunu-sage: 187 219 182; /* Soft sage green */
+    --nunu-cream: 254 249 195; /* Warm cream */
 
-    /* Primary - gentle peachy pink, like a bunny's nose */
-    --primary: 15 85% 75%;
-    --primary-foreground: 0 0% 100%;
-    --primary-soft: 15 45% 90%;
+    /* UI colors */
+    --secondary: 241 245 249; /* Soft cloud grey */
+    --secondary-foreground: 51 65 85;
+    --secondary-soft: 241 245 249 / 0.6;
 
-    /* Secondary - soft sage green, like gentle leaves */
-    --secondary: 140 25% 85%;
-    --secondary-foreground: 25 15% 25%;
-    --secondary-soft: 140 15% 92%;
+    --muted: 248 250 252; /* Very soft grey */
+    --muted-foreground: 100 116 139;
 
-    /* Muted tones - very soft and comfortable */
-    --muted: 40 15% 95%;
-    --muted-foreground: 25 8% 50%;
+    --accent: 203 213 225; /* Soft slate blue */
+    --accent-foreground: 51 65 85;
+    --accent-soft: 203 213 225 / 0.2;
 
-    /* Accent - warm lavender, like twilight comfort */
-    --accent: 280 20% 85%;
-    --accent-foreground: 25 15% 25%;
-    --accent-soft: 280 15% 92%;
+    --destructive: 248 113 113; /* Soft coral */
+    --destructive-foreground: 255 255 255;
 
-    /* Destructive - very gentle coral, not harsh */
-    --destructive: 5 70% 75%;
-    --destructive-foreground: 0 0% 100%;
+    --border: 226 232 240; /* Soft border */
+    --input: 241 245 249; /* Input background */
+    --ring: 147 197 253; /* Focus ring matches primary */
 
-    /* Borders and inputs - barely there, soft */
-    --border: 40 15% 88%;
-    --input: 40 15% 94%;
-    --ring: 15 85% 75%;
+    /* Card and surface colors */
+    --card: 255 255 255; /* Clean white */
+    --card-foreground: 51 65 85;
 
-    /* Radius - extra rounded for comfort */
+    --popover: 255 255 255;
+    --popover-foreground: 51 65 85;
+
+    /* Gradients for emotional comfort */
+    --gradient-comfort: linear-gradient(135deg, hsl(248 250 252) 0%, hsl(241 245 249) 50%, hsl(226 232 240) 100%);
+    --gradient-nurture: linear-gradient(135deg, hsl(147 197 253) 0%, hsl(165 207 255) 100%);
+    --gradient-calm: linear-gradient(135deg, hsl(196 224 255) 0%, hsl(203 213 225) 100%);
+
+    /* Soft shadows for gentle depth */
+    --shadow-gentle: 0 1px 3px 0 hsl(147 197 253 / 0.1), 0 1px 2px -1px hsl(147 197 253 / 0.1);
+    --shadow-comfort: 0 4px 6px -1px hsl(203 213 225 / 0.1), 0 2px 4px -2px hsl(203 213 225 / 0.1);
+    --shadow-nurture: 0 10px 15px -3px hsl(196 224 255 / 0.1), 0 4px 6px -4px hsl(196 224 255 / 0.1);
+
+    /* Animation values for comfort */
+    --transition-comfort: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --animation-gentle-bounce: bounce 2s ease-in-out infinite;
+    --animation-comfort-pulse: pulse 3s ease-in-out infinite;
+
     --radius: 0.75rem;
 
-    /* Custom Nunu colors */
-    --nunu-peach: 15 85% 75%;
-    --nunu-sage: 140 25% 85%;
-    --nunu-lavender: 280 20% 85%;
-    --nunu-cream: 40 20% 96%;
-    --nunu-soft-yellow: 50 60% 88%;
-
-    /* Gradients for emotional warmth */
-    --gradient-nurture: linear-gradient(135deg, hsl(15 85% 75% / 0.8), hsl(50 60% 88% / 0.8));
-    --gradient-calm: linear-gradient(180deg, hsl(280 20% 85% / 0.6), hsl(140 25% 85% / 0.6));
-    --gradient-comfort: linear-gradient(45deg, hsl(15 45% 90%), hsl(40 20% 96%));
-
-    /* Shadows - soft and comforting */
-    --shadow-gentle: 0 4px 20px hsl(15 85% 75% / 0.1);
-    --shadow-comfort: 0 8px 32px hsl(280 20% 85% / 0.15);
-    --shadow-nurture: 0 2px 12px hsl(140 25% 85% / 0.2);
-
-    /* Animations - gentle and smooth */
-    --transition-comfort: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    --transition-gentle: all 0.2s ease-out;
-
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 25 15% 8%;
-    --foreground: 40 20% 96%;
+    /* Dark mode - keeping it gentle and not harsh */
+    --background: 15 23 42; /* Deep navy */
+    --foreground: 241 245 249;
 
-    --card: 25 15% 10%;
-    --card-foreground: 40 20% 96%;
+    --primary: 147 197 253; /* Soft sky blue */
+    --primary-foreground: 15 23 42;
+    --primary-soft: 147 197 253 / 0.15;
 
-    --popover: 25 15% 10%;
-    --popover-foreground: 40 20% 96%;
+    --secondary: 30 41 59;
+    --secondary-foreground: 226 232 240;
+    --secondary-soft: 30 41 59 / 0.6;
 
-    --primary: 15 85% 65%;
-    --primary-foreground: 0 0% 100%;
-    --primary-soft: 15 45% 20%;
+    --muted: 30 41 59;
+    --muted-foreground: 148 163 184;
 
-    --secondary: 140 25% 25%;
-    --secondary-foreground: 40 20% 96%;
-    --secondary-soft: 140 15% 15%;
+    --accent: 71 85 105;
+    --accent-foreground: 241 245 249;
+    --accent-soft: 71 85 105 / 0.3;
 
-    --muted: 25 15% 12%;
-    --muted-foreground: 40 8% 60%;
+    --destructive: 248 113 113;
+    --destructive-foreground: 255 255 255;
 
-    --accent: 280 20% 25%;
-    --accent-foreground: 40 20% 96%;
-    --accent-soft: 280 15% 15%;
+    --border: 51 65 85;
+    --input: 30 41 59;
+    --ring: 147 197 253;
 
-    --destructive: 5 70% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --card: 30 41 59;
+    --card-foreground: 241 245 249;
 
-    --border: 25 15% 18%;
-    --input: 25 15% 15%;
-    --ring: 15 85% 65%;
+    --popover: 30 41 59;
+    --popover-foreground: 241 245 249;
 
-    /* Custom Nunu colors - darker versions */
-    --nunu-peach: 15 85% 65%;
-    --nunu-sage: 140 25% 25%;
-    --nunu-lavender: 280 20% 25%;
-    --nunu-cream: 25 15% 12%;
-    --nunu-soft-yellow: 50 40% 30%;
-
-    /* Dark mode gradients */
-    --gradient-nurture: linear-gradient(135deg, hsl(15 85% 65% / 0.6), hsl(50 40% 30% / 0.6));
-    --gradient-calm: linear-gradient(180deg, hsl(280 20% 25% / 0.5), hsl(140 25% 25% / 0.5));
-    --gradient-comfort: linear-gradient(45deg, hsl(15 45% 20%), hsl(25 15% 12%));
-
-    /* Shadows - softer in dark mode */
-    --shadow-gentle: 0 4px 20px hsl(15 85% 65% / 0.1);
-    --shadow-comfort: 0 8px 32px hsl(280 20% 25% / 0.15);
-    --shadow-nurture: 0 2px 12px hsl(140 25% 25% / 0.2);
+    /* Dark mode gradients - still gentle */
+    --gradient-comfort: linear-gradient(135deg, hsl(15 23 42) 0%, hsl(30 41 59) 50%, hsl(51 65 85) 100%);
+    --gradient-nurture: linear-gradient(135deg, hsl(147 197 253 / 0.2) 0%, hsl(165 207 255 / 0.2) 100%);
+    --gradient-calm: linear-gradient(135deg, hsl(196 224 255 / 0.15) 0%, hsl(203 213 225 / 0.15) 100%);
 
     /* Sidebar colors */
-    --sidebar-background: 25 15% 8%;
-    --sidebar-foreground: 40 20% 96%;
-    --sidebar-primary: 15 85% 65%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 25 15% 12%;
-    --sidebar-accent-foreground: 40 20% 96%;
-    --sidebar-border: 25 15% 18%;
-    --sidebar-ring: 15 85% 65%;
+    --sidebar-background: 15 23 42;
+    --sidebar-foreground: 241 245 249;
+    --sidebar-primary: 147 197 253;
+    --sidebar-primary-foreground: 15 23 42;
+    --sidebar-accent: 30 41 59;
+    --sidebar-accent-foreground: 241 245 249;
+    --sidebar-border: 51 65 85;
+    --sidebar-ring: 147 197 253;
   }
 }
 
@@ -154,8 +127,49 @@ All colors MUST be HSL for proper theming.
   * {
     @apply border-border;
   }
-
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Nunito', sans-serif;
+  }
+}
+
+/* Custom animation classes for emotional comfort */
+@layer utilities {
+  .animate-gentle-bounce {
+    animation: var(--animation-gentle-bounce);
+  }
+  
+  .animate-comfort-pulse {
+    animation: var(--animation-comfort-pulse);
+  }
+  
+  .transition-comfort {
+    transition: var(--transition-comfort);
+  }
+
+  /* Background utilities */
+  .bg-gradient-comfort {
+    background: var(--gradient-comfort);
+  }
+  
+  .bg-gradient-nurture {
+    background: var(--gradient-nurture);
+  }
+  
+  .bg-gradient-calm {
+    background: var(--gradient-calm);
+  }
+
+  /* Shadow utilities */
+  .shadow-gentle {
+    box-shadow: var(--shadow-gentle);
+  }
+  
+  .shadow-comfort {
+    box-shadow: var(--shadow-comfort);
+  }
+  
+  .shadow-nurture {
+    box-shadow: var(--shadow-nurture);
   }
 }

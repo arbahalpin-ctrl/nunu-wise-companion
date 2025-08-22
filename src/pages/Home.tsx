@@ -3,7 +3,7 @@ import { Heart, Zap, Bed, Sparkles, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { getCurrentWeekQuote } from '@/data/weeklyQuotes';
-import heroImage from '@/assets/nunu-hero.jpg';
+import koalaHero from '@/assets/koala-hero.jpg';
 
 const Home = () => {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
@@ -11,14 +11,14 @@ const Home = () => {
   const currentQuote = getCurrentWeekQuote();
 
   const moods = [
-    { id: 'great', icon: Zap, label: 'Energized', color: 'text-nunu-yellow' },
-    { id: 'light', icon: 'emoji', emoji: '✨', label: 'Light today', color: 'text-nunu-yellow' },
-    { id: 'hopeful', icon: Sparkles, label: 'Hopeful', color: 'text-primary' },
-    { id: 'tender', icon: 'emoji', emoji: '🧸', label: 'Tender', color: 'text-nunu-peach' },
+    { id: 'great', icon: Zap, label: 'Energized', color: 'text-primary' },
+    { id: 'light', icon: 'emoji', emoji: '✨', label: 'Light today', color: 'text-primary' },
+    { id: 'hopeful', icon: Sparkles, label: 'Hopeful', color: 'text-nunu-sky' },
+    { id: 'tender', icon: 'emoji', emoji: '🧸', label: 'Tender', color: 'text-nunu-blush' },
     { id: 'hanging', icon: 'emoji', emoji: '🫶', label: 'Hanging in there', color: 'text-nunu-sage' },
     { id: 'exhausted', icon: Bed, label: 'Exhausted', color: 'text-muted-foreground' },
     { id: 'tearful', icon: 'emoji', emoji: '😢', label: 'Tearful', color: 'text-blue-400' },
-    { id: 'overwhelmed', icon: HelpCircle, label: 'Overwhelmed', color: 'text-orange-400' },
+    { id: 'overwhelmed', icon: HelpCircle, label: 'Overwhelmed', color: 'text-amber-400' },
     { id: 'unknown', icon: HelpCircle, label: "I don't know what I feel", color: 'text-muted-foreground' },
   ];
 
@@ -39,7 +39,7 @@ const Home = () => {
       <div className="relative">
         <div 
           className="h-48 bg-cover bg-center bg-gradient-nurture rounded-b-3xl overflow-hidden"
-          style={{ backgroundImage: `url(${heroImage})` }}
+          style={{ backgroundImage: `url(${koalaHero})` }}
         >
           <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
           <div className="relative h-full flex items-end p-6">

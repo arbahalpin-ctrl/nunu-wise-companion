@@ -55,13 +55,11 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				nunu: {
-					peach: 'hsl(var(--nunu-peach))',
-					sage: 'hsl(var(--nunu-sage))',
-					lavender: 'hsl(var(--nunu-lavender))',
-					cream: 'hsl(var(--nunu-cream))',
-					yellow: 'hsl(var(--nunu-soft-yellow))'
-				},
+				// Nunu brand colors - updated to soft blues and pastels
+				"nunu-sky": 'hsl(var(--nunu-sky))',
+				"nunu-blush": 'hsl(var(--nunu-blush))',
+				"nunu-sage": 'hsl(var(--nunu-sage))',
+				"nunu-cream": 'hsl(var(--nunu-cream))',
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -72,6 +70,9 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				}
+			},
+			fontFamily: {
+				sans: ['Nunito', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
