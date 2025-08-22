@@ -3,8 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import { useNavigate } from 'react-router-dom';
 
 const Settings = () => {
+  const navigate = useNavigate();
   const isPremium = false; // This would come from user state
 
   const premiumFeatures = [
@@ -148,7 +150,11 @@ const Settings = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button variant="ghost" className="w-full justify-start rounded-xl">
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start rounded-xl"
+              onClick={() => navigate('/help-faq')}
+            >
               <HelpCircle className="h-4 w-4 mr-3" />
               Help & FAQ
             </Button>
