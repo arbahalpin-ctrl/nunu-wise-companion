@@ -38,10 +38,10 @@ const Home = () => {
           <div className="relative h-full flex items-end p-6">
             <div>
               <h1 className="text-2xl font-bold text-foreground mb-1">
-                Hello, beautiful mama ✨
+                Hi, sweet mama 💛
               </h1>
               <p className="text-muted-foreground">
-                How are you feeling today?
+                Take a moment just for you — how are you really feeling?
               </p>
             </div>
           </div>
