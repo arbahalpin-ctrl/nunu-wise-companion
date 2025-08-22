@@ -65,21 +65,21 @@ const Home = ({ onTabChange }: HomeProps) => {
         <div className="flex flex-col items-center text-center space-y-4">
           {/* Koala Image */}
           <div className="relative">
-            <div className="w-20 h-20 bg-white/90 rounded-full p-2 shadow-gentle backdrop-blur-sm border border-white/20">
+            <div className="w-20 h-20 bg-white rounded-full p-2 shadow-nurture backdrop-blur-sm border-2 border-white/30">
               <img 
                 src={koalaHero} 
                 alt="Gentle koala companion" 
-                className="w-full h-full object-contain rounded-full"
+                className="w-full h-full object-contain rounded-full drop-shadow-sm"
               />
             </div>
           </div>
           
           {/* Greeting */}
           <div>
-            <h1 className="text-2xl font-bold text-foreground mb-1">
-              Hi, sweet mama 💛
+            <h1 className="text-3xl font-bold text-foreground mb-2 tracking-tight">
+              Hi, sweet mama <span className="text-primary animate-comfort-pulse">💛</span>
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-base leading-relaxed">
               Take a moment just for you — how are you really feeling?
             </p>
           </div>
