@@ -1,53 +1,53 @@
 export const weeklyQuotes = [
   {
     week: 1,
-    quote: "You don't have to be perfect to be exactly what your baby needs. You're already enough.",
-    emoji: "🌸"
+    quote: "Love and exhaustion can live in the same heart. Both are true, both are okay.",
+    emoji: "💕"
   },
   {
     week: 2, 
-    quote: "It's okay if today was messy. Tomorrow is a new chance to be gentle with yourself.",
-    emoji: "🤗"
+    quote: "You are not behind. You are exactly where your baby needs you to be.",
+    emoji: "🌿"
   },
   {
     week: 3,
-    quote: "Rest isn't selfish—it's how you refill the well you're pouring from every day.",
-    emoji: "🛌"
+    quote: "Your baby doesn't need perfection. Just your love, your presence, your breath.",
+    emoji: "🤗"
   },
   {
     week: 4,
-    quote: "Feeling overwhelmed doesn't mean you're failing. It means you're human, and that's beautiful.",
-    emoji: "💙"
+    quote: "Some days will feel endless. But so will the love.",
+    emoji: "🌸"
   },
   {
     week: 5,
-    quote: "You're becoming someone new while caring for someone new. Be patient with both of you.",
-    emoji: "🌱"
+    quote: "Rest is resistance. You deserve rest even if the laundry isn't done.",
+    emoji: "🛌"
   },
   {
     week: 6,
-    quote: "Asking for help isn't giving up—it's showing your baby what healthy support looks like.",
-    emoji: "🫶"
+    quote: "You don't have to enjoy every moment. Just survive the ones that are hard.",
+    emoji: "🤲"
   },
   {
     week: 7,
-    quote: "The tiny moments matter more than the big gestures. You're writing love in everyday care.",
+    quote: "You're doing enough. Even when it doesn't feel like it.",
     emoji: "✨"
   },
   {
     week: 8,
-    quote: "Your feelings—all of them—are valid. There's no wrong way to feel right now.",
-    emoji: "🤲"
+    quote: "You were never meant to do this alone. And you don't have to.",
+    emoji: "🫶"
   },
   {
     week: 9,
-    quote: "You're not losing yourself in motherhood. You're discovering parts of yourself you never knew existed.",
+    quote: "You're not losing yourself. You're evolving into something even stronger.",
     emoji: "🦋"
   },
   {
     week: 10,
-    quote: "Love and exhaustion can live in the same heart. Both are true, both are okay.",
-    emoji: "💕"
+    quote: "Your feelings—all of them—are valid. There's no wrong way to feel right now.",
+    emoji: "💙"
   },
   {
     week: 11,
@@ -56,8 +56,8 @@ export const weeklyQuotes = [
   },
   {
     week: 12,
-    quote: "You're not behind on anything. You're exactly where you need to be, one breath at a time.",
-    emoji: "🌿"
+    quote: "Asking for help isn't giving up—it's showing your baby what healthy support looks like.",
+    emoji: "🌱"
   }
 ];
 
