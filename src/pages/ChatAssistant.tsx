@@ -16,7 +16,7 @@ const ChatAssistant = () => {
     {
       id: '1',
       type: 'assistant',
-      content: "Hello beautiful mama! 💝 I'm here to support you through this incredible journey. I know Emma usually has her morning feeding around this time - how did it go today?",
+      content: "Hi there! I'm here to help you navigate this parenting journey. I noticed Emma usually has her morning feed around this time - how did it go today?",
       timestamp: '10:30'
     },
     {
@@ -28,7 +28,7 @@ const ChatAssistant = () => {
     {
       id: '3',
       type: 'assistant',
-      content: "Oh sweetie, you're not doing anything wrong! Fussy feeding days happen to all babies. I see Emma usually calms down with gentle rocking - have you tried that? Also, sometimes babies are fussy when they're going through a growth spurt. You're such a loving, attentive mom. 🌸",
+      content: "That sounds frustrating — but you're not doing anything wrong. Lots of babies have fussy feeds, especially during growth spurts. Some mums find gentle rocking helps — maybe give that a try and see how she responds? You're doing your best, and that matters.",
       timestamp: '10:33'
     }
   ]);
@@ -177,7 +177,7 @@ const ChatAssistant = () => {
             <div className="flex items-center justify-center gap-2">
               <Heart className="h-4 w-4 text-accent-foreground" />
               <p className="text-xs text-accent-foreground">
-                Remember: You're doing an amazing job, mama 💕
+                You're doing your best, and that's what matters ✨
               </p>
             </div>
           </CardContent>
