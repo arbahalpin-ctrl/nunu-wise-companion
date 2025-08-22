@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import Onboarding from '@/components/Onboarding';
+import FloatingChatButton from '@/components/FloatingChatButton';
 import Home from '@/pages/Home';
 import BabyProfile from '@/pages/BabyProfile';
 import Routines from '@/pages/Routines';
@@ -27,6 +28,10 @@ const Index = () => {
     return <Onboarding onComplete={handleOnboardingComplete} />;
   }
 
+  const handleChatOpen = () => {
+    setActiveTab('chat');
+  };
+
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'home':
@@ -50,6 +55,14 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {renderActiveTab()}
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      
+      {/* Floating Chat Button - Hidden on chat page */}
+      {activeTab !== 'chat' && (
+        <FloatingChatButton 
+          onChatOpen={handleChatOpen}
+          isActive={activeTab === 'chat'}
+        />
+      )}
     </div>
   );
 };
