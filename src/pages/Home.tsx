@@ -1,0 +1,162 @@
+import { useState } from 'react';
+import { Heart, Smile, Meh, Frown, Zap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import heroImage from '@/assets/nunu-hero.jpg';
+
+const Home = () => {
+  const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [hasCheckedIn, setHasCheckedIn] = useState(false);
+
+  const moods = [
+    { id: 'great', icon: Zap, label: 'Energized', color: 'text-nunu-yellow' },
+    { id: 'good', icon: Smile, label: 'Good', color: 'text-nunu-sage' },
+    { id: 'okay', icon: Meh, label: 'Okay', color: 'text-accent' },
+    { id: 'struggling', icon: Frown, label: 'Struggling', color: 'text-destructive' },
+  ];
+
+  const handleMoodSelect = (moodId: string) => {
+    setSelectedMood(moodId);
+  };
+
+  const handleCheckin = () => {
+    if (selectedMood) {
+      setHasCheckedIn(true);
+      // Here you would save the mood check-in
+    }
+  };
+
+  return (
+    <div className="pb-20 min-h-screen bg-gradient-comfort">
+      {/* Hero Section */}
+      <div className="relative">
+        <div 
+          className="h-48 bg-cover bg-center bg-gradient-nurture rounded-b-3xl overflow-hidden"
+          style={{ backgroundImage: `url(${heroImage})` }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
+          <div className="relative h-full flex items-end p-6">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground mb-1">
+                Hello, beautiful mama ✨
+              </h1>
+              <p className="text-muted-foreground">
+                How are you feeling today?
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-6 space-y-6">
+        {/* Mood Check-in */}
+        {!hasCheckedIn ? (
+          <Card className="shadow-gentle border-none">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Heart className="h-5 w-5 text-primary animate-comfort-pulse" />
+                <h2 className="font-semibold">Daily Check-in</h2>
+              </div>
+              
+              <p className="text-muted-foreground text-sm mb-4">
+                Take a moment to acknowledge how you're feeling. There's no right or wrong answer.
+              </p>
+
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                {moods.map((mood) => {
+                  const Icon = mood.icon;
+                  const isSelected = selectedMood === mood.id;
+                  
+                  return (
+                    <button
+                      key={mood.id}
+                      onClick={() => handleMoodSelect(mood.id)}
+                      className={`
+                        p-4 rounded-2xl border-2 transition-all duration-300 text-left
+                        ${isSelected 
+                          ? 'border-primary bg-primary-soft shadow-gentle' 
+                          : 'border-border hover:border-primary/50 hover:bg-muted'
+                        }
+                      `}
+                    >
+                      <Icon className={`h-6 w-6 mb-2 ${mood.color}`} />
+                      <span className="font-medium text-sm">{mood.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <Button 
+                onClick={handleCheckin}
+                disabled={!selectedMood}
+                className="w-full rounded-xl shadow-gentle"
+              >
+                Check In
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="shadow-gentle border-none bg-gradient-comfort">
+            <CardContent className="p-6 text-center">
+              <div className="animate-gentle-bounce mb-2">
+                <Heart className="h-8 w-8 text-primary mx-auto" />
+              </div>
+              <h3 className="font-semibold mb-2">Thank you for sharing</h3>
+              <p className="text-muted-foreground text-sm">
+                Remember, you're doing an amazing job. Every feeling is valid. 💝
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Quick Actions */}
+        <div className="space-y-3">
+          <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+            Quick Actions
+          </h3>
+          
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="shadow-nurture border-none cursor-pointer hover:scale-105 transition-transform">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">🍼</div>
+                <span className="text-sm font-medium">Log Feeding</span>
+              </CardContent>
+            </Card>
+            
+            <Card className="shadow-nurture border-none cursor-pointer hover:scale-105 transition-transform">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">😴</div>
+                <span className="text-sm font-medium">Sleep Log</span>
+              </CardContent>
+            </Card>
+            
+            <Card className="shadow-nurture border-none cursor-pointer hover:scale-105 transition-transform">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">🎵</div>
+                <span className="text-sm font-medium">Voice Note</span>
+              </CardContent>
+            </Card>
+            
+            <Card className="shadow-nurture border-none cursor-pointer hover:scale-105 transition-transform">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">💬</div>
+                <span className="text-sm font-medium">Chat Support</span>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Gentle Reminder */}
+        <Card className="shadow-gentle border-none bg-accent-soft">
+          <CardContent className="p-4">
+            <p className="text-sm text-accent-foreground italic text-center">
+              "You are stronger than you think and more loved than you know." 🌸
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default Home;

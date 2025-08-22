@@ -1,12 +1,55 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useEffect } from 'react';
+import Navigation from '@/components/Navigation';
+import Onboarding from '@/components/Onboarding';
+import Home from '@/pages/Home';
+import BabyProfile from '@/pages/BabyProfile';
+import Routines from '@/pages/Routines';
+import VoiceNotes from '@/pages/VoiceNotes';
+import ChatAssistant from '@/pages/ChatAssistant';
+import Settings from '@/pages/Settings';
 
 const Index = () => {
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
+  const [activeTab, setActiveTab] = useState('home');
+
+  useEffect(() => {
+    // Check if user has completed onboarding
+    const completed = localStorage.getItem('nunu-onboarding-completed');
+    setHasCompletedOnboarding(!!completed);
+  }, []);
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('nunu-onboarding-completed', 'true');
+    setHasCompletedOnboarding(true);
+  };
+
+  if (!hasCompletedOnboarding) {
+    return <Onboarding onComplete={handleOnboardingComplete} />;
+  }
+
+  const renderActiveTab = () => {
+    switch (activeTab) {
+      case 'home':
+        return <Home />;
+      case 'baby':
+        return <BabyProfile />;
+      case 'routines':
+        return <Routines />;
+      case 'notes':
+        return <VoiceNotes />;
+      case 'chat':
+        return <ChatAssistant />;
+      case 'settings':
+        return <Settings />;
+      default:
+        return <Home />;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      {renderActiveTab()}
+      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 };
