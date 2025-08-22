@@ -36,21 +36,27 @@ const Home = () => {
   return (
     <div className="pb-20 min-h-screen bg-gradient-comfort">
       {/* Hero Section */}
-      <div className="relative">
-        <div 
-          className="h-48 bg-cover bg-center bg-gradient-nurture rounded-b-3xl overflow-hidden"
-          style={{ backgroundImage: `url(${koalaHero})` }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
-          <div className="relative h-full flex items-end p-6">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground mb-1">
-                Hi, sweet mama 💛
-              </h1>
-              <p className="text-muted-foreground">
-                Take a moment just for you — how are you really feeling?
-              </p>
+      <div className="relative bg-gradient-nurture rounded-b-3xl overflow-hidden p-6">
+        <div className="flex flex-col items-center text-center space-y-4">
+          {/* Koala Image */}
+          <div className="relative">
+            <div className="w-20 h-20 bg-white/90 rounded-full p-2 shadow-gentle backdrop-blur-sm border border-white/20">
+              <img 
+                src={koalaHero} 
+                alt="Gentle koala companion" 
+                className="w-full h-full object-contain rounded-full"
+              />
             </div>
+          </div>
+          
+          {/* Greeting */}
+          <div>
+            <h1 className="text-2xl font-bold text-foreground mb-1">
+              Hi, sweet mama 💛
+            </h1>
+            <p className="text-muted-foreground">
+              Take a moment just for you — how are you really feeling?
+            </p>
           </div>
         </div>
       </div>
