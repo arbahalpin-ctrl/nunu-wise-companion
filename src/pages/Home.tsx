@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { getCurrentWeekQuote } from '@/data/weeklyQuotes';
 import koalaHero from '@/assets/koala-gentle.png';
+import FeedingTimer, { FeedingLog as FeedingLogType } from '@/components/FeedingTimer';
+import FeedingLog from '@/components/FeedingLog';
 
 interface HomeProps {
   onTabChange?: (tab: string) => void;
@@ -12,6 +14,8 @@ interface HomeProps {
 const Home = ({ onTabChange }: HomeProps) => {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [hasCheckedIn, setHasCheckedIn] = useState(false);
+  const [showFeedingTimer, setShowFeedingTimer] = useState(false);
+  const [feedingLogs, setFeedingLogs] = useState<FeedingLogType[]>([]);
   const currentQuote = getCurrentWeekQuote();
 
   // Sample baby data - this would come from baby profile in a real app
@@ -57,6 +61,20 @@ const Home = ({ onTabChange }: HomeProps) => {
       // Here you would save the mood check-in
     }
   };
+
+  const handleSaveFeed = (feed: FeedingLogType) => {
+    setFeedingLogs(prev => [...prev, feed]);
+    setShowFeedingTimer(false);
+  };
+
+  if (showFeedingTimer) {
+    return (
+      <FeedingTimer 
+        onBack={() => setShowFeedingTimer(false)}
+        onSaveFeed={handleSaveFeed}
+      />
+    );
+  }
 
   return (
     <div className="pb-20 min-h-screen bg-gradient-comfort">
@@ -237,7 +255,10 @@ const Home = ({ onTabChange }: HomeProps) => {
           </h3>
           
           <div className="grid grid-cols-2 gap-3">
-            <Card className="shadow-nurture border-none cursor-pointer hover:scale-105 transition-transform">
+            <Card 
+              className="shadow-nurture border-none cursor-pointer hover:scale-105 transition-transform"
+              onClick={() => setShowFeedingTimer(true)}
+            >
               <CardContent className="p-4 text-center">
                 <div className="text-2xl mb-2">🍼</div>
                 <span className="text-sm font-medium">Log Feeding</span>
@@ -260,6 +281,8 @@ const Home = ({ onTabChange }: HomeProps) => {
           </div>
         </div>
 
+        {/* Today's Feeding Log */}
+        {feedingLogs.length > 0 && <FeedingLog feeds={feedingLogs} />}
       </div>
     </div>
   );
