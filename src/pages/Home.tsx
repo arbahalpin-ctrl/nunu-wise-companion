@@ -1,11 +1,15 @@
 import { useState } from 'react';
-import { Heart, Zap, Bed, Sparkles, HelpCircle } from 'lucide-react';
+import { Heart, Zap, Bed, Sparkles, HelpCircle, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { getCurrentWeekQuote } from '@/data/weeklyQuotes';
 import koalaHero from '@/assets/koala-gentle.png';
 
-const Home = () => {
+interface HomeProps {
+  onTabChange?: (tab: string) => void;
+}
+
+const Home = ({ onTabChange }: HomeProps) => {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [hasCheckedIn, setHasCheckedIn] = useState(false);
   const currentQuote = getCurrentWeekQuote();
@@ -62,6 +66,37 @@ const Home = () => {
       </div>
 
       <div className="p-6 space-y-6">
+        {/* Chat with Nunu - Conversation Starter */}
+        <Card 
+          className="shadow-gentle border-none bg-card cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02]"
+          onClick={() => onTabChange?.('chat')}
+        >
+          <CardContent className="p-5">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                  <MessageCircle className="h-6 w-6 text-primary animate-comfort-pulse" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-gentle-bounce"></div>
+              </div>
+              
+              <div className="flex-1">
+                <h3 className="font-semibold text-foreground mb-1">Chat with Nunu</h3>
+                <p className="text-muted-foreground text-sm">
+                  What's on your mind today, mama? 💭
+                </p>
+                <p className="text-xs text-primary mt-1 font-medium">
+                  Tap to start chatting • Nunu is listening...
+                </p>
+              </div>
+              
+              <div className="text-2xl">
+                💬
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Mood Check-in */}
         {!hasCheckedIn ? (
           <Card className="shadow-gentle border-none">
@@ -150,13 +185,6 @@ const Home = () => {
               <CardContent className="p-4 text-center">
                 <div className="text-2xl mb-2">🎵</div>
                 <span className="text-sm font-medium">Voice Note</span>
-              </CardContent>
-            </Card>
-            
-            <Card className="shadow-nurture border-none cursor-pointer hover:scale-105 transition-transform">
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">💬</div>
-                <span className="text-sm font-medium">Chat Support</span>
               </CardContent>
             </Card>
           </div>

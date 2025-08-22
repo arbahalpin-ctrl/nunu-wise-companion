@@ -30,7 +30,7 @@ const Index = () => {
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'home':
-        return <Home />;
+        return <Home onTabChange={setActiveTab} />;
       case 'baby':
         return <BabyProfile />;
       case 'routines':
@@ -42,7 +42,7 @@ const Index = () => {
       case 'settings':
         return <Settings />;
       default:
-        return <Home />;
+        return <Home onTabChange={setActiveTab} />;
     }
   };
 
