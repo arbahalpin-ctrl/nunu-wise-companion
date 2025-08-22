@@ -97,6 +97,23 @@ const Home = ({ onTabChange }: HomeProps) => {
           </CardContent>
         </Card>
 
+        {/* Quote of the Day */}
+        <Card className="shadow-gentle border-none bg-accent/20 backdrop-blur-sm">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <div className="text-lg">✨</div>
+              <div className="flex-1">
+                <p className="text-sm text-accent-foreground italic leading-relaxed">
+                  "{currentQuote.quote}" {currentQuote.emoji}
+                </p>
+                <p className="text-xs text-muted-foreground mt-2 font-medium">
+                  Quote of the day
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Mood Check-in */}
         {!hasCheckedIn ? (
           <Card className="shadow-gentle border-none">
@@ -190,14 +207,6 @@ const Home = ({ onTabChange }: HomeProps) => {
           </div>
         </div>
 
-        {/* Gentle Reminder */}
-        <Card className="shadow-gentle border-none bg-accent-soft">
-          <CardContent className="p-4">
-            <p className="text-sm text-accent-foreground italic text-center">
-              "{currentQuote.quote}" {currentQuote.emoji}
-            </p>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
