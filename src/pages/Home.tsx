@@ -13,7 +13,9 @@ const Home = () => {
     { id: 'light', icon: 'emoji', emoji: '✨', label: 'Light today', color: 'text-nunu-yellow' },
     { id: 'hopeful', icon: Sparkles, label: 'Hopeful', color: 'text-primary' },
     { id: 'tender', icon: 'emoji', emoji: '🧸', label: 'Tender', color: 'text-nunu-peach' },
+    { id: 'hanging', icon: 'emoji', emoji: '🫶', label: 'Hanging in there', color: 'text-nunu-sage' },
     { id: 'exhausted', icon: Bed, label: 'Exhausted', color: 'text-muted-foreground' },
+    { id: 'tearful', icon: 'emoji', emoji: '😢', label: 'Tearful', color: 'text-blue-400' },
     { id: 'overwhelmed', icon: HelpCircle, label: 'Overwhelmed', color: 'text-orange-400' },
     { id: 'unknown', icon: HelpCircle, label: "I don't know what I feel", color: 'text-muted-foreground' },
   ];
