@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Heart, Smile, Meh, Frown, Zap } from 'lucide-react';
+import { Heart, Smile, Meh, Frown, Zap, Bed, Sparkles, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import heroImage from '@/assets/nunu-hero.jpg';
@@ -11,8 +11,12 @@ const Home = () => {
   const moods = [
     { id: 'great', icon: Zap, label: 'Energized', color: 'text-nunu-yellow' },
     { id: 'good', icon: Smile, label: 'Good', color: 'text-nunu-sage' },
+    { id: 'hopeful', icon: Sparkles, label: 'Hopeful', color: 'text-primary' },
     { id: 'okay', icon: Meh, label: 'Okay', color: 'text-accent' },
+    { id: 'exhausted', icon: Bed, label: 'Exhausted', color: 'text-muted-foreground' },
+    { id: 'overwhelmed', icon: HelpCircle, label: 'Overwhelmed', color: 'text-orange-400' },
     { id: 'struggling', icon: Frown, label: 'Struggling', color: 'text-destructive' },
+    { id: 'unknown', icon: HelpCircle, label: "I don't know what I feel", color: 'text-muted-foreground' },
   ];
 
   const handleMoodSelect = (moodId: string) => {
@@ -59,7 +63,7 @@ const Home = () => {
               </div>
               
               <p className="text-muted-foreground text-sm mb-4">
-                Take a moment to acknowledge how you're feeling. There's no right or wrong answer.
+                Your feelings matter. Let's gently name them — no pressure, no judgment.
               </p>
 
               <div className="grid grid-cols-2 gap-3 mb-4">
