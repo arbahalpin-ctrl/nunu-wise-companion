@@ -64,7 +64,7 @@ const ChatAssistant = () => {
             <Bot className="h-6 w-6 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-foreground">Nunu AI</h1>
+            <h1 className="text-xl font-bold text-foreground">Nunu</h1>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <div className="w-2 h-2 bg-nunu-sage rounded-full animate-pulse" />
               Online & ready to help
