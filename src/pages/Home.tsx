@@ -106,9 +106,6 @@ const Home = ({ onTabChange }: HomeProps) => {
                 <p className="text-sm text-accent-foreground italic leading-relaxed">
                   "{currentQuote.quote}" {currentQuote.emoji}
                 </p>
-                <p className="text-xs text-muted-foreground mt-2 font-medium">
-                  Quote of the day
-                </p>
               </div>
             </div>
           </CardContent>
