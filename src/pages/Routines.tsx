@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { Plus, Clock, Baby, Moon, AlertCircle } from 'lucide-react';
+import { Plus, Clock, Baby, Moon, AlertCircle, BarChart3, Sun, Eye, EyeOff, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
 
 interface RoutineEntry {
   id: string;
@@ -10,15 +12,24 @@ interface RoutineEntry {
   time: string;
   duration?: string;
   notes?: string;
+  isNighttime?: boolean;
 }
 
 const Routines = () => {
   const [entries] = useState<RoutineEntry[]>([
-    { id: '1', type: 'feeding', time: '08:30', duration: '25 min', notes: 'Good latch' },
-    { id: '2', type: 'diaper', time: '09:15', notes: 'Wet diaper' },
-    { id: '3', type: 'sleep', time: '10:00', duration: '2h 30min', notes: 'Peaceful nap' },
-    { id: '4', type: 'feeding', time: '12:45', duration: '20 min' },
+    { id: '1', type: 'feeding', time: '08:30', duration: '25 min', notes: 'Good latch', isNighttime: false },
+    { id: '2', type: 'diaper', time: '09:15', notes: 'Wet diaper', isNighttime: false },
+    { id: '3', type: 'sleep', time: '10:00', duration: '2h 30min', notes: 'Peaceful nap', isNighttime: false },
+    { id: '4', type: 'feeding', time: '12:45', duration: '20 min', isNighttime: false },
+    { id: '5', type: 'sleep', time: '13:15', duration: '1h 45min', notes: 'Longest nap of the day', isNighttime: false },
+    { id: '6', type: 'feeding', time: '15:30', duration: '30 min', isNighttime: false },
+    { id: '7', type: 'diaper', time: '16:00', notes: 'Clean diaper', isNighttime: false },
+    { id: '8', type: 'feeding', time: '02:30', duration: '15 min', notes: 'Night feed', isNighttime: true },
+    { id: '9', type: 'diaper', time: '02:45', notes: 'Quick change', isNighttime: true },
   ]);
+
+  const [showTimeline, setShowTimeline] = useState(false);
+  const [showNightData, setShowNightData] = useState(false);
 
   const getEntryIcon = (type: string) => {
     switch (type) {
@@ -38,10 +49,36 @@ const Routines = () => {
     }
   };
 
-  const todayEntries = entries.filter(entry => {
-    // For demo, showing all entries as "today"
-    return true;
-  });
+  const predictNextFeed = () => {
+    const feedingEntries = entries.filter(e => e.type === 'feeding').sort((a, b) => a.time.localeCompare(b.time));
+    if (feedingEntries.length < 2) return null;
+    
+    const lastFeed = feedingEntries[feedingEntries.length - 1];
+    const avgInterval = 3; // hours (could calculate from actual data)
+    const lastTime = new Date(`2024-01-01 ${lastFeed.time}`);
+    const nextTime = new Date(lastTime.getTime() + avgInterval * 60 * 60 * 1000);
+    
+    return nextTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const getSmartInsight = () => {
+    const sleepEntries = entries.filter(e => e.type === 'sleep' && !e.isNighttime);
+    const longestNap = sleepEntries.reduce((prev, current) => {
+      const prevDuration = prev.duration?.includes('h') ? parseInt(prev.duration) * 60 : 0;
+      const currentDuration = current.duration?.includes('h') ? parseInt(current.duration) * 60 : 0;
+      return currentDuration > prevDuration ? current : prev;
+    }, sleepEntries[0]);
+
+    if (longestNap) {
+      return `Emma usually takes her longest nap around ${longestNap.time}. You might want to plan some rest time for yourself too 💆‍♀️`;
+    }
+    return "Emma's settling into her rhythm beautifully. Keep noting these patterns — they'll help you both find your flow ✨";
+  };
+
+  const getDayEntries = () => entries.filter(entry => !entry.isNighttime);
+  const getNightEntries = () => entries.filter(entry => entry.isNighttime);
+  
+  const displayEntries = showNightData ? entries : getDayEntries();
 
   return (
     <div className="pb-20 min-h-screen bg-gradient-comfort">
@@ -51,6 +88,50 @@ const Routines = () => {
       </div>
 
       <div className="p-6 space-y-6">
+        {/* Smart Pattern Summary */}
+        <Card className="shadow-gentle border-none bg-gradient-to-r from-accent-soft to-secondary-soft">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <TrendingUp className="h-5 w-5 text-primary mt-0.5" />
+              <div>
+                <h4 className="font-medium text-sm mb-2">Pattern Insight</h4>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {getSmartInsight()}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* View Controls */}
+        <div className="flex items-center justify-between bg-card rounded-xl p-4 shadow-gentle">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm">Timeline view</span>
+              <Switch 
+                checked={showTimeline} 
+                onCheckedChange={setShowTimeline}
+              />
+            </div>
+            <Separator orientation="vertical" className="h-4" />
+            <div className="flex items-center gap-2">
+              <Moon className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm">Show overnight</span>
+              <Switch 
+                checked={showNightData} 
+                onCheckedChange={setShowNightData}
+              />
+            </div>
+          </div>
+          
+          {/* Next Event Prediction */}
+          {predictNextFeed() && (
+            <Badge variant="outline" className="bg-primary-soft text-primary-foreground">
+              🕐 Next expected feed: ~{predictNextFeed()}
+            </Badge>
+          )}
+        </div>
         {/* Quick Add Buttons */}
         <div className="grid grid-cols-3 gap-3">
           <Button className="h-16 flex-col gap-1 bg-nunu-peach hover:bg-nunu-peach/90 rounded-2xl shadow-gentle">
@@ -67,25 +148,107 @@ const Routines = () => {
           </Button>
         </div>
 
+        {/* Timeline View */}
+        {showTimeline && (
+          <Card className="shadow-gentle border-none">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                Visual Timeline
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {/* Timeline hours */}
+                <div className="grid grid-cols-24 gap-px text-xs text-muted-foreground">
+                  {Array.from({length: 24}, (_, i) => (
+                    <div key={i} className="text-center">
+                      {i.toString().padStart(2, '0')}
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Feeding timeline */}
+                <div className="relative">
+                  <span className="text-xs text-muted-foreground mr-2">🍼</span>
+                  <div className="grid grid-cols-24 gap-px">
+                    {Array.from({length: 24}, (_, hour) => {
+                      const hasFeeding = displayEntries.some(entry => 
+                        entry.type === 'feeding' && parseInt(entry.time.split(':')[0]) === hour
+                      );
+                      return (
+                        <div 
+                          key={hour} 
+                          className={`h-4 rounded-sm ${hasFeeding ? 'bg-nunu-peach' : 'bg-muted/30'}`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Sleep timeline */}
+                <div className="relative">
+                  <span className="text-xs text-muted-foreground mr-2">😴</span>
+                  <div className="grid grid-cols-24 gap-px">
+                    {Array.from({length: 24}, (_, hour) => {
+                      const hasSleep = displayEntries.some(entry => 
+                        entry.type === 'sleep' && parseInt(entry.time.split(':')[0]) === hour
+                      );
+                      return (
+                        <div 
+                          key={hour} 
+                          className={`h-4 rounded-sm ${hasSleep ? 'bg-nunu-lavender' : 'bg-muted/30'}`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Diaper timeline */}
+                <div className="relative">
+                  <span className="text-xs text-muted-foreground mr-2">👶</span>
+                  <div className="grid grid-cols-24 gap-px">
+                    {Array.from({length: 24}, (_, hour) => {
+                      const hasDiaper = displayEntries.some(entry => 
+                        entry.type === 'diaper' && parseInt(entry.time.split(':')[0]) === hour
+                      );
+                      return (
+                        <div 
+                          key={hour} 
+                          className={`h-4 rounded-sm ${hasDiaper ? 'bg-nunu-sage' : 'bg-muted/30'}`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Today's Timeline */}
         <Card className="shadow-gentle border-none">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-primary" />
-              Today's Timeline
+              {showNightData ? "Today's Complete Timeline" : "Daytime Activities"}
+              {showNightData && getNightEntries().length > 0 && (
+                <Badge variant="secondary" className="text-xs">
+                  {getNightEntries().length} overnight
+                </Badge>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {todayEntries.length === 0 ? (
-              <div className="text-center py-8">
-                <Baby className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-muted-foreground">No entries yet today</p>
-                <p className="text-sm text-muted-foreground">Tap the buttons above to start tracking</p>
-              </div>
-            ) : (
+            {/* Day entries */}
+            {getDayEntries().length > 0 && (
               <div className="space-y-3">
-                {todayEntries.map((entry) => (
-                  <div key={entry.id} className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/50 transition-colors">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Sun className="h-4 w-4" />
+                  <span>Daytime ({getDayEntries().length} activities)</span>
+                </div>
+                {getDayEntries().map((entry) => (
+                  <div key={entry.id} className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/50 transition-colors ml-6">
                     <div className="text-2xl">
                       {getEntryIcon(entry.type)}
                     </div>
@@ -105,6 +268,46 @@ const Routines = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Night entries */}
+            {showNightData && getNightEntries().length > 0 && (
+              <div className="space-y-3">
+                <Separator className="my-4" />
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Moon className="h-4 w-4" />
+                  <span>Overnight ({getNightEntries().length} activities)</span>
+                </div>
+                {getNightEntries().map((entry) => (
+                  <div key={entry.id} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-secondary-soft/30 ml-6">
+                    <div className="text-2xl">
+                      {getEntryIcon(entry.type)}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Badge variant="secondary" className={`${getEntryColor(entry.type)} text-xs`}>
+                          {entry.type}
+                        </Badge>
+                        <span className="text-sm font-medium">{entry.time}</span>
+                        {entry.duration && (
+                          <span className="text-xs text-muted-foreground">• {entry.duration}</span>
+                        )}
+                      </div>
+                      {entry.notes && (
+                        <p className="text-sm text-muted-foreground">{entry.notes}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {displayEntries.length === 0 && (
+              <div className="text-center py-8">
+                <Baby className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-muted-foreground">No entries yet today</p>
+                <p className="text-sm text-muted-foreground">Tap the buttons above to start tracking</p>
               </div>
             )}
           </CardContent>
@@ -128,6 +331,21 @@ const Routines = () => {
               <div>
                 <div className="text-2xl font-bold text-nunu-sage">31</div>
                 <div className="text-xs text-muted-foreground">Diapers</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Gentle Routine Suggestions */}
+        <Card className="shadow-gentle border-none bg-gradient-to-br from-accent-soft to-secondary-soft">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <div className="text-lg">🐨</div>
+              <div>
+                <h4 className="font-medium text-sm mb-2">Today's Gentle Insight</h4>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Emma slept a bit less than usual today. You might want to keep the evening wind-down extra calm and gentle.
+                </p>
               </div>
             </div>
           </CardContent>
