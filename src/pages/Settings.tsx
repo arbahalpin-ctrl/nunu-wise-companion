@@ -129,6 +129,16 @@ const Settings = () => {
           </CardContent>
         </Card>
 
+        {/* About Nunu */}
+        <Card className="shadow-gentle border-none bg-gradient-to-br from-secondary-soft to-accent-soft/30">
+          <CardContent className="p-6 text-center">
+            <h3 className="text-lg font-semibold mb-4 text-foreground">About Nunu</h3>
+            <p className="text-sm text-muted-foreground font-serif leading-relaxed">
+              Motherhood is deeply personal, often overwhelming. Nunu is here to offer personalized support, grounded in empathy and understanding — so every mum feels seen, heard, and gently guided through her unique journey. 💕
+            </p>
+          </CardContent>
+        </Card>
+
         {/* Privacy & Support */}
         <Card className="shadow-gentle border-none">
           <CardHeader>
