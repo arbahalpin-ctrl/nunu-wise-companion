@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Heart, Zap, Bed, Sparkles, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { getCurrentWeekQuote } from '@/data/weeklyQuotes';
 import heroImage from '@/assets/nunu-hero.jpg';
 
 const Home = () => {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [hasCheckedIn, setHasCheckedIn] = useState(false);
+  const currentQuote = getCurrentWeekQuote();
 
   const moods = [
     { id: 'great', icon: Zap, label: 'Energized', color: 'text-nunu-yellow' },
@@ -158,7 +160,7 @@ const Home = () => {
         <Card className="shadow-gentle border-none bg-accent-soft">
           <CardContent className="p-4">
             <p className="text-sm text-accent-foreground italic text-center">
-              "You are stronger than you think and more loved than you know." 🌸
+              "{currentQuote.quote}" {currentQuote.emoji}
             </p>
           </CardContent>
         </Card>
