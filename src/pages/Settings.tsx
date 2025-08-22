@@ -1,13 +1,23 @@
-import { Crown, Heart, Bell, Shield, HelpCircle, Star, Check } from 'lucide-react';
+import { Crown, Heart, Bell, Shield, HelpCircle, Star, Check, Baby, MessageSquare, Calendar, Globe, Palette, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 const Settings = () => {
   const navigate = useNavigate();
   const isPremium = false; // This would come from user state
+  const [babyName, setBabyName] = useState("Emma");
+  const [babyPronouns, setBabyPronouns] = useState("she/her");
+  const [aiTone, setAiTone] = useState("soft-encouraging");
+  const [motherhoodStage, setMotherhoodStage] = useState("newborn");
+  const [quoteTheme, setQuoteTheme] = useState("empowering");
 
   const premiumFeatures = [
     'Unlimited AI chat support',
@@ -96,6 +106,72 @@ const Settings = () => {
           </Card>
         )}
 
+        {/* Personalization Section */}
+        <Card className="shadow-gentle border-none">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Baby className="h-5 w-5 text-primary" />
+              Personalize Nunu
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="baby-name" className="text-sm font-medium">Baby's name</Label>
+              <Input
+                id="baby-name"
+                value={babyName}
+                onChange={(e) => setBabyName(e.target.value)}
+                className="rounded-xl"
+                placeholder="Enter baby's name"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="baby-pronouns" className="text-sm font-medium">Pronouns</Label>
+              <Select value={babyPronouns} onValueChange={setBabyPronouns}>
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="she/her">She/Her</SelectItem>
+                  <SelectItem value="he/him">He/Him</SelectItem>
+                  <SelectItem value="they/them">They/Them</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">AI support tone</Label>
+              <Select value={aiTone} onValueChange={setAiTone}>
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="soft-encouraging">Soft & Encouraging</SelectItem>
+                  <SelectItem value="warm-realistic">Warm but Realistic</SelectItem>
+                  <SelectItem value="light-uplifting">Light & Uplifting</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Current stage</Label>
+              <Select value={motherhoodStage} onValueChange={setMotherhoodStage}>
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pregnancy">Pregnancy</SelectItem>
+                  <SelectItem value="newborn">Newborn</SelectItem>
+                  <SelectItem value="infant">Infant</SelectItem>
+                  <SelectItem value="toddler">Toddler</SelectItem>
+                  <SelectItem value="post-weaning">Post-weaning</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Notifications */}
         <Card className="shadow-gentle border-none">
           <CardHeader>
@@ -128,6 +204,60 @@ const Settings = () => {
               </div>
               <Switch defaultChecked />
             </div>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">Customize daily quotes</p>
+                <p className="text-sm text-muted-foreground">Choose themes that resonate with you</p>
+              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="rounded-xl">
+                    <Palette className="h-4 w-4 mr-1" />
+                    Themes
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-card border-none shadow-gentle">
+                  <DialogHeader>
+                    <DialogTitle>Quote Themes</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-3">
+                    {['empowering', 'grounded', 'funny-light', 'spiritual', 'random-mix'].map((theme) => (
+                      <div key={theme} className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          id={theme}
+                          name="quote-theme"
+                          value={theme}
+                          checked={quoteTheme === theme}
+                          onChange={(e) => setQuoteTheme(e.target.value)}
+                          className="text-primary"
+                        />
+                        <Label htmlFor={theme} className="text-sm capitalize cursor-pointer">
+                          {theme.replace('-', ' & ').replace('funny-light', 'Funny/Light')}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Mood Check-in History */}
+        <Card className="shadow-gentle border-none">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-primary" />
+              Mood History
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button variant="ghost" className="w-full justify-start rounded-xl">
+              <MessageSquare className="h-4 w-4 mr-3" />
+              View past check-ins & journal entries
+            </Button>
           </CardContent>
         </Card>
 
@@ -138,6 +268,38 @@ const Settings = () => {
             <p className="text-sm text-muted-foreground font-serif leading-relaxed">
               Motherhood is deeply personal, often overwhelming. Nunu is here to offer personalized support, grounded in empathy and understanding — so every mum feels seen, heard, and gently guided through her unique journey. 💕
             </p>
+          </CardContent>
+        </Card>
+
+        {/* Mental Health Support */}
+        <Card className="shadow-gentle border-none bg-accent-soft">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Phone className="h-5 w-5 text-primary" />
+              Need a Little Extra Support?
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground mb-4">
+              If you're feeling low, anxious, or just need someone to talk to — here are some resources that can help.
+            </p>
+            
+            <div className="grid gap-2">
+              <Button variant="ghost" className="w-full justify-start rounded-xl text-left">
+                <Phone className="h-4 w-4 mr-3 text-primary" />
+                Postpartum helpline
+              </Button>
+              
+              <Button variant="ghost" className="w-full justify-start rounded-xl">
+                <Heart className="h-4 w-4 mr-3 text-primary" />
+                Breathing exercise
+              </Button>
+              
+              <Button variant="ghost" className="w-full justify-start rounded-xl">
+                <MessageSquare className="h-4 w-4 mr-3 text-primary" />
+                Reflection journal
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
@@ -157,6 +319,11 @@ const Settings = () => {
             >
               <HelpCircle className="h-4 w-4 mr-3" />
               Help & FAQ
+            </Button>
+            
+            <Button variant="ghost" className="w-full justify-start rounded-xl">
+              <Globe className="h-4 w-4 mr-3" />
+              Language & Region
             </Button>
             
             <Button variant="ghost" className="w-full justify-start rounded-xl">
