@@ -5,7 +5,7 @@ import FloatingChatButton from '@/components/FloatingChatButton';
 import Home from '@/pages/Home';
 import BabyProfile from '@/pages/BabyProfile';
 import Routines from '@/pages/Routines';
-import VoiceNotes from '@/pages/VoiceNotes';
+import Reflections from '@/pages/Reflections';
 import ChatAssistant from '@/pages/ChatAssistant';
 import Settings from '@/pages/Settings';
 
@@ -41,7 +41,7 @@ const Index = () => {
       case 'routines':
         return <Routines />;
       case 'notes':
-        return <VoiceNotes />;
+        return <Reflections />;
       case 'chat':
         return <ChatAssistant />;
       case 'settings':
