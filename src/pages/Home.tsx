@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Heart, Zap, Bed, Sparkles, HelpCircle, MessageCircle } from 'lucide-react';
+import { Heart, Zap, Bed, Sparkles, HelpCircle, MessageCircle, Baby, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { getCurrentWeekQuote } from '@/data/weeklyQuotes';
@@ -13,6 +13,27 @@ const Home = ({ onTabChange }: HomeProps) => {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [hasCheckedIn, setHasCheckedIn] = useState(false);
   const currentQuote = getCurrentWeekQuote();
+
+  // Sample baby data - this would come from baby profile in a real app
+  const babyData = {
+    name: "Emma",
+    birthDate: new Date(Date.now() - (45 * 24 * 60 * 60 * 1000)), // 45 days ago
+    lastFeed: "2 hours ago",
+    lastSleep: "30 mins ago"
+  };
+
+  const getBabyAge = () => {
+    const ageInDays = Math.floor((Date.now() - babyData.birthDate.getTime()) / (1000 * 60 * 60 * 24));
+    if (ageInDays < 14) {
+      return `${ageInDays} days old`;
+    } else if (ageInDays < 70) {
+      const weeks = Math.floor(ageInDays / 7);
+      return `${weeks} week${weeks > 1 ? 's' : ''} old`;
+    } else {
+      const months = Math.floor(ageInDays / 30);
+      return `${months} month${months > 1 ? 's' : ''} old`;
+    }
+  };
 
   const moods = [
     { id: 'great', icon: Zap, label: 'Energized', color: 'text-primary' },
@@ -106,6 +127,41 @@ const Home = ({ onTabChange }: HomeProps) => {
                 <p className="text-sm text-accent-foreground italic leading-relaxed">
                   "{currentQuote.quote}" {currentQuote.emoji}
                 </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Baby Summary Widget */}
+        <Card className="shadow-gentle border-none bg-gradient-to-r from-primary/5 to-primary/10">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                <Baby className="h-6 w-6 text-primary" />
+              </div>
+              
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-semibold text-foreground">{babyData.name}</h3>
+                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
+                    {getBabyAge()}
+                  </span>
+                </div>
+                
+                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-blue-500/60 rounded-full"></div>
+                    <span>Fed {babyData.lastFeed}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-purple-500/60 rounded-full"></div>
+                    <span>Slept {babyData.lastSleep}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="text-xl">
+                👶
               </div>
             </div>
           </CardContent>
