@@ -3,7 +3,7 @@ import { Heart, Zap, Bed, Sparkles, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { getCurrentWeekQuote } from '@/data/weeklyQuotes';
-import koalaHero from '@/assets/koala-hero.jpg';
+import koalaHero from '@/assets/koala-minimal.jpg';
 
 const Home = () => {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
