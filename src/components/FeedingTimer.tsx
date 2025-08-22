@@ -7,6 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 interface FeedingTimerProps {
   onBack: () => void;
   onSaveFeed: (feed: FeedingLog) => void;
+  initialFeedingType?: 'left-breast' | 'right-breast' | 'bottle';
+  previousNotes?: string;
 }
 
 export interface FeedingLog {
@@ -17,11 +19,11 @@ export interface FeedingLog {
   notes: string;
 }
 
-const FeedingTimer = ({ onBack, onSaveFeed }: FeedingTimerProps) => {
+const FeedingTimer = ({ onBack, onSaveFeed, initialFeedingType, previousNotes }: FeedingTimerProps) => {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [seconds, setSeconds] = useState(0);
-  const [feedingType, setFeedingType] = useState<'left-breast' | 'right-breast' | 'bottle' | null>(null);
-  const [notes, setNotes] = useState('');
+  const [feedingType, setFeedingType] = useState<'left-breast' | 'right-breast' | 'bottle' | null>(initialFeedingType || null);
+  const [notes, setNotes] = useState(previousNotes || '');
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [showChimeWarning, setShowChimeWarning] = useState(false);
 

@@ -6,6 +6,7 @@ import { getCurrentWeekQuote } from '@/data/weeklyQuotes';
 import koalaHero from '@/assets/koala-gentle.png';
 import FeedingTimer, { FeedingLog as FeedingLogType } from '@/components/FeedingTimer';
 import FeedingLog from '@/components/FeedingLog';
+import BreastSwitchPrompt from '@/components/BreastSwitchPrompt';
 
 interface HomeProps {
   onTabChange?: (tab: string) => void;
@@ -16,6 +17,12 @@ const Home = ({ onTabChange }: HomeProps) => {
   const [hasCheckedIn, setHasCheckedIn] = useState(false);
   const [showFeedingTimer, setShowFeedingTimer] = useState(false);
   const [feedingLogs, setFeedingLogs] = useState<FeedingLogType[]>([]);
+  const [showBreastSwitchPrompt, setShowBreastSwitchPrompt] = useState(false);
+  const [lastFeedNotes, setLastFeedNotes] = useState('');
+  const [timerProps, setTimerProps] = useState<{
+    initialFeedingType?: 'left-breast' | 'right-breast' | 'bottle';
+    previousNotes?: string;
+  }>({});
   const currentQuote = getCurrentWeekQuote();
 
   // Sample baby data - this would come from baby profile in a real app
@@ -64,7 +71,34 @@ const Home = ({ onTabChange }: HomeProps) => {
 
   const handleSaveFeed = (feed: FeedingLogType) => {
     setFeedingLogs(prev => [...prev, feed]);
-    setShowFeedingTimer(false);
+    setLastFeedNotes(feed.notes);
+    
+    // If it was a left breast feed, prompt for right breast
+    if (feed.feedingType === 'left-breast') {
+      setShowFeedingTimer(false);
+      setShowBreastSwitchPrompt(true);
+    } else {
+      setShowFeedingTimer(false);
+    }
+  };
+
+  const handleBreastSwitchYes = () => {
+    setShowBreastSwitchPrompt(false);
+    setTimerProps({
+      initialFeedingType: 'right-breast',
+      previousNotes: lastFeedNotes
+    });
+    setShowFeedingTimer(true);
+  };
+
+  const handleBreastSwitchNo = () => {
+    setShowBreastSwitchPrompt(false);
+    setTimerProps({});
+  };
+
+  const handleStartFeedingTimer = () => {
+    setTimerProps({});
+    setShowFeedingTimer(true);
   };
 
   if (showFeedingTimer) {
@@ -72,6 +106,8 @@ const Home = ({ onTabChange }: HomeProps) => {
       <FeedingTimer 
         onBack={() => setShowFeedingTimer(false)}
         onSaveFeed={handleSaveFeed}
+        initialFeedingType={timerProps.initialFeedingType}
+        previousNotes={timerProps.previousNotes}
       />
     );
   }
@@ -257,7 +293,7 @@ const Home = ({ onTabChange }: HomeProps) => {
           <div className="grid grid-cols-2 gap-3">
             <Card 
               className="shadow-nurture border-none cursor-pointer hover:scale-105 transition-transform"
-              onClick={() => setShowFeedingTimer(true)}
+              onClick={handleStartFeedingTimer}
             >
               <CardContent className="p-4 text-center">
                 <div className="text-2xl mb-2">🍼</div>
@@ -283,6 +319,13 @@ const Home = ({ onTabChange }: HomeProps) => {
 
         {/* Today's Feeding Log */}
         {feedingLogs.length > 0 && <FeedingLog feeds={feedingLogs} />}
+
+        {/* Breast Switch Prompt */}
+        <BreastSwitchPrompt
+          isVisible={showBreastSwitchPrompt}
+          onYes={handleBreastSwitchYes}
+          onNo={handleBreastSwitchNo}
+        />
       </div>
     </div>
   );
