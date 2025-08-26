@@ -12,48 +12,113 @@ interface Message {
 }
 
 const ChatAssistant = () => {
-  const [messages] = useState<Message[]>([
+  const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       type: 'assistant',
-      content: "Hi there! I'm here to help you navigate this parenting journey. I noticed Emma usually has her morning feed around this time - how did it go today?",
-      timestamp: '10:30'
-    },
-    {
-      id: '2',
-      type: 'user',
-      content: "She was a bit fussy during feeding this morning. I'm worried I'm doing something wrong.",
-      timestamp: '10:32'
-    },
-    {
-      id: '3',
-      type: 'assistant',
-      content: "That sounds frustrating — but you're not doing anything wrong. Lots of babies have fussy feeds, especially during growth spurts. Some mums find gentle rocking helps — maybe give that a try and see how she responds? You're doing your best, and that matters.",
-      timestamp: '10:33'
+      content: "Hello lovely! I'm Nunu, your gentle sleep consultant. I'm here to listen without judgment and help you through any sleep challenges. How are you feeling about bedtime and sleep routines lately? 💙",
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
   
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
-  const handleSend = () => {
-    if (newMessage.trim()) {
-      // Add user message logic here
-      setNewMessage('');
-      setIsTyping(true);
-      
-      // Simulate AI response
-      setTimeout(() => {
-        setIsTyping(false);
-      }, 2000);
+  // Generate intelligent AI responses based on user input
+  const generateNunuResponse = (userMessage: string): string => {
+    const message = userMessage.toLowerCase();
+    
+    // Sleep-related responses
+    if (message.includes('sleep') || message.includes('bedtime') || message.includes('night')) {
+      const sleepResponses = [
+        "Sleep challenges are so common, mama. Every baby is different, and finding what works takes time. What's been the biggest struggle for you lately? 💤",
+        "I hear you on the sleep struggles. Remember, there's no perfect baby sleep - only what works for your family. Can you tell me about your current bedtime routine?",
+        "Sleep deprivation is hard on everyone. You're not alone in this journey. What time does your little one usually go to bed? Let's start there and work together. 🌙",
+        "It sounds like sleep has been challenging. That's completely normal! Many families go through this. What would feel like a win for you right now - even a small one?"
+      ];
+      return sleepResponses[Math.floor(Math.random() * sleepResponses.length)];
     }
+    
+    // Overwhelmed/emotional responses  
+    if (message.includes('overwhelmed') || message.includes('tired') || message.includes('exhausted') || message.includes('help')) {
+      return "Oh sweetheart, I can hear how tired you are. Being a parent is one of the hardest things we ever do, and it's okay to feel overwhelmed. You're doing so much more right than you realize. Take a deep breath - we'll figure this out together, one gentle step at a time. 🤗";
+    }
+    
+    // Wake ups during the night
+    if (message.includes('wake') || message.includes('waking') || message.includes('night wake')) {
+      return "Night wakings can be so draining. Every baby wakes during the night - it's completely normal. The goal isn't to eliminate all wakes, but to help your little one learn to settle back to sleep more easily. How many times are they typically waking? And how long does it usually take to get them back down?";
+    }
+    
+    // Nap-related
+    if (message.includes('nap') || message.includes('napping')) {
+      return "Naps can be tricky! They're so important for both baby and you to recharge. Some babies are natural nappers, others need more help learning. What's happening with naps right now? Are they too short, hard to start, or not happening at all?";
+    }
+    
+    // Age-related questions
+    if (message.includes('month') || message.includes('old') || message.includes('age')) {
+      return "Every age and stage brings new sleep patterns. What works at one age might need adjusting as they grow - and that's completely normal. How old is your little one? Understanding their developmental stage helps me give you better guidance. 👶";
+    }
+    
+    // Routine/schedule questions
+    if (message.includes('routine') || message.includes('schedule')) {
+      return "Routines can be so helpful, but they don't have to be rigid! Think of it as a gentle rhythm rather than a strict schedule. Babies thrive on predictability, but there's room for flexibility too. What does your current bedtime routine look like?";
+    }
+    
+    // Crying/fussy
+    if (message.includes('cry') || message.includes('fussy') || message.includes('crying')) {
+      return "Crying is their only way to communicate right now, and it doesn't mean you're doing anything wrong. It's so hard to hear them upset, I know. Sometimes they cry because they're overtired, sometimes because they need comfort to settle. You know your baby best - trust your instincts along with these gentle approaches.";
+    }
+    
+    // Positive responses
+    if (message.includes('better') || message.includes('good') || message.includes('working') || message.includes('improving')) {
+      return "That's wonderful to hear! I'm so proud of the progress you're making. Small improvements add up to big changes over time. What do you think has been helping the most? Let's build on what's working! ✨";
+    }
+    
+    // Default empathetic responses
+    const defaultResponses = [
+      "Thank you for sharing that with me. It takes courage to reach out when things feel hard. I'm here to support you through this - no judgment, just gentle guidance. What feels most important to work on first?",
+      "I can hear how much you care about your little one. That love is everything, even when sleep feels impossible. Every family's journey is different, and we'll find what works for yours. What's one thing that would make tonight feel a little easier?",
+      "You're doing such important work, mama. Parenting is both beautiful and exhausting, often at the same time. I'm here to help you navigate this with kindness - for both your baby and yourself. What support do you need most right now?",
+      "Sleep challenges don't mean you're failing - they mean you're human, and your baby is learning. We'll work through this together, gently and at your own pace. What feels like the biggest priority to tackle first? 💙"
+    ];
+    
+    return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+  };
+
+  const handleSend = () => {
+    if (!newMessage.trim()) return;
+    
+    // Add user message
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: newMessage.trim(),
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
+    setNewMessage('');
+    setIsTyping(true);
+    
+    // Generate and add AI response after a realistic delay
+    setTimeout(() => {
+      const aiResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'assistant',
+        content: generateNunuResponse(newMessage),
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      
+      setMessages(prev => [...prev, aiResponse]);
+      setIsTyping(false);
+    }, 1500 + Math.random() * 1000); // Random delay between 1.5-2.5 seconds for realism
   };
 
   const suggestedQuestions = [
-    "Is this normal for her age?",
-    "Help with sleep schedule",
+    "My baby won't sleep through the night",
+    "Help with bedtime routine",
     "I'm feeling overwhelmed",
-    "Feeding tips"
+    "How many naps is normal?"
   ];
 
   return (
