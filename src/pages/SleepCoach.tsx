@@ -50,6 +50,16 @@ const SleepCoach = () => {
   const [sleepLogs, setSleepLogs] = useState<SleepLog[]>([]);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [showSleepLogging, setShowSleepLogging] = useState(false);
+  const [currentLog, setCurrentLog] = useState<Partial<SleepLog>>({
+    date: new Date().toISOString().split('T')[0],
+    bedtime: '',
+    wakeTime: '',
+    nightWakes: 0,
+    napCount: 0,
+    fallAsleepTime: '',
+    notes: ''
+  });
 
   useEffect(() => {
     const savedProfile = localStorage.getItem('nunu-sleep-profile');
@@ -73,6 +83,52 @@ const SleepCoach = () => {
       title: "Sleep profile saved",
       description: "Your personalized sleep coaching plan is ready!",
     });
+  };
+
+  const saveSleepLog = () => {
+    if (!currentLog.bedtime || !currentLog.wakeTime) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in bedtime and wake time",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newLog: SleepLog = {
+      id: Date.now().toString(),
+      date: currentLog.date || new Date().toISOString().split('T')[0],
+      bedtime: currentLog.bedtime!,
+      wakeTime: currentLog.wakeTime!,
+      nightWakes: currentLog.nightWakes || 0,
+      napCount: currentLog.napCount || 0,
+      fallAsleepTime: currentLog.fallAsleepTime || '',
+      notes: currentLog.notes || ''
+    };
+
+    const updatedLogs = [...sleepLogs, newLog];
+    setSleepLogs(updatedLogs);
+    localStorage.setItem('nunu-sleep-logs', JSON.stringify(updatedLogs));
+    
+    setShowSleepLogging(false);
+    setCurrentLog({
+      date: new Date().toISOString().split('T')[0],
+      bedtime: '',
+      wakeTime: '',
+      nightWakes: 0,
+      napCount: 0,
+      fallAsleepTime: '',
+      notes: ''
+    });
+
+    toast({
+      title: "Sleep logged! 🌙",
+      description: "Great start! I'll use this to build your personalized routine.",
+    });
+  };
+
+  const startSleepTracking = () => {
+    setShowSleepLogging(true);
   };
 
   const startOnboarding = () => {
@@ -311,6 +367,143 @@ const SleepCoach = () => {
     return renderOnboarding();
   }
 
+  const renderSleepLogging = () => (
+    <div className="min-h-screen bg-gradient-comfort p-4">
+      <div className="max-w-md mx-auto">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-6 pt-4">
+          <Button variant="ghost" size="sm" onClick={() => setShowSleepLogging(false)}>
+            ← Back
+          </Button>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+              <Moon className="w-4 h-4 text-primary-foreground" />
+            </div>
+            <h1 className="text-lg font-semibold">Sleep Tracking</h1>
+          </div>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">🐨</span>
+              <div>
+                <CardTitle className="text-lg">Let's log your first night</CardTitle>
+                <CardDescription className="leading-relaxed">
+                  I'll use this to gently build your personalized routine. Every detail helps me understand your little one better.
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            {/* Date */}
+            <div className="space-y-2">
+              <Label>Which night are we logging?</Label>
+              <Input
+                type="date"
+                value={currentLog.date}
+                onChange={(e) => setCurrentLog(prev => ({ ...prev, date: e.target.value }))}
+              />
+            </div>
+
+            {/* Bedtime */}
+            <div className="space-y-2">
+              <Label>What time did bedtime start? 🌙</Label>
+              <Input
+                type="time"
+                value={currentLog.bedtime}
+                onChange={(e) => setCurrentLog(prev => ({ ...prev, bedtime: e.target.value }))}
+                placeholder="e.g., 19:30"
+              />
+            </div>
+
+            {/* Wake time */}
+            <div className="space-y-2">
+              <Label>What time did they wake up for the day? ☀️</Label>
+              <Input
+                type="time"
+                value={currentLog.wakeTime}
+                onChange={(e) => setCurrentLog(prev => ({ ...prev, wakeTime: e.target.value }))}
+                placeholder="e.g., 07:00"
+              />
+            </div>
+
+            {/* Fall asleep time */}
+            <div className="space-y-2">
+              <Label>How long did it take to fall asleep? (minutes)</Label>
+              <Select value={currentLog.fallAsleepTime} onValueChange={(value) => setCurrentLog(prev => ({ ...prev, fallAsleepTime: value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select time" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0-5 minutes">0-5 minutes (amazing!)</SelectItem>
+                  <SelectItem value="5-15 minutes">5-15 minutes (great)</SelectItem>
+                  <SelectItem value="15-30 minutes">15-30 minutes (normal)</SelectItem>
+                  <SelectItem value="30+ minutes">30+ minutes (we can work on this)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Night wakes */}
+            <div className="space-y-2">
+              <Label>How many times did they wake during the night?</Label>
+              <Select value={currentLog.nightWakes?.toString()} onValueChange={(value) => setCurrentLog(prev => ({ ...prev, nightWakes: parseInt(value) }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select number" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">0 times (wonderful!)</SelectItem>
+                  <SelectItem value="1">1 time</SelectItem>
+                  <SelectItem value="2">2 times</SelectItem>
+                  <SelectItem value="3">3 times</SelectItem>
+                  <SelectItem value="4">4+ times</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Nap count */}
+            <div className="space-y-2">
+              <Label>How many naps did they have during the day?</Label>
+              <Select value={currentLog.napCount?.toString()} onValueChange={(value) => setCurrentLog(prev => ({ ...prev, napCount: parseInt(value) }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select number" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">No naps</SelectItem>
+                  <SelectItem value="1">1 nap</SelectItem>
+                  <SelectItem value="2">2 naps</SelectItem>
+                  <SelectItem value="3">3+ naps</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Notes */}
+            <div className="space-y-2">
+              <Label>Any notes about the night? (optional)</Label>
+              <Textarea
+                value={currentLog.notes}
+                onChange={(e) => setCurrentLog(prev => ({ ...prev, notes: e.target.value }))}
+                placeholder="e.g., seemed overtired, had a growth spurt, new environment..."
+                rows={3}
+              />
+            </div>
+
+            <div className="pt-4">
+              <Button onClick={saveSleepLog} className="w-full" size="lg">
+                Save Sleep Log 💤
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  if (showSleepLogging) {
+    return renderSleepLogging();
+  }
+
   if (!hasProfile) {
     return (
       <div className="min-h-screen bg-gradient-comfort p-4">
@@ -375,7 +568,7 @@ const SleepCoach = () => {
                 <h3 className="font-medium text-sm mb-1">{insight.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{insight.message}</p>
                 {insight.showCTA && (
-                  <Button size="sm" className="mt-3 w-full">
+                  <Button size="sm" className="mt-3 w-full" onClick={startSleepTracking}>
                     ✨ Start tracking your first night
                   </Button>
                 )}
@@ -547,7 +740,7 @@ const SleepCoach = () => {
                   <div className="text-center py-8">
                     <Baby className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
                     <p className="text-muted-foreground mb-4">Start logging sleep to track progress</p>
-                    <Button variant="outline">Log Last Night</Button>
+                    <Button variant="outline" onClick={startSleepTracking}>Log Last Night</Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
