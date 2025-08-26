@@ -12,7 +12,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
     { id: 'baby', icon: Baby, label: 'Baby' },
     { id: 'routines', icon: Clock, label: 'Routines' },
     { id: 'sleep', icon: Moon, label: 'Sleep' },
-    { id: 'notes', icon: Mic, label: 'Notes' },
+    { id: 'notes', icon: Mic, label: 'Reflect' },
     { id: 'chat', icon: MessageCircle, label: 'Chat' },
     { id: 'settings', icon: Settings, label: 'Settings' },
   ];

@@ -141,36 +141,89 @@ const Home = ({ onTabChange }: HomeProps) => {
       </div>
 
       <div className="p-6 space-y-6">
-        {/* Chat with Nunu - Conversation Starter */}
-        <Card 
-          className="shadow-gentle border-none bg-card cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02]"
-          onClick={() => onTabChange?.('chat')}
-        >
-          <CardContent className="p-5">
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                  <MessageCircle className="h-6 w-6 text-primary animate-comfort-pulse" />
+        {/* Ask Nunu - Quick Topic Starters */}
+        <div className="space-y-3">
+          <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+            <MessageCircle className="h-5 w-5 text-primary" />
+            Ask Nunu About...
+          </h3>
+          
+          <div className="grid grid-cols-2 gap-3">
+            <Card 
+              className="shadow-gentle border-none bg-card cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02]"
+              onClick={() => {
+                onTabChange?.('chat');
+                // This would pre-fill the chat with sleep support message
+              }}
+            >
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">😴</div>
+                <span className="text-sm font-medium">Sleep Support</span>
+                <p className="text-xs text-muted-foreground mt-1">Bedtime, naps, night wakes</p>
+              </CardContent>
+            </Card>
+            
+            <Card 
+              className="shadow-gentle border-none bg-card cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02]"
+              onClick={() => {
+                onTabChange?.('chat');
+                // This would pre-fill the chat with feeding message
+              }}
+            >
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">🍼</div>
+                <span className="text-sm font-medium">Feeding & Weaning</span>
+                <p className="text-xs text-muted-foreground mt-1">Breastfeeding, bottles, solids</p>
+              </CardContent>
+            </Card>
+            
+            <Card 
+              className="shadow-gentle border-none bg-card cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02]"
+              onClick={() => {
+                onTabChange?.('chat');
+                // This would pre-fill the chat with potty training message
+              }}
+            >
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">🚽</div>
+                <span className="text-sm font-medium">Potty Training</span>
+                <p className="text-xs text-muted-foreground mt-1">Readiness, tips, accidents</p>
+              </CardContent>
+            </Card>
+            
+            <Card 
+              className="shadow-gentle border-none bg-card cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02]"
+              onClick={() => {
+                onTabChange?.('chat');
+                // This would pre-fill the chat with overwhelm message
+              }}
+            >
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">🤗</div>
+                <span className="text-sm font-medium">I'm Overwhelmed</span>
+                <p className="text-xs text-muted-foreground mt-1">Emotional support & care</p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <Card 
+            className="shadow-gentle border-none bg-gradient-to-r from-primary/5 to-accent/5 cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02]"
+            onClick={() => onTabChange?.('chat')}
+          >
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <MessageCircle className="h-5 w-5 text-primary animate-comfort-pulse" />
                 </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-gentle-bounce"></div>
+                <div className="flex-1">
+                  <h4 className="font-medium text-sm">General Motherhood Chat</h4>
+                  <p className="text-xs text-muted-foreground">Open conversation with Nunu about anything</p>
+                </div>
+                <div className="text-lg">💭</div>
               </div>
-              
-              <div className="flex-1">
-                <h3 className="font-semibold text-foreground mb-1">Chat with Nunu</h3>
-                <p className="text-muted-foreground text-sm">
-                  What's on your mind today, mama? 💭
-                </p>
-                <p className="text-xs text-primary mt-1 font-medium">
-                  Tap to start chatting • Nunu is listening...
-                </p>
-              </div>
-              
-              <div className="text-2xl">
-                💬
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Quote of the Day */}
         <Card className="shadow-gentle border-none bg-accent/20 backdrop-blur-sm">

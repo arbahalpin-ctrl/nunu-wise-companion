@@ -127,7 +127,7 @@ const Reflections = () => {
   return (
     <div className="pb-20 min-h-screen bg-gradient-comfort">
       <div className="bg-gradient-calm p-6 rounded-b-3xl">
-        <h1 className="text-2xl font-bold text-foreground mb-2">Reflections</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-2">Reflect with Nunu</h1>
         <p className="text-muted-foreground">A safe space to share your thoughts and feelings — in your voice or your words</p>
       </div>
 

@@ -58,6 +58,26 @@ export const weeklyQuotes = [
     week: 12,
     quote: "Asking for help isn't giving up—it's showing your baby what healthy support looks like.",
     emoji: "🌱"
+  },
+  {
+    week: 13,
+    quote: "You're not just feeding their body, you're nourishing their soul with love.",
+    emoji: "🍼"
+  },
+  {
+    week: 14,
+    quote: "Tantrums are storms that pass. Your calm presence is their safe harbor.",
+    emoji: "⛈️"
+  },
+  {
+    week: 15,
+    quote: "Every mother doubts herself sometimes. That doubt means you care deeply.",
+    emoji: "💭"
+  },
+  {
+    week: 16,
+    quote: "You're not failing if you're trying. Progress isn't always visible.",
+    emoji: "🌿"
   }
 ];
 
@@ -69,7 +89,7 @@ export const getCurrentWeekQuote = () => {
   const oneWeek = 1000 * 60 * 60 * 24 * 7;
   const weekOfYear = Math.floor(diff / oneWeek);
   
-  // Cycle through the 12 quotes
-  const quoteIndex = weekOfYear % 12;
+  // Cycle through the 16 quotes
+  const quoteIndex = weekOfYear % 16;
   return weeklyQuotes[quoteIndex];
 };
