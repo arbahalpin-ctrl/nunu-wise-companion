@@ -552,7 +552,7 @@ const SleepCoach = () => {
         </div>
 
         {/* Input Area */}
-        {chatMessages.length > 0 && chatStep >= 0 && chatStep < 7 && (
+        {chatStep >= 0 && chatStep < 7 && (
           <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4">
             <div className="max-w-md mx-auto flex gap-3">
               <Input
@@ -564,6 +564,20 @@ const SleepCoach = () => {
               />
               <Button onClick={handleChatResponse} disabled={!currentInput.trim()}>
                 Send
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Conversation Complete Message */}
+        {chatStep === -1 && (
+          <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4">
+            <div className="max-w-md mx-auto text-center">
+              <p className="text-sm text-muted-foreground mb-3">
+                Conversation complete! Your sleep log has been saved.
+              </p>
+              <Button onClick={() => setShowSleepLogging(false)} variant="outline" size="sm">
+                Return to Sleep Coach
               </Button>
             </div>
           </div>
