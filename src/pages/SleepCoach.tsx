@@ -60,6 +60,9 @@ const SleepCoach = () => {
     fallAsleepTime: '',
     notes: ''
   });
+  const [chatStep, setChatStep] = useState(0);
+  const [chatMessages, setChatMessages] = useState<Array<{type: 'nunu' | 'user', content: string, timestamp: number}>>([]);
+  const [currentInput, setCurrentInput] = useState('');
 
   useEffect(() => {
     const savedProfile = localStorage.getItem('nunu-sleep-profile');
@@ -129,6 +132,148 @@ const SleepCoach = () => {
 
   const startSleepTracking = () => {
     setShowSleepLogging(true);
+    setChatStep(0);
+    setChatMessages([]);
+    setCurrentInput('');
+    
+    // Start the conversation
+    setTimeout(() => {
+      setChatMessages([{
+        type: 'nunu',
+        content: "Hey mama, I'm here to listen. How did bedtime go last night? Was it smooth sailing or one of those nights? 💙",
+        timestamp: Date.now()
+      }]);
+    }, 500);
+  };
+
+  const getNextQuestion = (step: number): string => {
+    const questions = [
+      "Hey mama, I'm here to listen. How did bedtime go last night? Was it smooth sailing or one of those nights? 💙",
+      "Got it, thank you for sharing. What time did you start the bedtime routine?",
+      "And what time did your little one finally fall asleep?",
+      "How many times did they wake during the night, if at all? Every wake is normal, mama.",
+      "Did they have any naps during the day? How many would you say?",
+      "How long did it take them to settle down at bedtime? Take your best guess - there's no wrong answer.",
+      "Is there anything else about the night that felt important to note? Maybe they seemed extra tired, or something was different than usual?"
+    ];
+    return questions[step] || "";
+  };
+
+  const handleChatResponse = () => {
+    if (!currentInput.trim()) return;
+
+    // Add user message
+    const userMessage = {
+      type: 'user' as const,
+      content: currentInput,
+      timestamp: Date.now()
+    };
+
+    setChatMessages(prev => [...prev, userMessage]);
+
+    // Process the response based on current step
+    setTimeout(() => {
+      let nunuResponse = "";
+      let nextStep = chatStep + 1;
+
+      switch (chatStep) {
+        case 0: // Bedtime experience
+          setCurrentLog(prev => ({ ...prev, notes: currentInput }));
+          nunuResponse = "Thank you for trusting me with that. Every night is different, and you're doing your best. 🤗";
+          break;
+        case 1: // Bedtime start
+          setCurrentLog(prev => ({ ...prev, bedtime: currentInput }));
+          nunuResponse = "Perfect, that gives me a good picture of your routine.";
+          break;
+        case 2: // Fall asleep time
+          setCurrentLog(prev => ({ ...prev, wakeTime: currentInput }));
+          nunuResponse = "I hear you. Sleep can be such a journey for our little ones.";
+          break;
+        case 3: // Night wakes
+          const wakes = parseInt(currentInput) || 0;
+          setCurrentLog(prev => ({ ...prev, nightWakes: wakes }));
+          nunuResponse = wakes === 0 ? "What a gift when they sleep through! 🌙" : 
+                       wakes === 1 ? "One wake is actually really normal for many babies." :
+                       wakes <= 3 ? "Those night wakes can be exhausting. You're handling it beautifully." :
+                       "Oh mama, those frequent wakes are tough. You're so strong for getting through each night.";
+          break;
+        case 4: // Naps
+          const naps = parseInt(currentInput) || 0;
+          setCurrentLog(prev => ({ ...prev, napCount: naps }));
+          nunuResponse = naps === 0 ? "No naps can make for a long day. You're doing great." :
+                        naps === 1 ? "One good nap can make such a difference." :
+                        "Multiple naps - that's wonderful for both of you to get some rest.";
+          break;
+        case 5: // Fall asleep time
+          setCurrentLog(prev => ({ ...prev, fallAsleepTime: currentInput }));
+          nunuResponse = "Every baby has their own rhythm for settling down. There's no perfect timeline.";
+          break;
+        case 6: // Additional notes
+          setCurrentLog(prev => ({ ...prev, notes: prev.notes + (prev.notes ? ' ' : '') + currentInput }));
+          nunuResponse = "Thanks for sharing, you're doing your best and it shows. I'll start building your sleep insights based on this first log. We'll go gently 💫";
+          nextStep = -1; // End conversation
+          break;
+      }
+
+      setChatMessages(prev => [...prev, {
+        type: 'nunu',
+        content: nunuResponse,
+        timestamp: Date.now()
+      }]);
+
+      if (nextStep >= 0 && nextStep < 7) {
+        setTimeout(() => {
+          setChatMessages(prev => [...prev, {
+            type: 'nunu',
+            content: getNextQuestion(nextStep),
+            timestamp: Date.now()
+          }]);
+          setChatStep(nextStep);
+        }, 2000);
+      } else {
+        // End conversation and save log
+        setTimeout(() => {
+          saveSleepLogFromChat();
+        }, 2000);
+      }
+    }, 1000);
+
+    setCurrentInput('');
+  };
+
+  const saveSleepLogFromChat = () => {
+    const newLog: SleepLog = {
+      id: Date.now().toString(),
+      date: currentLog.date || new Date().toISOString().split('T')[0],
+      bedtime: currentLog.bedtime || '',
+      wakeTime: currentLog.wakeTime || '',
+      nightWakes: currentLog.nightWakes || 0,
+      napCount: currentLog.napCount || 0,
+      fallAsleepTime: currentLog.fallAsleepTime || '',
+      notes: currentLog.notes || ''
+    };
+
+    const updatedLogs = [...sleepLogs, newLog];
+    setSleepLogs(updatedLogs);
+    localStorage.setItem('nunu-sleep-logs', JSON.stringify(updatedLogs));
+    
+    setShowSleepLogging(false);
+    setChatStep(0);
+    setChatMessages([]);
+    setCurrentLog({
+      date: new Date().toISOString().split('T')[0],
+      bedtime: '',
+      wakeTime: '',
+      nightWakes: 0,
+      napCount: 0,
+      fallAsleepTime: '',
+      notes: ''
+    });
+
+    toast({
+      title: "Sleep logged! 🌙",
+      description: "I'll use this to build your personalized insights. Sweet dreams ahead!",
+    });
   };
 
   const startOnboarding = () => {
@@ -368,10 +513,10 @@ const SleepCoach = () => {
   }
 
   const renderSleepLogging = () => (
-    <div className="min-h-screen bg-gradient-comfort p-4">
+    <div className="min-h-screen bg-gradient-comfort">
       <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6 pt-4">
+        <div className="flex items-center gap-3 p-4 bg-card border-b border-border">
           <Button variant="ghost" size="sm" onClick={() => setShowSleepLogging(false)}>
             ← Back
           </Button>
@@ -379,123 +524,50 @@ const SleepCoach = () => {
             <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
               <Moon className="w-4 h-4 text-primary-foreground" />
             </div>
-            <h1 className="text-lg font-semibold">Sleep Tracking</h1>
+            <div>
+              <h1 className="text-lg font-semibold">Chat with Nunu</h1>
+              <p className="text-xs text-muted-foreground">Your gentle sleep consultant</p>
+            </div>
           </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">🐨</span>
-              <div>
-                <CardTitle className="text-lg">Let's log your first night</CardTitle>
-                <CardDescription className="leading-relaxed">
-                  I'll use this to gently build your personalized routine. Every detail helps me understand your little one better.
-                </CardDescription>
+        {/* Chat Messages */}
+        <div className="p-4 space-y-4 pb-24 min-h-[calc(100vh-8rem)]">
+          {chatMessages.map((message, index) => (
+            <div key={index} className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+              {message.type === 'nunu' && (
+                <div className="w-8 h-8 rounded-full bg-nunu-cream flex items-center justify-center flex-shrink-0">
+                  🐨
+                </div>
+              )}
+              <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                message.type === 'nunu' 
+                  ? 'bg-card border border-border' 
+                  : 'bg-primary text-primary-foreground'
+              }`}>
+                <p className="text-sm leading-relaxed">{message.content}</p>
               </div>
             </div>
-          </CardHeader>
+          ))}
+        </div>
 
-          <CardContent className="space-y-6">
-            {/* Date */}
-            <div className="space-y-2">
-              <Label>Which night are we logging?</Label>
+        {/* Input Area */}
+        {chatMessages.length > 0 && chatStep >= 0 && chatStep < 7 && (
+          <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4">
+            <div className="max-w-md mx-auto flex gap-3">
               <Input
-                type="date"
-                value={currentLog.date}
-                onChange={(e) => setCurrentLog(prev => ({ ...prev, date: e.target.value }))}
+                value={currentInput}
+                onChange={(e) => setCurrentInput(e.target.value)}
+                placeholder="Type your response..."
+                onKeyPress={(e) => e.key === 'Enter' && handleChatResponse()}
+                className="flex-1"
               />
-            </div>
-
-            {/* Bedtime */}
-            <div className="space-y-2">
-              <Label>What time did bedtime start? 🌙</Label>
-              <Input
-                type="time"
-                value={currentLog.bedtime}
-                onChange={(e) => setCurrentLog(prev => ({ ...prev, bedtime: e.target.value }))}
-                placeholder="e.g., 19:30"
-              />
-            </div>
-
-            {/* Wake time */}
-            <div className="space-y-2">
-              <Label>What time did they wake up for the day? ☀️</Label>
-              <Input
-                type="time"
-                value={currentLog.wakeTime}
-                onChange={(e) => setCurrentLog(prev => ({ ...prev, wakeTime: e.target.value }))}
-                placeholder="e.g., 07:00"
-              />
-            </div>
-
-            {/* Fall asleep time */}
-            <div className="space-y-2">
-              <Label>How long did it take to fall asleep? (minutes)</Label>
-              <Select value={currentLog.fallAsleepTime} onValueChange={(value) => setCurrentLog(prev => ({ ...prev, fallAsleepTime: value }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select time" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0-5 minutes">0-5 minutes (amazing!)</SelectItem>
-                  <SelectItem value="5-15 minutes">5-15 minutes (great)</SelectItem>
-                  <SelectItem value="15-30 minutes">15-30 minutes (normal)</SelectItem>
-                  <SelectItem value="30+ minutes">30+ minutes (we can work on this)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Night wakes */}
-            <div className="space-y-2">
-              <Label>How many times did they wake during the night?</Label>
-              <Select value={currentLog.nightWakes?.toString()} onValueChange={(value) => setCurrentLog(prev => ({ ...prev, nightWakes: parseInt(value) }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select number" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0">0 times (wonderful!)</SelectItem>
-                  <SelectItem value="1">1 time</SelectItem>
-                  <SelectItem value="2">2 times</SelectItem>
-                  <SelectItem value="3">3 times</SelectItem>
-                  <SelectItem value="4">4+ times</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Nap count */}
-            <div className="space-y-2">
-              <Label>How many naps did they have during the day?</Label>
-              <Select value={currentLog.napCount?.toString()} onValueChange={(value) => setCurrentLog(prev => ({ ...prev, napCount: parseInt(value) }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select number" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0">No naps</SelectItem>
-                  <SelectItem value="1">1 nap</SelectItem>
-                  <SelectItem value="2">2 naps</SelectItem>
-                  <SelectItem value="3">3+ naps</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Notes */}
-            <div className="space-y-2">
-              <Label>Any notes about the night? (optional)</Label>
-              <Textarea
-                value={currentLog.notes}
-                onChange={(e) => setCurrentLog(prev => ({ ...prev, notes: e.target.value }))}
-                placeholder="e.g., seemed overtired, had a growth spurt, new environment..."
-                rows={3}
-              />
-            </div>
-
-            <div className="pt-4">
-              <Button onClick={saveSleepLog} className="w-full" size="lg">
-                Save Sleep Log 💤
+              <Button onClick={handleChatResponse} disabled={!currentInput.trim()}>
+                Send
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        )}
       </div>
     </div>
   );
