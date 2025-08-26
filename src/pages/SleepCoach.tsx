@@ -91,9 +91,10 @@ const SleepCoach = () => {
   const getSleepInsight = () => {
     if (sleepLogs.length === 0) {
       return {
-        title: "Ready to start tracking?",
-        message: "Log your first night to get personalized insights from Nunu 🐨",
-        type: "welcome"
+        title: "Let's begin tonight.",
+        message: "Based on your baby's age and your style, I'll help you find a gentle rhythm that works for both of you.",
+        type: "welcome",
+        showCTA: true
       };
     }
 
@@ -373,6 +374,11 @@ const SleepCoach = () => {
               <div>
                 <h3 className="font-medium text-sm mb-1">{insight.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{insight.message}</p>
+                {insight.showCTA && (
+                  <Button size="sm" className="mt-3 w-full">
+                    ✨ Start tracking your first night
+                  </Button>
+                )}
                 {nextEvent && (
                   <Badge variant="secondary" className="mt-2 text-xs">
                     {nextEvent}
@@ -403,25 +409,49 @@ const SleepCoach = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Mini Timeline Toggle */}
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm">Show ideal nap schedule</Label>
+                  <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
+                    Timeline View
+                  </Button>
+                </div>
+
                 {profile.babyAge.includes('3-6') && (
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                      <span className="font-medium">Wake Up</span>
-                      <span className="text-muted-foreground">6:30-7:00 AM</span>
+                  <>
+                    {/* Visual Timeline */}
+                    <div className="relative">
+                      <div className="flex items-center space-x-1 mb-2">
+                        <div className="w-2 h-8 bg-yellow-200 rounded"></div>
+                        <div className="w-2 h-6 bg-blue-200 rounded"></div>
+                        <div className="w-2 h-8 bg-blue-200 rounded"></div>
+                        <div className="w-2 h-12 bg-indigo-300 rounded"></div>
+                        <span className="text-xs text-muted-foreground ml-2">Daily rhythm</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                      <span className="font-medium">Morning Nap</span>
-                      <span className="text-muted-foreground">9:00-10:30 AM</span>
+
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
+                        <span className="font-medium">Wake Up</span>
+                        <span className="text-muted-foreground">6:30-7:00 AM</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-950 rounded-lg border-l-4 border-l-blue-400">
+                        <span className="font-medium">Morning Nap</span>
+                        <span className="text-muted-foreground">9:00-10:30 AM</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-950 rounded-lg border-l-4 border-l-blue-400">
+                        <span className="font-medium">Afternoon Nap</span>
+                        <div className="text-right">
+                          <span className="text-muted-foreground">1:00-2:30 PM</span>
+                          <div className="text-xs text-blue-600">🕐 Next expected: ~1:15 PM</div>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-indigo-50 dark:bg-indigo-950 rounded-lg border-l-4 border-l-indigo-400">
+                        <span className="font-medium">Bedtime</span>
+                        <span className="text-muted-foreground">7:00-7:30 PM</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                      <span className="font-medium">Afternoon Nap</span>
-                      <span className="text-muted-foreground">1:00-2:30 PM</span>
-                    </div>
-                    <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                      <span className="font-medium">Bedtime</span>
-                      <span className="text-muted-foreground">7:00-7:30 PM</span>
-                    </div>
-                  </div>
+                  </>
                 )}
                 
                 <div className="p-3 bg-accent-soft rounded-lg">
@@ -439,19 +469,54 @@ const SleepCoach = () => {
               </CardHeader>
               <CardContent>
                 {profile.currentMethod ? (
-                  <div className="space-y-3">
-                    <Badge variant="secondary" className="text-sm">
-                      {profile.currentMethod} - Day {Math.floor((Date.now() - profile.dayStarted) / (1000 * 60 * 60 * 24)) + 1}
-                    </Badge>
+                  <div className="space-y-4">
+                    {/* Color-coded method tag */}
+                    <div className="flex items-center gap-2">
+                      <Badge 
+                        variant="secondary" 
+                        className={`text-sm ${
+                          profile.currentMethod.includes('Ferber') ? 'bg-orange-100 text-orange-800 dark:bg-orange-950' :
+                          profile.currentMethod.includes('Gentle') ? 'bg-green-100 text-green-800 dark:bg-green-950' :
+                          profile.currentMethod.includes('No-Cry') ? 'bg-blue-100 text-blue-800 dark:bg-blue-950' :
+                          'bg-purple-100 text-purple-800 dark:bg-purple-950'
+                        }`}
+                      >
+                        {profile.currentMethod} • Day {Math.floor((Date.now() - profile.dayStarted) / (1000 * 60 * 60 * 24)) + 1}
+                      </Badge>
+                    </div>
+                    
+                    <div className="p-3 bg-gradient-calm rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <span className="text-sm">🐨</span>
+                        <p className="text-sm text-muted-foreground">
+                          It's okay to take your time. We'll find what works for you, together. 💛
+                        </p>
+                      </div>
+                    </div>
+                    
                     <p className="text-sm text-muted-foreground">
                       Stay consistent with your chosen method. Most babies need 3-7 days to adjust to new sleep patterns.
                     </p>
-                    <Button variant="outline" size="sm" className="w-full">
-                      Switch Method
-                    </Button>
+                    
+                    <Select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Switch Method" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="gentle">🌱 Gentle Sleep Shaping</SelectItem>
+                        <SelectItem value="ferber">🔄 Ferber Method</SelectItem>
+                        <SelectItem value="chair">🪑 Chair Method</SelectItem>
+                        <SelectItem value="nocry">💙 No-Cry Solutions</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 ) : (
-                  <div className="text-center">
+                  <div className="text-center space-y-3">
+                    <div className="p-3 bg-gradient-calm rounded-lg">
+                      <p className="text-sm text-muted-foreground">
+                        Take a deep breath. We'll start gentle and adjust as needed. 🤗
+                      </p>
+                    </div>
                     <Button 
                       onClick={() => {
                         setProfile(prev => ({ 
