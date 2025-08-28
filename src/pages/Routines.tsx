@@ -30,6 +30,7 @@ const Routines = () => {
 
   const [showTimeline, setShowTimeline] = useState(false);
   const [showNightData, setShowNightData] = useState(false);
+  const [filterType, setFilterType] = useState<'all' | 'feeding' | 'sleep' | 'diaper'>('all');
 
   const getEntryIcon = (type: string) => {
     switch (type) {
@@ -78,7 +79,13 @@ const Routines = () => {
   const getDayEntries = () => entries.filter(entry => !entry.isNighttime);
   const getNightEntries = () => entries.filter(entry => entry.isNighttime);
   
-  const displayEntries = showNightData ? entries : getDayEntries();
+  const getFilteredEntries = (entriesList: RoutineEntry[]) => {
+    if (filterType === 'all') return entriesList;
+    return entriesList.filter(entry => entry.type === filterType);
+  };
+  
+  const baseEntries = showNightData ? entries : getDayEntries();
+  const displayEntries = getFilteredEntries(baseEntries);
 
   return (
     <div className="pb-20 min-h-screen bg-gradient-comfort">
@@ -132,15 +139,31 @@ const Routines = () => {
             </Badge>
           )}
         </div>
-        {/* Quick Add Buttons */}
+        {/* Quick Add/Filter Buttons */}
         <div className="grid grid-cols-3 gap-3">
-          <Button className="h-16 flex-col gap-1 bg-nunu-peach hover:bg-nunu-peach/90 rounded-2xl shadow-gentle">
+          <Button 
+            onClick={() => setFilterType(filterType === 'feeding' ? 'all' : 'feeding')}
+            className={`h-16 flex-col gap-1 rounded-2xl shadow-gentle transition-all ${
+              filterType === 'feeding' 
+                ? 'bg-nunu-peach hover:bg-nunu-peach/90 ring-2 ring-nunu-peach/50' 
+                : 'bg-nunu-peach/50 hover:bg-nunu-peach/70'
+            }`}
+          >
             <span className="text-xl">🍼</span>
             <span className="text-xs">Feeding</span>
+            {filterType === 'feeding' && <div className="text-xs opacity-75">✓ Filtered</div>}
           </Button>
-          <Button className="h-16 flex-col gap-1 bg-nunu-lavender hover:bg-nunu-lavender/90 rounded-2xl shadow-gentle">
+          <Button 
+            onClick={() => setFilterType(filterType === 'sleep' ? 'all' : 'sleep')}
+            className={`h-16 flex-col gap-1 rounded-2xl shadow-gentle transition-all ${
+              filterType === 'sleep' 
+                ? 'bg-nunu-lavender hover:bg-nunu-lavender/90 ring-2 ring-nunu-lavender/50' 
+                : 'bg-nunu-lavender/50 hover:bg-nunu-lavender/70'
+            }`}
+          >
             <span className="text-xl">😴</span>
             <span className="text-xs">Sleep</span>
+            {filterType === 'sleep' && <div className="text-xs opacity-75">✓ Filtered</div>}
           </Button>
           <Button className="h-16 flex-col gap-1 bg-nunu-sage hover:bg-nunu-sage/90 rounded-2xl shadow-gentle">
             <span className="text-xl">👶</span>
@@ -231,23 +254,34 @@ const Routines = () => {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-primary" />
-              {showNightData ? "Today's Complete Timeline" : "Daytime Activities"}
+              {filterType !== 'all' ? `${filterType.charAt(0).toUpperCase() + filterType.slice(1)} Entries` : 
+               showNightData ? "Today's Complete Timeline" : "Daytime Activities"}
               {showNightData && getNightEntries().length > 0 && (
                 <Badge variant="secondary" className="text-xs">
                   {getNightEntries().length} overnight
                 </Badge>
               )}
+              {filterType !== 'all' && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setFilterType('all')}
+                  className="text-xs h-6 px-2"
+                >
+                  Show All
+                </Button>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {/* Day entries */}
-            {getDayEntries().length > 0 && (
+            {getFilteredEntries(getDayEntries()).length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Sun className="h-4 w-4" />
-                  <span>Daytime ({getDayEntries().length} activities)</span>
+                  <span>Daytime ({getFilteredEntries(getDayEntries()).length} activities)</span>
                 </div>
-                {getDayEntries().map((entry) => (
+                {getFilteredEntries(getDayEntries()).map((entry) => (
                   <div key={entry.id} className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/50 transition-colors ml-6">
                     <div className="text-2xl">
                       {getEntryIcon(entry.type)}
@@ -272,14 +306,14 @@ const Routines = () => {
             )}
 
             {/* Night entries */}
-            {showNightData && getNightEntries().length > 0 && (
+            {showNightData && getFilteredEntries(getNightEntries()).length > 0 && (
               <div className="space-y-3">
                 <Separator className="my-4" />
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Moon className="h-4 w-4" />
-                  <span>Overnight ({getNightEntries().length} activities)</span>
+                  <span>Overnight ({getFilteredEntries(getNightEntries()).length} activities)</span>
                 </div>
-                {getNightEntries().map((entry) => (
+                {getFilteredEntries(getNightEntries()).map((entry) => (
                   <div key={entry.id} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-secondary-soft/30 ml-6">
                     <div className="text-2xl">
                       {getEntryIcon(entry.type)}
