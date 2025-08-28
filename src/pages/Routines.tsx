@@ -165,9 +165,17 @@ const Routines = () => {
             <span className="text-xs">Sleep</span>
             {filterType === 'sleep' && <div className="text-xs opacity-75">✓ Filtered</div>}
           </Button>
-          <Button className="h-16 flex-col gap-1 bg-nunu-sage hover:bg-nunu-sage/90 rounded-2xl shadow-gentle">
+          <Button 
+            onClick={() => setFilterType(filterType === 'diaper' ? 'all' : 'diaper')}
+            className={`h-16 flex-col gap-1 rounded-2xl shadow-gentle transition-all ${
+              filterType === 'diaper' 
+                ? 'bg-nunu-sage hover:bg-nunu-sage/90 ring-2 ring-nunu-sage/50' 
+                : 'bg-nunu-sage/50 hover:bg-nunu-sage/70'
+            }`}
+          >
             <span className="text-xl">👶</span>
             <span className="text-xs">Diaper</span>
+            {filterType === 'diaper' && <div className="text-xs opacity-75">✓ Filtered</div>}
           </Button>
         </div>
 
