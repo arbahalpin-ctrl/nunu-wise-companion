@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ArrowRight, Heart, Baby, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import heroImage from '@/assets/nunu-hero.jpg';
+import heroImage from '@/assets/nunu-logo-koala.png';
 
 interface OnboardingProps {
   onComplete: () => void;

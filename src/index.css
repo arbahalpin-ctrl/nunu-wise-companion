@@ -4,57 +4,57 @@
 
 @layer base {
   :root {
-    /* Base colors - soft, calming blue-grey palette */
-    --background: 210 31% 95%; /* Soft blue-grey like #E9F0F4 */
-    --foreground: 215 25% 27%; /* Deep slate for text */
+    /* Base colors - warm, earthy neutral palette */
+    --background: 33 43% 96%; /* Soft ivory #FAF4EF */
+    --foreground: 0 14% 21%; /* Deep chocolate #3C2F2F */
 
-    /* Primary brand colors - soft sky blue */
-    --primary: 210 100% 80%; /* Gentle sky blue */
-    --primary-foreground: 215 25% 15%; /* Dark slate for contrast */
-    --primary-soft: 210 100% 95%; /* Ultra soft version */
-    --primary-glow: 210 100% 85%; /* Lighter glow version */
+    /* Primary brand colors - muted cocoa brown */
+    --primary: 24 18% 31%; /* Muted cocoa brown #5C4A41 */
+    --primary-foreground: 33 43% 96%; /* Soft ivory contrast */
+    --primary-soft: 33 42% 81%; /* Warm beige #E2C6AD */
+    --primary-glow: 24 38% 73%; /* Dusty rose glow */
 
-    /* Nunu brand colors - refined pastel palette */
-    --nunu-sky: 210 60% 85%; /* Soft sky blue */
-    --nunu-blush: 340 50% 85%; /* Gentle blush */
-    --nunu-sage: 140 30% 75%; /* Soft sage green */
-    --nunu-cream: 45 40% 92%; /* Warm cream */
+    /* Nunu brand colors - earthy neutral tones */
+    --nunu-sky: 24 18% 31%; /* Muted cocoa brown */
+    --nunu-blush: 24 38% 73%; /* Dusty rose */
+    --nunu-sage: 24 21% 69%; /* Warm taupe */
+    --nunu-cream: 33 43% 96%; /* Soft ivory */
 
     /* UI colors */
-    --secondary: 210 20% 92%; /* Soft cloud grey */
-    --secondary-foreground: 215 25% 27%;
-    --secondary-soft: 210 20% 96%;
+    --secondary: 24 38% 73%; /* Dusty rose */
+    --secondary-foreground: 0 14% 21%; /* Deep chocolate */
+    --secondary-soft: 24 21% 69%; /* Warm taupe */
 
-    --muted: 210 15% 96%; /* Very soft grey */
-    --muted-foreground: 215 15% 50%;
+    --muted: 33 42% 81%; /* Warm beige - subtle backgrounds */
+    --muted-foreground: 0 0% 29%; /* Charcoal grey - secondary text */
 
-    --accent: 210 25% 87%; /* Soft slate blue */
-    --accent-foreground: 215 25% 27%;
-    --accent-soft: 210 25% 95%;
+    --accent: 24 21% 69%; /* Warm taupe */
+    --accent-foreground: 0 14% 21%; /* Deep chocolate */
+    --accent-soft: 33 42% 81%; /* Warm beige highlight */
 
-    --destructive: 0 70% 70%; /* Soft coral */
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%; /* Warm red for alerts */
+    --destructive-foreground: 33 43% 96%; /* Soft ivory */
 
-    --border: 210 20% 87%; /* Soft border */
-    --input: 210 25% 94%; /* Input background */
-    --ring: 210 100% 80%; /* Focus ring matches primary */
+    --border: 33 42% 81%; /* Warm beige - gentle divisions */
+    --input: 33 43% 96%; /* Soft ivory - form backgrounds */
+    --ring: 24 18% 31%; /* Muted cocoa - focus indicators */
 
     /* Card and surface colors */
-    --card: 0 0% 100%; /* Clean white */
-    --card-foreground: 215 25% 27%;
+    --card: 33 43% 96%; /* Soft ivory - clean surfaces */
+    --card-foreground: 0 14% 21%; /* Deep chocolate */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 27%;
+    --popover: 33 43% 96%;
+    --popover-foreground: 0 14% 21%;
 
-    /* Gradients for emotional comfort */
-    --gradient-comfort: linear-gradient(135deg, hsl(210 31% 95%) 0%, hsl(210 25% 92%) 50%, hsl(210 20% 90%) 100%);
-    --gradient-nurture: linear-gradient(135deg, hsl(210 100% 80%) 0%, hsl(210 100% 85%) 100%);
-    --gradient-calm: linear-gradient(135deg, hsl(210 60% 85%) 0%, hsl(210 25% 87%) 100%);
+    /* Gradients for nurturing aesthetics */
+    --gradient-comfort: linear-gradient(45deg, hsl(33 43% 96%) 0%, hsl(24 38% 73%) 100%);
+    --gradient-nurture: linear-gradient(135deg, hsl(24 38% 73%) 0%, hsl(33 42% 81%) 100%);
+    --gradient-calm: linear-gradient(180deg, hsl(33 43% 96%) 0%, hsl(24 21% 69%) 100%);
 
     /* Soft shadows for gentle depth */
-    --shadow-gentle: 0 1px 3px 0 hsl(210 100% 80% / 0.1), 0 1px 2px -1px hsl(210 100% 80% / 0.1);
-    --shadow-comfort: 0 4px 6px -1px hsl(210 25% 87% / 0.1), 0 2px 4px -2px hsl(210 25% 87% / 0.1);
-    --shadow-nurture: 0 10px 15px -3px hsl(210 60% 85% / 0.1), 0 4px 6px -4px hsl(210 60% 85% / 0.1);
+    --shadow-gentle: 0 1px 3px 0 hsl(24 18% 31% / 0.1), 0 1px 2px -1px hsl(24 18% 31% / 0.1);
+    --shadow-comfort: 0 4px 6px -1px hsl(24 38% 73% / 0.3), 0 2px 4px -2px hsl(24 38% 73% / 0.3);
+    --shadow-nurture: 0 10px 15px -3px hsl(33 42% 81% / 0.2), 0 4px 6px -4px hsl(33 42% 81% / 0.2);
 
     /* Animation values for comfort */
     --transition-comfort: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -63,63 +63,63 @@
 
     --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 215 25% 27%;
-    --sidebar-primary: 210 100% 80%;
-    --sidebar-primary-foreground: 215 25% 15%;
-    --sidebar-accent: 210 20% 92%;
-    --sidebar-accent-foreground: 215 25% 27%;
-    --sidebar-border: 210 20% 87%;
-    --sidebar-ring: 210 100% 80%;
+    --sidebar-background: 33 43% 96%;
+    --sidebar-foreground: 0 14% 21%;
+    --sidebar-primary: 24 18% 31%;
+    --sidebar-primary-foreground: 33 43% 96%;
+    --sidebar-accent: 24 38% 73%;
+    --sidebar-accent-foreground: 0 14% 21%;
+    --sidebar-border: 33 42% 81%;
+    --sidebar-ring: 24 18% 31%;
   }
 
   .dark {
-    /* Dark mode - keeping it gentle and not harsh */
-    --background: 215 28% 17%; /* Deep blue-grey navy */
-    --foreground: 210 20% 92%;
+    /* Dark mode: Deep chocolate and warm tones */
+    --background: 0 14% 21%; /* Deep chocolate - comforting dark */
+    --foreground: 33 43% 96%; /* Soft ivory - gentle light text */
 
-    --primary: 210 100% 70%; /* Soft sky blue */
-    --primary-foreground: 215 28% 17%;
-    --primary-soft: 210 100% 25%;
+    --primary: 24 38% 73%; /* Dusty rose - warm accent */
+    --primary-foreground: 0 14% 21%; /* Deep chocolate */
+    --primary-soft: 24 21% 69%; /* Warm taupe highlight */
 
-    --secondary: 215 25% 22%;
-    --secondary-foreground: 210 20% 92%;
-    --secondary-soft: 215 25% 28%;
+    --secondary: 33 42% 81%; /* Warm beige accent */
+    --secondary-foreground: 0 14% 21%;
+    --secondary-soft: 24 21% 69%; /* Warm taupe */
 
-    --muted: 215 25% 22%;
-    --muted-foreground: 210 15% 60%;
+    --muted: 24 18% 31%; /* Muted cocoa - subtle dark backgrounds */
+    --muted-foreground: 0 0% 29%; /* Charcoal grey - muted text */
 
-    --accent: 215 20% 30%;
-    --accent-foreground: 210 20% 92%;
-    --accent-soft: 215 20% 35%;
+    --accent: 24 21% 69%; /* Warm taupe - gentle accent */
+    --accent-foreground: 0 14% 21%;
+    --accent-soft: 33 42% 81%; /* Warm beige */
 
-    --destructive: 0 70% 65%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%; /* Warm red - softer alerts */
+    --destructive-foreground: 33 43% 96%;
 
-    --border: 215 25% 25%;
-    --input: 215 25% 22%;
-    --ring: 210 100% 70%;
+    --border: 24 18% 31%; /* Muted cocoa - divisions */
+    --input: 24 18% 31%; /* Muted cocoa - form fields */
+    --ring: 24 38% 73%; /* Dusty rose */
 
-    --card: 215 25% 20%;
-    --card-foreground: 210 20% 92%;
+    --card: 24 18% 31%; /* Muted cocoa - elevated dark surfaces */
+    --card-foreground: 33 43% 96%;
 
-    --popover: 215 25% 20%;
-    --popover-foreground: 210 20% 92%;
+    --popover: 24 18% 31%;
+    --popover-foreground: 33 43% 96%;
 
-    /* Dark mode gradients - still gentle */
-    --gradient-comfort: linear-gradient(135deg, hsl(215 28% 17%) 0%, hsl(215 25% 22%) 50%, hsl(215 25% 25%) 100%);
-    --gradient-nurture: linear-gradient(135deg, hsl(210 100% 70% / 0.2) 0%, hsl(210 100% 75% / 0.2) 100%);
-    --gradient-calm: linear-gradient(135deg, hsl(210 60% 65% / 0.15) 0%, hsl(215 20% 30% / 0.15) 100%);
+    /* Dark mode gradients */
+    --gradient-comfort: linear-gradient(45deg, hsl(0 14% 21%) 0%, hsl(24 38% 73%) 100%);
+    --gradient-nurture: linear-gradient(135deg, hsl(24 38% 73%) 0%, hsl(24 18% 31%) 100%);
+    --gradient-calm: linear-gradient(180deg, hsl(24 18% 31%) 0%, hsl(24 21% 69%) 100%);
 
     /* Sidebar colors */
-    --sidebar-background: 215 28% 17%;
-    --sidebar-foreground: 210 20% 92%;
-    --sidebar-primary: 210 100% 70%;
-    --sidebar-primary-foreground: 215 28% 17%;
-    --sidebar-accent: 215 25% 22%;
-    --sidebar-accent-foreground: 210 20% 92%;
-    --sidebar-border: 215 25% 25%;
-    --sidebar-ring: 210 100% 70%;
+    --sidebar-background: 0 14% 21%;
+    --sidebar-foreground: 33 43% 96%;
+    --sidebar-primary: 24 38% 73%;
+    --sidebar-primary-foreground: 0 14% 21%;
+    --sidebar-accent: 24 18% 31%;
+    --sidebar-accent-foreground: 33 43% 96%;
+    --sidebar-border: 24 18% 31%;
+    --sidebar-ring: 24 38% 73%;
   }
 }
 

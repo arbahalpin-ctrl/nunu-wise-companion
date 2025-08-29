@@ -3,7 +3,7 @@ import { Heart, Zap, Bed, Sparkles, HelpCircle, MessageCircle, Baby, Calendar, C
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { getCurrentWeekQuote } from '@/data/weeklyQuotes';
-import koalaHero from '@/assets/koala-hero.jpg';
+import koalaHero from '@/assets/nunu-logo-koala.png';
 import FeedingTimer, { FeedingLog as FeedingLogType } from '@/components/FeedingTimer';
 import FeedingLog from '@/components/FeedingLog';
 import BreastSwitchPrompt from '@/components/BreastSwitchPrompt';
