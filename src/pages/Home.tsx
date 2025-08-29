@@ -167,13 +167,13 @@ const Home = ({ onTabChange }: HomeProps) => {
               className="shadow-gentle border-none bg-card cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02]"
               onClick={() => {
                 onTabChange?.('chat');
-                // This would pre-fill the chat with feeding message
+                // This would pre-fill the chat with weaning message
               }}
             >
               <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">🍼</div>
-                <span className="text-sm font-medium">Feeding & Weaning</span>
-                <p className="text-xs text-muted-foreground mt-1">Breastfeeding, bottles, solids</p>
+                <div className="text-2xl mb-2">🥄</div>
+                <span className="text-sm font-medium">Weaning & Recipes</span>
+                <p className="text-xs text-muted-foreground mt-1">Baby-led weaning, recipes, allergens</p>
               </CardContent>
             </Card>
             

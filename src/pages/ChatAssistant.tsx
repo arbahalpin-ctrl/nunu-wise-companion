@@ -39,14 +39,26 @@ const ChatAssistant = () => {
       return sleepResponses[Math.floor(Math.random() * sleepResponses.length)];
     }
     
-    // Feeding & weaning responses
-    if (message.includes('feed') || message.includes('breastfeed') || message.includes('bottle') || message.includes('wean') || message.includes('milk') || message.includes('latch') || message.includes('solid')) {
+    // Weaning & recipes responses
+    if (message.includes('wean') || message.includes('solid') || message.includes('food') || message.includes('recipe') || message.includes('eat') || message.includes('meal') || message.includes('allergen') || message.includes('peanut') || message.includes('egg') || message.includes('pasta') || message.includes('finger') || message.includes('blw') || message.includes('spoon') || message.includes('chok') || message.includes('gag') || message.includes('texture')) {
+      const weaningResponses = [
+        "Weaning is such an exciting journey! Every baby develops at their own pace with eating. How old is your little one and what foods have you tried so far? I can share age-appropriate suggestions! 🥄",
+        "Starting solids can feel overwhelming with all the advice out there. Remember, 'food before one is just for fun' - milk is still their main nutrition. What specific foods or textures are you curious about?",
+        "Baby-led weaning and spoon feeding both have benefits - many families do a combination! What approach feels right for your family? I can share safe serving ideas for any food! 🍌",
+        "Gagging is a normal part of learning to eat - it's actually their safety reflex working! It sounds scary but it's different from choking. What foods are you worried about introducing?",
+        "Allergen introduction can feel nerve-wracking, but early exposure (around 6 months) is actually protective! Peanut butter, eggs, fish can all be safe when offered appropriately. How can I help you feel confident?",
+        "Pasta is perfect for little hands! For 8+ month olds, try large tube shapes they can grab, or long strips they can suck on. What ingredients do you have at home? I can suggest simple, baby-safe combinations! 🍝"
+      ];
+      return weaningResponses[Math.floor(Math.random() * weaningResponses.length)];
+    }
+    
+    // General feeding & breastfeeding responses  
+    if (message.includes('feed') || message.includes('breastfeed') || message.includes('bottle') || message.includes('milk') || message.includes('latch') || message.includes('pump')) {
       const feedingResponses = [
         "Feeding journeys are so personal and can bring up a lot of emotions. Whether breastfeeding, formula feeding, or combination feeding - you're nourishing your baby with love. What's your experience been like?",
         "Every feeding relationship is unique. Some flow easily, others take patience and support. How are you feeling about feeding right now?",
-        "Weaning can bring up such mixed emotions - relief, sadness, freedom, guilt. All of these feelings are normal. Where are you in your feeding journey?",
         "Feeding challenges can feel overwhelming, but remember - a fed baby is the goal, however that looks for your family. What support do you need right now?",
-        "Starting solids is such an exciting milestone! It can also feel overwhelming with all the advice out there. How is your little one taking to solid foods?"
+        "Breastfeeding can be beautiful and challenging all at once. Your feelings about it - whatever they are - are completely valid. How are things going for you?"
       ];
       return feedingResponses[Math.floor(Math.random() * feedingResponses.length)];
     }
@@ -141,9 +153,11 @@ const ChatAssistant = () => {
 
   const suggestedQuestions = [
     "I'm feeling overwhelmed",
-    "Help with feeding challenges", 
+    "How do I serve pasta to my 8-month-old?", 
     "Sleep is so hard right now",
-    "Tell me about tantrums"
+    "Can my baby have peanut butter?",
+    "Tell me about tantrums",
+    "What meals can I make with bananas?"
   ];
 
   return (
