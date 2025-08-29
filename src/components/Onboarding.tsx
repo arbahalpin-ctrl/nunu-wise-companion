@@ -17,10 +17,13 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       subtitle: "Your gentle companion through motherhood",
       content: (
         <div className="text-center space-y-6">
-          <div 
-            className="w-32 h-32 mx-auto rounded-3xl bg-cover bg-center shadow-comfort"
-            style={{ backgroundImage: `url(${heroImage})` }}
-          />
+          <div className="w-32 h-32 mx-auto bg-white rounded-full p-4 shadow-comfort">
+            <img 
+              src={heroImage} 
+              alt="Nunu koala logo" 
+              className="w-full h-full object-contain rounded-full"
+            />
+          </div>
           <div>
             <h2 className="text-2xl font-bold mb-3">Hello, beautiful mama 💝</h2>
             <p className="text-muted-foreground leading-relaxed">
