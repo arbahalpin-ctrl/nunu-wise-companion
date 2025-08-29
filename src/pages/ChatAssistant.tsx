@@ -39,15 +39,42 @@ const ChatAssistant = () => {
       return sleepResponses[Math.floor(Math.random() * sleepResponses.length)];
     }
     
-    // Weaning & recipes responses
-    if (message.includes('wean') || message.includes('solid') || message.includes('food') || message.includes('recipe') || message.includes('eat') || message.includes('meal') || message.includes('allergen') || message.includes('peanut') || message.includes('egg') || message.includes('pasta') || message.includes('finger') || message.includes('blw') || message.includes('spoon') || message.includes('chok') || message.includes('gag') || message.includes('texture')) {
+    // Nunu's Kitchen - Comprehensive Weaning & Recipe Responses
+    if (message.includes('wean') || message.includes('solid') || message.includes('food') || message.includes('recipe') || message.includes('eat') || message.includes('meal') || message.includes('allergen') || message.includes('peanut') || message.includes('egg') || message.includes('pasta') || message.includes('finger') || message.includes('blw') || message.includes('spoon') || message.includes('chok') || message.includes('gag') || message.includes('texture') || message.includes('kitchen') || message.includes('cook') || message.includes('prep') || message.includes('cut') || message.includes('steam') || message.includes('month') || message.includes('breakfast') || message.includes('lunch') || message.includes('dinner') || message.includes('snack')) {
+      
+      // Specific food safety questions
+      if (message.includes('egg')) {
+        return "Great choice! Eggs are wonderful from 6+ months. 🥚 **Safe serving:** For BLW, try well-cooked egg strips or mini muffins. For spoon-feeding, scrambled eggs work perfectly. **Safety tip:** Cook thoroughly (no runny yolks for babies). Start with just egg yolk if you're nervous, then whole egg. You're doing amazing introducing variety! ✨";
+      }
+      
+      if (message.includes('strawberr')) {
+        return "Strawberries are delicious and safe from 6+ months! 🍓 **Safe serving:** For babies under 12 months, cut lengthwise into thin slices or quarters (never whole). For 10+ months, you can cut into small pieces. **Safety tip:** Rinse well and remove the green top. Fresh is best - frozen works too! Your little one will love the sweet taste.";
+      }
+      
+      if (message.includes('tuna')) {
+        return "Tuna can be offered from 6+ months - great protein choice! 🐟 **Safe serving:** Choose canned tuna in water (low sodium), flake into small pieces or mix into pasta/rice. **Safety tip:** Limit to 1-2 times per week due to mercury. Look for 'light' tuna vs albacore. Mix with avocado or cream cheese for easy eating! You're giving them such good nutrition.";
+      }
+      
+      if (message.includes('carrot') && (message.includes('oat') || message.includes('what can i make'))) {
+        return "Carrots and oats make a perfect combo! 🥕 **3 easy ideas:** 1) Steamed carrot sticks + oat porridge fingers, 2) Carrot-oat mini muffins (blend both, add egg), 3) Overnight oats with grated raw carrot for older babies. **Safety tip:** Steam carrots until finger-soft. You're so creative with combinations!";
+      }
+      
+      if (message.includes('breakfast') && message.includes('blw')) {
+        return "BLW breakfasts are so fun! Here are 3 easy ideas: 🌅 **1) Banana pancakes** (mashed banana + egg, cook as strips), **2) Toast soldiers** with avocado smear or nut butter, **3) Steamed apple wedges** with cinnamon. **Safety tip:** Make sure everything is soft enough to squish with your fingers. Your little one will love exploring these textures!";
+      }
+      
+      if (message.includes('protein') && message.includes('lunch')) {
+        return "Protein lunches made simple! 💪 **Easy options:** 1) Shredded chicken mixed with pasta, 2) Mashed chickpeas formed into patties, 3) Scrambled egg with cheese strips, 4) Fish cakes (salmon/cod). **Prep tip:** Cook proteins until very tender. Batch cook on weekends! You're doing such a great job nourishing your baby.";
+      }
+      
+      // General weaning responses with enhanced safety focus
       const weaningResponses = [
-        "Weaning is such an exciting journey! Every baby develops at their own pace with eating. How old is your little one and what foods have you tried so far? I can share age-appropriate suggestions! 🥄",
-        "Starting solids can feel overwhelming with all the advice out there. Remember, 'food before one is just for fun' - milk is still their main nutrition. What specific foods or textures are you curious about?",
-        "Baby-led weaning and spoon feeding both have benefits - many families do a combination! What approach feels right for your family? I can share safe serving ideas for any food! 🍌",
-        "Gagging is a normal part of learning to eat - it's actually their safety reflex working! It sounds scary but it's different from choking. What foods are you worried about introducing?",
-        "Allergen introduction can feel nerve-wracking, but early exposure (around 6 months) is actually protective! Peanut butter, eggs, fish can all be safe when offered appropriately. How can I help you feel confident?",
-        "Pasta is perfect for little hands! For 8+ month olds, try large tube shapes they can grab, or long strips they can suck on. What ingredients do you have at home? I can suggest simple, baby-safe combinations! 🍝"
+        "Welcome to Nunu's Kitchen! 👩‍🍳 Weaning is such an exciting journey. Every baby develops at their own pace with eating. How old is your little one and what foods have you tried so far? I'll share age-appropriate, safe serving suggestions!",
+        "Starting solids can feel overwhelming, but you've got this! Remember, 'food before one is just for fun' - milk is still their main nutrition. **Safety first:** Always supervise eating and trust your instincts. What specific foods or textures are you curious about?",
+        "Baby-led weaning and spoon feeding both have amazing benefits - many families do a combination! What approach feels right for your family? I can share safe serving sizes and shapes for any food you're thinking about! 🍌",
+        "Gagging vs choking - such an important distinction! Gagging is normal and actually shows their reflexes are working to keep them safe. It sounds scary but it's different from choking. **Signs of normal gagging:** Loud, able to breathe/cry. What foods are you worried about?",
+        "Allergen introduction can feel nerve-wracking, but early exposure (around 6 months) is actually protective! **Top 8 allergens:** Peanuts, eggs, milk, fish, shellfish, tree nuts, wheat, soy. Start with small amounts mixed into familiar foods. How can I help you feel confident?",
+        "Kitchen prep tips coming right up! **Golden rules:** Soft enough to squish with your fingers, appropriate size (think grape-sized or smaller for round foods), and always supervise. What are you planning to prepare? I'll give you specific cutting and cooking guidance! 🔪✨"
       ];
       return weaningResponses[Math.floor(Math.random() * weaningResponses.length)];
     }
@@ -152,12 +179,12 @@ const ChatAssistant = () => {
   };
 
   const suggestedQuestions = [
+    "Can my 6-month-old have egg?",
+    "How do I cut strawberries safely?", 
+    "3 BLW breakfast ideas please",
+    "What can I make with carrots and oats?",
     "I'm feeling overwhelmed",
-    "How do I serve pasta to my 8-month-old?", 
-    "Sleep is so hard right now",
-    "Can my baby have peanut butter?",
-    "Tell me about tantrums",
-    "What meals can I make with bananas?"
+    "Is my baby ready for finger foods?"
   ];
 
   return (

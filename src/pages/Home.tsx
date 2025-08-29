@@ -164,16 +164,16 @@ const Home = ({ onTabChange }: HomeProps) => {
             </Card>
             
             <Card 
-              className="shadow-gentle border-none bg-card cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02]"
+              className="shadow-gentle border-none bg-gradient-to-r from-orange-50 to-amber-50 cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02] border border-orange-200/50"
               onClick={() => {
                 onTabChange?.('chat');
-                // This would pre-fill the chat with weaning message
+                // This would pre-fill the chat with kitchen/weaning message
               }}
             >
               <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">🥄</div>
-                <span className="text-sm font-medium">Weaning & Recipes</span>
-                <p className="text-xs text-muted-foreground mt-1">Baby-led weaning, recipes, allergens</p>
+                <div className="text-2xl mb-2">👩‍🍳</div>
+                <span className="text-sm font-bold text-orange-800">Nunu's Kitchen</span>
+                <p className="text-xs text-orange-600 mt-1">Weaning recipes & food safety</p>
               </CardContent>
             </Card>
             
@@ -207,19 +207,22 @@ const Home = ({ onTabChange }: HomeProps) => {
           </div>
           
           <Card 
-            className="shadow-gentle border-none bg-gradient-to-r from-primary/5 to-accent/5 cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02]"
+            className="shadow-gentle border-none bg-gradient-to-r from-primary/5 to-accent/5 cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02] col-span-2"
             onClick={() => onTabChange?.('chat')}
           >
             <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                  <MessageCircle className="h-5 w-5 text-primary animate-comfort-pulse" />
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-orange-100 to-amber-100 rounded-full flex items-center justify-center border border-orange-200/50">
+                  <span className="text-2xl">👩‍🍳</span>
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium text-sm">General Motherhood Chat</h4>
-                  <p className="text-xs text-muted-foreground">Open conversation with Nunu about anything</p>
+                  <h4 className="font-bold text-base text-orange-800">🍽️ Nunu's Kitchen - Weaning Guide</h4>
+                  <p className="text-sm text-orange-600 mt-1">AI-powered weaning support • Safe food prep • Recipe ideas • Allergen guidance</p>
+                  <div className="flex gap-1 mt-2">
+                    <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">BLW Tips</span>
+                    <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">Safety First</span>
+                  </div>
                 </div>
-                <div className="text-lg">💭</div>
               </div>
             </CardContent>
           </Card>
