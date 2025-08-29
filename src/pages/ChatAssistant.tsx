@@ -1,8 +1,11 @@
-import { useState } from 'react';
-import { Send, Bot, User, Heart, Clock } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Send, Bot, User, Heart, Clock, ChefHat, ToggleLeft, ToggleRight, Sparkles, Baby } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import nunuKitchenIcon from '@/assets/nunu-kitchen-icon.jpg';
 
 interface Message {
   id: string;
@@ -11,7 +14,12 @@ interface Message {
   timestamp: string;
 }
 
-const ChatAssistant = () => {
+interface ChatAssistantProps {
+  isKitchenMode?: boolean;
+  onKitchenModeChange?: (mode: boolean) => void;
+}
+
+const ChatAssistant = ({ isKitchenMode: initialKitchenMode = false, onKitchenModeChange }: ChatAssistantProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -23,6 +31,20 @@ const ChatAssistant = () => {
   
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isKitchenMode, setIsKitchenMode] = useState(initialKitchenMode);
+  const [weaningPreference, setWeaningPreference] = useState<'blw' | 'spoon' | 'mixed'>('blw');
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Sync with parent component
+  useEffect(() => {
+    if (initialKitchenMode !== isKitchenMode) {
+      setIsKitchenMode(initialKitchenMode);
+    }
+  }, [initialKitchenMode]);
+
+  useEffect(() => {
+    onKitchenModeChange?.(isKitchenMode);
+  }, [isKitchenMode, onKitchenModeChange]);
 
   // Generate intelligent AI responses based on user input - comprehensive motherhood support
   const generateNunuResponse = (userMessage: string): string => {
@@ -187,21 +209,148 @@ const ChatAssistant = () => {
     "Is my baby ready for finger foods?"
   ];
 
+  const kitchenPrompts = [
+    "What can I serve at 7 months?",
+    "Ideas with banana?", 
+    "Is this food safe?",
+    "How to introduce allergens?",
+    "Easy finger foods for beginners?",
+    "Can I give my baby pasta?"
+  ];
+
+  const commonIngredients = [
+    "🍌 Banana", "🥕 Carrot", "🥑 Avocado", "🍎 Apple", 
+    "🧀 Cheese", "🥚 Egg", "🍝 Pasta", "🥔 Sweet Potato"
+  ];
+
+  const handleIngredientClick = (ingredient: string) => {
+    const ingredientName = ingredient.split(' ')[1];
+    setNewMessage(`Ideas with ${ingredientName.toLowerCase()}?`);
+  };
+
+  const handlePromptClick = (prompt: string) => {
+    setNewMessage(prompt);
+  };
+
+  const handleKitchenModeToggle = () => {
+    setIsKitchenMode(!isKitchenMode);
+    if (!isKitchenMode) {
+      // Switch to kitchen mode - add kitchen welcome message
+      const kitchenWelcome: Message = {
+        id: Date.now().toString(),
+        type: 'assistant',
+        content: "Welcome to Nunu's Kitchen! 👩‍🍳 Let's explore baby's next meal together. I'm here to help with safe food prep, age-appropriate recipes, and weaning guidance. Whether you're doing baby-led weaning or spoon feeding, I'll support you every step of the way! What would you like to know about feeding your little one?",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setMessages(prev => [...prev, kitchenWelcome]);
+    }
+  };
+
+  // Show onboarding on first visit to kitchen mode
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem('nunu-kitchen-onboarding');
+    if (isKitchenMode && !hasSeenOnboarding) {
+      setShowOnboarding(true);
+    }
+  }, [isKitchenMode]);
+
+  const handleCompleteOnboarding = () => {
+    localStorage.setItem('nunu-kitchen-onboarding', 'true');
+    setShowOnboarding(false);
+  };
+
   return (
     <div className="pb-20 h-screen bg-gradient-comfort flex flex-col">
-      <div className="bg-gradient-calm p-6 rounded-b-3xl flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-gentle">
-            <Bot className="h-6 w-6 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">Nunu</h1>
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <div className="w-2 h-2 bg-nunu-sage rounded-full animate-pulse" />
-              Your motherhood companion
+      <div className={`p-6 rounded-b-3xl flex-shrink-0 ${isKitchenMode ? 'bg-gradient-to-r from-orange-50 to-amber-50' : 'bg-gradient-calm'}`}>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-gentle ${isKitchenMode ? 'bg-orange-100' : 'bg-primary'}`}>
+              {isKitchenMode ? (
+                <img src={nunuKitchenIcon} alt="Nunu's Kitchen" className="w-8 h-8 rounded-full" />
+              ) : (
+                <Bot className="h-6 w-6 text-primary-foreground" />
+              )}
+            </div>
+            <div>
+              <h1 className={`text-xl font-bold ${isKitchenMode ? 'text-orange-800' : 'text-foreground'}`}>
+                {isKitchenMode ? "Nunu's Kitchen" : "Nunu"}
+              </h1>
+              <div className={`flex items-center gap-1 text-sm ${isKitchenMode ? 'text-orange-600' : 'text-muted-foreground'}`}>
+                <div className="w-2 h-2 bg-nunu-sage rounded-full animate-pulse" />
+                {isKitchenMode ? "Your weaning companion" : "Your motherhood companion"}
+              </div>
             </div>
           </div>
+          
+          <Button
+            onClick={handleKitchenModeToggle}
+            variant={isKitchenMode ? "default" : "outline"}
+            size="sm"
+            className={isKitchenMode ? "bg-orange-200 text-orange-800 hover:bg-orange-300" : ""}
+          >
+            <ChefHat className="h-4 w-4 mr-2" />
+            Kitchen
+          </Button>
         </div>
+
+        {isKitchenMode && (
+          <div className="space-y-4">
+            <p className="text-orange-700 font-medium text-center">
+              Let's explore baby's next meal together 🥄
+            </p>
+            
+            {/* Weaning Preference Toggle */}
+            <div className="flex items-center justify-center gap-4 bg-white/50 rounded-xl p-3">
+              <span className={`text-sm font-medium ${weaningPreference === 'blw' ? 'text-orange-800' : 'text-orange-600'}`}>
+                Baby-Led Weaning
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => setWeaningPreference('blw')}
+                  variant={weaningPreference === 'blw' ? 'default' : 'ghost'}
+                  size="sm"
+                  className={weaningPreference === 'blw' ? 'bg-orange-200 text-orange-800' : 'text-orange-600'}
+                >
+                  BLW
+                </Button>
+                <Button
+                  onClick={() => setWeaningPreference('mixed')}
+                  variant={weaningPreference === 'mixed' ? 'default' : 'ghost'}
+                  size="sm"
+                  className={weaningPreference === 'mixed' ? 'bg-orange-200 text-orange-800' : 'text-orange-600'}
+                >
+                  Mixed
+                </Button>
+                <Button
+                  onClick={() => setWeaningPreference('spoon')}
+                  variant={weaningPreference === 'spoon' ? 'default' : 'ghost'}
+                  size="sm"
+                  className={weaningPreference === 'spoon' ? 'bg-orange-200 text-orange-800' : 'text-orange-600'}
+                >
+                  Spoon
+                </Button>
+              </div>
+            </div>
+
+            {/* Quick Ingredient Buttons */}
+            <div>
+              <p className="text-xs text-orange-600 mb-2 text-center">Quick ingredient ideas:</p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {commonIngredients.map((ingredient, index) => (
+                  <Button
+                    key={index}
+                    onClick={() => handleIngredientClick(ingredient)}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs bg-white/70 border-orange-200 text-orange-700 hover:bg-orange-100"
+                  >
+                    {ingredient}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Chat Messages */}
@@ -264,30 +413,38 @@ const ChatAssistant = () => {
       </div>
 
       {/* Suggested Questions */}
-      <div className="p-4 flex-shrink-0">
-        <div className="mb-3">
-          <p className="text-xs text-muted-foreground mb-2">Quick questions:</p>
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {suggestedQuestions.map((question) => (
-              <Button 
-                key={question}
-                variant="outline" 
-                size="sm"
-                className="whitespace-nowrap rounded-full text-xs"
-                onClick={() => setNewMessage(question)}
+      <div className="p-6 pt-0 flex-shrink-0">
+        <div className="space-y-3">
+          <h3 className="text-sm font-medium text-muted-foreground mb-3">
+            {isKitchenMode ? "Recipe & safety suggestions:" : "Suggested questions:"}
+          </h3>
+          <div className="grid grid-cols-1 gap-2">
+            {(isKitchenMode ? kitchenPrompts : suggestedQuestions).map((question, index) => (
+              <Button
+                key={index}
+                onClick={() => handlePromptClick(question)}
+                variant="ghost"
+                className={`justify-start text-left h-auto p-3 text-sm rounded-xl border border-border/50 ${
+                  isKitchenMode 
+                    ? 'bg-orange-50 hover:bg-orange-100 text-orange-800 border-orange-200' 
+                    : 'bg-card hover:bg-muted/50'
+                }`}
               >
+                {isKitchenMode && <ChefHat className="h-3 w-3 mr-2 flex-shrink-0" />}
                 {question}
               </Button>
             ))}
           </div>
         </div>
+      </div>
 
-        {/* Message Input */}
+      {/* Message Input */}
+      <div className="p-6 pt-0 flex-shrink-0">
         <div className="flex gap-2">
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Share what's on your mind..."
+            placeholder={isKitchenMode ? "Ask about weaning, recipes, or food safety..." : "Share what's on your mind..."}
             className="rounded-full bg-card border-border"
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
           />
@@ -314,6 +471,53 @@ const ChatAssistant = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Onboarding Dialog */}
+      <Dialog open={showOnboarding} onOpenChange={setShowOnboarding}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-12 h-12 bg-gradient-to-r from-orange-100 to-amber-100 rounded-full flex items-center justify-center">
+                <img src={nunuKitchenIcon} alt="Nunu's Kitchen" className="w-8 h-8 rounded-full" />
+              </div>
+              <div>
+                <DialogTitle className="text-orange-800 flex items-center gap-2">
+                  <Sparkles className="h-5 w-5" />
+                  Welcome to Nunu's Kitchen!
+                </DialogTitle>
+              </div>
+            </div>
+            <DialogDescription className="text-orange-700 leading-relaxed">
+              Let Nunu help you with weaning, meal ideas, and food safety. Whether you're doing baby-led weaning or spoon feeding, 
+              Nunu is here to guide you through mealtimes with confidence.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 mt-4">
+            <div className="bg-orange-50 p-4 rounded-xl border border-orange-200">
+              <h4 className="font-semibold text-orange-800 mb-2 flex items-center gap-2">
+                <Baby className="h-4 w-4" />
+                What I can help with:
+              </h4>
+              <ul className="text-sm text-orange-700 space-y-1">
+                <li>• Age-appropriate food suggestions</li>
+                <li>• Safe cutting and prep techniques</li>
+                <li>• Allergen introduction guidance</li>
+                <li>• Recipe ideas using your ingredients</li>
+                <li>• Choking prevention tips</li>
+              </ul>
+            </div>
+            
+            <Button 
+              onClick={handleCompleteOnboarding}
+              className="w-full bg-orange-200 text-orange-800 hover:bg-orange-300 border border-orange-300"
+            >
+              Start Chatting
+              <ChefHat className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

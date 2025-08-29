@@ -10,9 +10,10 @@ import BreastSwitchPrompt from '@/components/BreastSwitchPrompt';
 
 interface HomeProps {
   onTabChange?: (tab: string) => void;
+  onKitchenModeToggle?: () => void;
 }
 
-const Home = ({ onTabChange }: HomeProps) => {
+const Home = ({ onTabChange, onKitchenModeToggle }: HomeProps) => {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [hasCheckedIn, setHasCheckedIn] = useState(false);
   const [showFeedingTimer, setShowFeedingTimer] = useState(false);
@@ -167,7 +168,7 @@ const Home = ({ onTabChange }: HomeProps) => {
               className="shadow-gentle border-none bg-gradient-to-r from-orange-50 to-amber-50 cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02] border border-orange-200/50"
               onClick={() => {
                 onTabChange?.('chat');
-                // This would pre-fill the chat with kitchen/weaning message
+                onKitchenModeToggle?.();
               }}
             >
               <CardContent className="p-4 text-center">
@@ -208,7 +209,10 @@ const Home = ({ onTabChange }: HomeProps) => {
           
           <Card 
             className="shadow-gentle border-none bg-gradient-to-r from-primary/5 to-accent/5 cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02] col-span-2"
-            onClick={() => onTabChange?.('chat')}
+            onClick={() => {
+              onTabChange?.('chat');
+              onKitchenModeToggle?.();
+            }}
           >
             <CardContent className="p-4">
               <div className="flex items-center gap-4">
@@ -216,11 +220,15 @@ const Home = ({ onTabChange }: HomeProps) => {
                   <span className="text-2xl">👩‍🍳</span>
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-bold text-base text-orange-800">🍽️ Nunu's Kitchen - Weaning Guide</h4>
+                  <h4 className="font-bold text-base text-orange-800 flex items-center gap-2">
+                    🍽️ Nunu's Kitchen - Weaning Guide
+                    <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-normal">NEW</span>
+                  </h4>
                   <p className="text-sm text-orange-600 mt-1">AI-powered weaning support • Safe food prep • Recipe ideas • Allergen guidance</p>
                   <div className="flex gap-1 mt-2">
                     <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">BLW Tips</span>
                     <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">Safety First</span>
+                    <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">Age-Appropriate</span>
                   </div>
                 </div>
               </div>

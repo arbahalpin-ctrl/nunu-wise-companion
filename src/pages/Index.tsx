@@ -13,6 +13,7 @@ import Settings from '@/pages/Settings';
 const Index = () => {
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
+  const [isKitchenMode, setIsKitchenMode] = useState(false);
 
   useEffect(() => {
     // Check if user has completed onboarding
@@ -23,6 +24,10 @@ const Index = () => {
   const handleOnboardingComplete = () => {
     localStorage.setItem('nunu-onboarding-completed', 'true');
     setHasCompletedOnboarding(true);
+  };
+
+  const handleKitchenModeToggle = () => {
+    setIsKitchenMode(true);
   };
 
   if (!hasCompletedOnboarding) {
@@ -36,7 +41,7 @@ const Index = () => {
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'home':
-        return <Home onTabChange={setActiveTab} />;
+        return <Home onTabChange={setActiveTab} onKitchenModeToggle={handleKitchenModeToggle} />;
       case 'baby':
         return <BabyProfile />;
       case 'routines':
@@ -46,11 +51,11 @@ const Index = () => {
       case 'notes':
         return <Reflections />;
       case 'chat':
-        return <ChatAssistant />;
+        return <ChatAssistant isKitchenMode={isKitchenMode} onKitchenModeChange={setIsKitchenMode} />;
       case 'settings':
         return <Settings />;
       default:
-        return <Home onTabChange={setActiveTab} />;
+        return <Home onTabChange={setActiveTab} onKitchenModeToggle={handleKitchenModeToggle} />;
     }
   };
 
