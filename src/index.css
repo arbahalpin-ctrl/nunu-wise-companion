@@ -4,57 +4,57 @@
 
 @layer base {
   :root {
-    /* Base colors - warm, earthy neutral palette */
-    --background: 33 43% 96%; /* Soft ivory #FAF4EF */
-    --foreground: 0 14% 21%; /* Deep chocolate #3C2F2F */
+    /* Base colors - pastel grey azure palette */
+    --background: 210 25% 97%; /* Soft azure white #F7F9FB */
+    --foreground: 210 15% 20%; /* Deep slate #313B42 */
 
-    /* Primary brand colors - muted cocoa brown */
-    --primary: 24 18% 31%; /* Muted cocoa brown #5C4A41 */
-    --primary-foreground: 33 43% 96%; /* Soft ivory contrast */
-    --primary-soft: 33 42% 81%; /* Warm beige #E2C6AD */
-    --primary-glow: 24 38% 73%; /* Dusty rose glow */
+    /* Primary brand colors - pastel grey azure */
+    --primary: 200 25% 65%; /* Pastel grey azure #9BB4C7 */
+    --primary-foreground: 210 25% 97%; /* Soft azure white contrast */
+    --primary-soft: 200 30% 85%; /* Light azure #D1E1EA */
+    --primary-glow: 200 35% 75%; /* Azure glow #B5CDD9 */
 
-    /* Nunu brand colors - earthy neutral tones */
-    --nunu-sky: 24 18% 31%; /* Muted cocoa brown */
-    --nunu-blush: 24 38% 73%; /* Dusty rose */
-    --nunu-sage: 24 21% 69%; /* Warm taupe */
-    --nunu-cream: 33 43% 96%; /* Soft ivory */
+    /* Nunu brand colors - azure tones */
+    --nunu-sky: 200 25% 65%; /* Pastel grey azure */
+    --nunu-blush: 200 35% 75%; /* Azure blush */
+    --nunu-sage: 200 20% 70%; /* Azure sage */
+    --nunu-cream: 210 25% 97%; /* Soft azure white */
 
     /* UI colors */
-    --secondary: 24 38% 73%; /* Dusty rose */
-    --secondary-foreground: 0 14% 21%; /* Deep chocolate */
-    --secondary-soft: 24 21% 69%; /* Warm taupe */
+    --secondary: 200 35% 75%; /* Azure blush */
+    --secondary-foreground: 210 15% 20%; /* Deep slate */
+    --secondary-soft: 200 20% 80%; /* Soft azure */
 
-    --muted: 33 42% 81%; /* Warm beige - subtle backgrounds */
-    --muted-foreground: 0 0% 29%; /* Charcoal grey - secondary text */
+    --muted: 200 30% 85%; /* Light azure - subtle backgrounds */
+    --muted-foreground: 210 10% 35%; /* Azure grey - secondary text */
 
-    --accent: 24 21% 69%; /* Warm taupe */
-    --accent-foreground: 0 14% 21%; /* Deep chocolate */
-    --accent-soft: 33 42% 81%; /* Warm beige highlight */
+    --accent: 200 20% 70%; /* Azure sage */
+    --accent-foreground: 210 15% 20%; /* Deep slate */
+    --accent-soft: 200 30% 85%; /* Light azure highlight */
 
     --destructive: 0 84% 60%; /* Warm red for alerts */
     --destructive-foreground: 33 43% 96%; /* Soft ivory */
 
-    --border: 33 42% 81%; /* Warm beige - gentle divisions */
-    --input: 33 43% 96%; /* Soft ivory - form backgrounds */
-    --ring: 24 18% 31%; /* Muted cocoa - focus indicators */
+    --border: 200 30% 85%; /* Light azure - gentle divisions */
+    --input: 210 25% 97%; /* Soft azure white - form backgrounds */
+    --ring: 200 25% 65%; /* Pastel grey azure - focus indicators */
 
     /* Card and surface colors */
-    --card: 33 43% 96%; /* Soft ivory - clean surfaces */
-    --card-foreground: 0 14% 21%; /* Deep chocolate */
+    --card: 210 25% 97%; /* Soft azure white - clean surfaces */
+    --card-foreground: 210 15% 20%; /* Deep slate */
 
-    --popover: 33 43% 96%;
-    --popover-foreground: 0 14% 21%;
+    --popover: 210 25% 97%;
+    --popover-foreground: 210 15% 20%;
 
     /* Gradients for nurturing aesthetics */
-    --gradient-comfort: linear-gradient(45deg, hsl(33 43% 96%) 0%, hsl(24 38% 73%) 100%);
-    --gradient-nurture: linear-gradient(135deg, hsl(24 38% 73%) 0%, hsl(33 42% 81%) 100%);
-    --gradient-calm: linear-gradient(180deg, hsl(33 43% 96%) 0%, hsl(24 21% 69%) 100%);
+    --gradient-comfort: linear-gradient(45deg, hsl(210 25% 97%) 0%, hsl(200 35% 75%) 100%);
+    --gradient-nurture: linear-gradient(135deg, hsl(200 35% 75%) 0%, hsl(200 30% 85%) 100%);
+    --gradient-calm: linear-gradient(180deg, hsl(210 25% 97%) 0%, hsl(200 20% 70%) 100%);
 
     /* Soft shadows for gentle depth */
-    --shadow-gentle: 0 1px 3px 0 hsl(24 18% 31% / 0.1), 0 1px 2px -1px hsl(24 18% 31% / 0.1);
-    --shadow-comfort: 0 4px 6px -1px hsl(24 38% 73% / 0.3), 0 2px 4px -2px hsl(24 38% 73% / 0.3);
-    --shadow-nurture: 0 10px 15px -3px hsl(33 42% 81% / 0.2), 0 4px 6px -4px hsl(33 42% 81% / 0.2);
+    --shadow-gentle: 0 1px 3px 0 hsl(200 25% 65% / 0.1), 0 1px 2px -1px hsl(200 25% 65% / 0.1);
+    --shadow-comfort: 0 4px 6px -1px hsl(200 35% 75% / 0.3), 0 2px 4px -2px hsl(200 35% 75% / 0.3);
+    --shadow-nurture: 0 10px 15px -3px hsl(200 30% 85% / 0.2), 0 4px 6px -4px hsl(200 30% 85% / 0.2);
 
     /* Animation values for comfort */
     --transition-comfort: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -63,63 +63,63 @@
 
     --radius: 0.75rem;
 
-    --sidebar-background: 33 43% 96%;
-    --sidebar-foreground: 0 14% 21%;
-    --sidebar-primary: 24 18% 31%;
-    --sidebar-primary-foreground: 33 43% 96%;
-    --sidebar-accent: 24 38% 73%;
-    --sidebar-accent-foreground: 0 14% 21%;
-    --sidebar-border: 33 42% 81%;
-    --sidebar-ring: 24 18% 31%;
+    --sidebar-background: 210 25% 97%;
+    --sidebar-foreground: 210 15% 20%;
+    --sidebar-primary: 200 25% 65%;
+    --sidebar-primary-foreground: 210 25% 97%;
+    --sidebar-accent: 200 35% 75%;
+    --sidebar-accent-foreground: 210 15% 20%;
+    --sidebar-border: 200 30% 85%;
+    --sidebar-ring: 200 25% 65%;
   }
 
   .dark {
-    /* Dark mode: Deep chocolate and warm tones */
-    --background: 0 14% 21%; /* Deep chocolate - comforting dark */
-    --foreground: 33 43% 96%; /* Soft ivory - gentle light text */
+    /* Dark mode: Deep azure and cool tones */
+    --background: 210 15% 20%; /* Deep slate - comforting dark */
+    --foreground: 210 25% 97%; /* Soft azure white - gentle light text */
 
-    --primary: 24 38% 73%; /* Dusty rose - warm accent */
-    --primary-foreground: 0 14% 21%; /* Deep chocolate */
-    --primary-soft: 24 21% 69%; /* Warm taupe highlight */
+    --primary: 200 35% 75%; /* Azure blush - cool accent */
+    --primary-foreground: 210 15% 20%; /* Deep slate */
+    --primary-soft: 200 20% 70%; /* Azure sage highlight */
 
-    --secondary: 33 42% 81%; /* Warm beige accent */
-    --secondary-foreground: 0 14% 21%;
-    --secondary-soft: 24 21% 69%; /* Warm taupe */
+    --secondary: 200 30% 85%; /* Light azure accent */
+    --secondary-foreground: 210 15% 20%;
+    --secondary-soft: 200 20% 70%; /* Azure sage */
 
-    --muted: 24 18% 31%; /* Muted cocoa - subtle dark backgrounds */
-    --muted-foreground: 0 0% 29%; /* Charcoal grey - muted text */
+    --muted: 200 20% 30%; /* Dark azure - subtle dark backgrounds */
+    --muted-foreground: 210 10% 40%; /* Cool grey - muted text */
 
-    --accent: 24 21% 69%; /* Warm taupe - gentle accent */
-    --accent-foreground: 0 14% 21%;
-    --accent-soft: 33 42% 81%; /* Warm beige */
+    --accent: 200 20% 70%; /* Azure sage - gentle accent */
+    --accent-foreground: 210 15% 20%;
+    --accent-soft: 200 30% 85%; /* Light azure */
 
     --destructive: 0 84% 60%; /* Warm red - softer alerts */
-    --destructive-foreground: 33 43% 96%;
+    --destructive-foreground: 210 25% 97%;
 
-    --border: 24 18% 31%; /* Muted cocoa - divisions */
-    --input: 24 18% 31%; /* Muted cocoa - form fields */
-    --ring: 24 38% 73%; /* Dusty rose */
+    --border: 200 20% 30%; /* Dark azure - divisions */
+    --input: 200 20% 30%; /* Dark azure - form fields */
+    --ring: 200 35% 75%; /* Azure blush */
 
-    --card: 24 18% 31%; /* Muted cocoa - elevated dark surfaces */
-    --card-foreground: 33 43% 96%;
+    --card: 200 20% 30%; /* Dark azure - elevated dark surfaces */
+    --card-foreground: 210 25% 97%;
 
-    --popover: 24 18% 31%;
-    --popover-foreground: 33 43% 96%;
+    --popover: 200 20% 30%;
+    --popover-foreground: 210 25% 97%;
 
     /* Dark mode gradients */
-    --gradient-comfort: linear-gradient(45deg, hsl(0 14% 21%) 0%, hsl(24 38% 73%) 100%);
-    --gradient-nurture: linear-gradient(135deg, hsl(24 38% 73%) 0%, hsl(24 18% 31%) 100%);
-    --gradient-calm: linear-gradient(180deg, hsl(24 18% 31%) 0%, hsl(24 21% 69%) 100%);
+    --gradient-comfort: linear-gradient(45deg, hsl(210 15% 20%) 0%, hsl(200 35% 75%) 100%);
+    --gradient-nurture: linear-gradient(135deg, hsl(200 35% 75%) 0%, hsl(200 20% 30%) 100%);
+    --gradient-calm: linear-gradient(180deg, hsl(200 20% 30%) 0%, hsl(200 20% 70%) 100%);
 
     /* Sidebar colors */
-    --sidebar-background: 0 14% 21%;
-    --sidebar-foreground: 33 43% 96%;
-    --sidebar-primary: 24 38% 73%;
-    --sidebar-primary-foreground: 0 14% 21%;
-    --sidebar-accent: 24 18% 31%;
-    --sidebar-accent-foreground: 33 43% 96%;
-    --sidebar-border: 24 18% 31%;
-    --sidebar-ring: 24 38% 73%;
+    --sidebar-background: 210 15% 20%;
+    --sidebar-foreground: 210 25% 97%;
+    --sidebar-primary: 200 35% 75%;
+    --sidebar-primary-foreground: 210 15% 20%;
+    --sidebar-accent: 200 20% 30%;
+    --sidebar-accent-foreground: 210 25% 97%;
+    --sidebar-border: 200 20% 30%;
+    --sidebar-ring: 200 35% 75%;
   }
 }
 
