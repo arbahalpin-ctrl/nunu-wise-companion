@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { MessageCircle, Moon, Heart, Sparkles, CloudRain, Battery, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import koalaHero from '@/assets/nunu-logo-koala.png';
+import koalaHero from '@/assets/nunu-logo.svg';
 
 interface HomeProps {
   onTabChange?: (tab: string) => void;

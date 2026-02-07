@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import heroImage from '@/assets/nunu-logo-koala.png';
+import heroImage from '@/assets/nunu-logo.svg';
 
 interface OnboardingProps {
   onComplete: () => void;
