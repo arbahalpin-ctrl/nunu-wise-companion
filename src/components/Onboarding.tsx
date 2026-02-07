@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { ArrowRight, Heart, Baby, Shield } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import heroImage from '@/assets/nunu-logo-koala.png';
 
 interface OnboardingProps {
@@ -9,195 +8,60 @@ interface OnboardingProps {
 }
 
 const Onboarding = ({ onComplete }: OnboardingProps) => {
-  const [currentStep, setCurrentStep] = useState(0);
-
-  const steps = [
-    {
-      title: "Welcome to Nunu",
-      subtitle: "Your gentle companion through motherhood",
-      content: (
-        <div className="text-center space-y-6">
-          <div className="w-44 h-44 mx-auto bg-white rounded-full p-3 shadow-comfort">
-            <img 
-              src={heroImage} 
-              alt="Nunu koala logo" 
-              className="w-full h-full object-contain rounded-full"
-            />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold mb-3">Hey, mama 💛</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              I'm Nunu. I'm here to walk beside you through the beautiful chaos of motherhood — 
-              no judgment, just support.
-            </p>
-          </div>
-          <div className="bg-accent-soft p-4 rounded-2xl">
-            <p className="text-sm text-accent-foreground italic">
-              "You don't have to be perfect. You just have to be present. And you already are."
-            </p>
-          </div>
-        </div>
-      )
-    },
-    {
-      title: "Track with Love",
-      subtitle: "Gentle routine tracking",
-      content: (
-        <div className="text-center space-y-6">
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-nunu-peach/20 p-4 rounded-2xl">
-              <div className="text-2xl mb-2">🍼</div>
-              <p className="text-xs font-medium">Feeding</p>
-            </div>
-            <div className="bg-nunu-lavender/20 p-4 rounded-2xl">
-              <div className="text-2xl mb-2">😴</div>
-              <p className="text-xs font-medium">Sleep</p>
-            </div>
-            <div className="bg-nunu-sage/20 p-4 rounded-2xl">
-              <div className="text-2xl mb-2">👶</div>
-              <p className="text-xs font-medium">Diapers</p>
-            </div>
-          </div>
-          <div>
-            <h2 className="text-xl font-bold mb-3">Understanding, not judging</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Track your baby's routines to learn their unique patterns. 
-              Every baby is different, and Nunu celebrates that.
-            </p>
-          </div>
-        </div>
-      )
-    },
-    {
-      title: "Your Voice Matters",
-      subtitle: "Express yourself safely",
-      content: (
-        <div className="text-center space-y-6">
-          <div className="w-20 h-20 bg-gradient-nurture rounded-full flex items-center justify-center mx-auto shadow-gentle">
-            <Heart className="h-8 w-8 text-white" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold mb-3">Share your heart</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Record voice notes, check in with your mood, and chat with our AI companion 
-              who remembers your journey and offers personalized support.
-            </p>
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center gap-3 text-left">
-              <div className="w-2 h-2 bg-primary rounded-full" />
-              <span className="text-sm">Daily mood check-ins</span>
-            </div>
-            <div className="flex items-center gap-3 text-left">
-              <div className="w-2 h-2 bg-primary rounded-full" />
-              <span className="text-sm">Voice reflection notes</span>
-            </div>
-            <div className="flex items-center gap-3 text-left">
-              <div className="w-2 h-2 bg-primary rounded-full" />
-              <span className="text-sm">AI companion that remembers</span>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    {
-      title: "Safe & Private",
-      subtitle: "Your data, your choice",
-      content: (
-        <div className="text-center space-y-6">
-          <div className="w-20 h-20 bg-gradient-calm rounded-full flex items-center justify-center mx-auto shadow-gentle">
-            <Shield className="h-8 w-8 text-white" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold mb-3">Protected with love</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Your most vulnerable moments deserve the highest protection. 
-              All data is encrypted and never shared without your permission.
-            </p>
-          </div>
-          <div className="bg-secondary-soft p-4 rounded-2xl">
-            <p className="text-sm text-secondary-foreground">
-              🔒 End-to-end encryption<br/>
-              🚫 No data selling<br/>
-              💝 Built by mothers, for mothers
-            </p>
-          </div>
-        </div>
-      )
-    }
-  ];
-
-  const handleNext = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      onComplete();
-    }
-  };
-
-  const handleSkip = () => {
-    onComplete();
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-comfort p-6 flex flex-col">
-      {/* Progress */}
-      <div className="flex justify-between items-center mb-8">
-        <div className="flex gap-2">
-          {steps.map((_, index) => (
-            <div 
-              key={index}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                index === currentStep 
-                  ? 'w-8 bg-primary' 
-                  : index < currentStep 
-                    ? 'w-2 bg-primary/60'
-                    : 'w-2 bg-border'
-              }`}
-            />
-          ))}
+    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white flex flex-col items-center justify-center p-8">
+      
+      {/* Koala - Big and Friendly */}
+      <div className="mb-8">
+        <div className="w-48 h-48 bg-white rounded-full p-4 shadow-xl border-4 border-white">
+          <img 
+            src={heroImage} 
+            alt="Nunu" 
+            className="w-full h-full object-contain rounded-full"
+          />
         </div>
-        <Button variant="ghost" onClick={handleSkip} className="text-sm text-muted-foreground">
-          Skip
-        </Button>
       </div>
 
-      {/* Content */}
-      <Card className="flex-1 shadow-comfort border-none">
-        <CardContent className="p-8 flex flex-col justify-center h-full">
-          {steps[currentStep].content}
-        </CardContent>
-      </Card>
-
-      {/* Navigation */}
-      <div className="mt-6 space-y-4">
-        <Button 
-          onClick={handleNext}
-          className="w-full py-4 rounded-2xl shadow-gentle text-base"
-        >
-          {currentStep < steps.length - 1 ? (
-            <>
-              Continue
-              <ArrowRight className="h-5 w-5 ml-2" />
-            </>
-          ) : (
-            <>
-              Start Your Journey
-              <Heart className="h-5 w-5 ml-2" />
-            </>
-          )}
-        </Button>
-        
-        {currentStep > 0 && (
-          <Button 
-            variant="ghost" 
-            onClick={() => setCurrentStep(currentStep - 1)}
-            className="w-full"
-          >
-            Back
-          </Button>
-        )}
+      {/* Simple Welcome */}
+      <div className="text-center max-w-xs mb-12">
+        <h1 className="text-3xl font-bold text-slate-800 mb-4">
+          Hey, I'm Nunu
+        </h1>
+        <p className="text-slate-500 leading-relaxed">
+          I'm here to listen, support, and help you through the tough moments of motherhood. No judgment — just a friend in your pocket.
+        </p>
       </div>
+
+      {/* What I help with - Simple list */}
+      <div className="flex gap-6 mb-12 text-slate-500">
+        <div className="flex flex-col items-center">
+          <span className="text-2xl mb-1">😴</span>
+          <span className="text-xs">Sleep</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <span className="text-2xl mb-1">💭</span>
+          <span className="text-xs">Worries</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <span className="text-2xl mb-1">💛</span>
+          <span className="text-xs">Support</span>
+        </div>
+      </div>
+
+      {/* Single CTA */}
+      <Button 
+        onClick={onComplete}
+        size="lg"
+        className="rounded-full px-10 py-6 text-base shadow-lg bg-slate-800 hover:bg-slate-700"
+      >
+        Let's start
+        <ArrowRight className="h-5 w-5 ml-2" />
+      </Button>
+
+      {/* Privacy note - subtle */}
+      <p className="text-xs text-slate-400 mt-8 text-center max-w-xs">
+        Your conversations are private. I'm here for you, not your data.
+      </p>
     </div>
   );
 };

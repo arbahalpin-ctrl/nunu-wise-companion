@@ -1,395 +1,146 @@
 import { useState } from 'react';
-import { Heart, Zap, Bed, Sparkles, HelpCircle, MessageCircle, Baby, Calendar, Clock } from 'lucide-react';
+import { MessageCircle, Moon, Heart, Sparkles, CloudRain, Battery, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { getCurrentWeekQuote } from '@/data/weeklyQuotes';
 import koalaHero from '@/assets/nunu-logo-koala.png';
-import FeedingTimer, { FeedingLog as FeedingLogType } from '@/components/FeedingTimer';
-import FeedingLog from '@/components/FeedingLog';
-import BreastSwitchPrompt from '@/components/BreastSwitchPrompt';
 
 interface HomeProps {
   onTabChange?: (tab: string) => void;
-  onKitchenModeToggle?: () => void;
 }
 
-const Home = ({ onTabChange, onKitchenModeToggle }: HomeProps) => {
+const Home = ({ onTabChange }: HomeProps) => {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
-  const [hasCheckedIn, setHasCheckedIn] = useState(false);
-  const [showFeedingTimer, setShowFeedingTimer] = useState(false);
-  const [feedingLogs, setFeedingLogs] = useState<FeedingLogType[]>([]);
-  const [showBreastSwitchPrompt, setShowBreastSwitchPrompt] = useState(false);
-  const [lastFeedNotes, setLastFeedNotes] = useState('');
-  const [timerProps, setTimerProps] = useState<{
-    initialFeedingType?: 'left-breast' | 'right-breast' | 'bottle';
-    previousNotes?: string;
-  }>({});
-  const currentQuote = getCurrentWeekQuote();
-
-  // Sample baby data - this would come from baby profile in a real app
-  const babyData = {
-    name: "Emma",
-    birthDate: new Date(Date.now() - (45 * 24 * 60 * 60 * 1000)), // 45 days ago
-    lastFeed: "2 hours ago",
-    lastSleep: "30 mins ago"
-  };
-
-  const getBabyAge = () => {
-    const ageInDays = Math.floor((Date.now() - babyData.birthDate.getTime()) / (1000 * 60 * 60 * 24));
-    if (ageInDays < 14) {
-      return `${ageInDays} days old`;
-    } else if (ageInDays < 70) {
-      const weeks = Math.floor(ageInDays / 7);
-      return `${weeks} week${weeks > 1 ? 's' : ''} old`;
-    } else {
-      const months = Math.floor(ageInDays / 30);
-      return `${months} month${months > 1 ? 's' : ''} old`;
-    }
-  };
+  const [showMoodResponse, setShowMoodResponse] = useState(false);
 
   const moods = [
-    { id: 'great', icon: Zap, label: 'Energized', color: 'text-primary' },
-    { id: 'light', icon: 'emoji', emoji: '✨', label: 'Light today', color: 'text-primary' },
-    { id: 'hopeful', icon: Sparkles, label: 'Hopeful', color: 'text-nunu-sky' },
-    { id: 'tender', icon: 'emoji', emoji: '🧸', label: 'Tender', color: 'text-nunu-blush' },
-    { id: 'hanging', icon: 'emoji', emoji: '🫶', label: 'Hanging in there', color: 'text-nunu-sage' },
-    { id: 'exhausted', icon: Bed, label: 'Exhausted', color: 'text-muted-foreground' },
-    { id: 'tearful', icon: 'emoji', emoji: '😢', label: 'Tearful', color: 'text-primary' },
-    { id: 'overwhelmed', icon: HelpCircle, label: 'Overwhelmed', color: 'text-destructive' },
-    { id: 'unknown', icon: HelpCircle, label: "I don't know what I feel", color: 'text-muted-foreground' },
+    { id: 'good', emoji: '😊', label: 'Good', color: 'bg-emerald-100 border-emerald-300' },
+    { id: 'okay', emoji: '😐', label: 'Okay', color: 'bg-amber-100 border-amber-300' },
+    { id: 'tired', emoji: '😴', label: 'Tired', color: 'bg-blue-100 border-blue-300' },
+    { id: 'anxious', emoji: '😰', label: 'Anxious', color: 'bg-purple-100 border-purple-300' },
+    { id: 'sad', emoji: '😢', label: 'Sad', color: 'bg-indigo-100 border-indigo-300' },
+    { id: 'overwhelmed', emoji: '😩', label: 'Overwhelmed', color: 'bg-rose-100 border-rose-300' },
   ];
+
+  const getMoodResponse = (mood: string) => {
+    const responses: Record<string, string> = {
+      good: "That's lovely to hear. Even good days deserve acknowledgment. 💛",
+      okay: "Okay is okay. Not every day needs to be amazing.",
+      tired: "Tiredness is so real in this season. You're running on fumes and still showing up.",
+      anxious: "Anxiety can feel so heavy. Want to talk through what's on your mind?",
+      sad: "Sadness is allowed here. You don't have to push through alone.",
+      overwhelmed: "When everything feels like too much, let's just focus on right now. One breath.",
+    };
+    return responses[mood] || "Thanks for sharing how you're feeling.";
+  };
 
   const handleMoodSelect = (moodId: string) => {
     setSelectedMood(moodId);
+    setShowMoodResponse(true);
   };
 
-  const handleCheckin = () => {
-    if (selectedMood) {
-      setHasCheckedIn(true);
-      // Here you would save the mood check-in
-    }
+  const handleTalkToNunu = () => {
+    onTabChange?.('chat');
   };
-
-  const handleSaveFeed = (feed: FeedingLogType) => {
-    setFeedingLogs(prev => [...prev, feed]);
-    setLastFeedNotes(feed.notes);
-    
-    // If it was a left breast feed, prompt for right breast
-    if (feed.feedingType === 'left-breast') {
-      setShowFeedingTimer(false);
-      setShowBreastSwitchPrompt(true);
-    } else {
-      setShowFeedingTimer(false);
-    }
-  };
-
-  const handleBreastSwitchYes = () => {
-    setShowBreastSwitchPrompt(false);
-    setTimerProps({
-      initialFeedingType: 'right-breast',
-      previousNotes: lastFeedNotes
-    });
-    setShowFeedingTimer(true);
-  };
-
-  const handleBreastSwitchNo = () => {
-    setShowBreastSwitchPrompt(false);
-    setTimerProps({});
-  };
-
-  const handleStartFeedingTimer = () => {
-    setTimerProps({});
-    setShowFeedingTimer(true);
-  };
-
-  if (showFeedingTimer) {
-    return (
-      <FeedingTimer 
-        onBack={() => setShowFeedingTimer(false)}
-        onSaveFeed={handleSaveFeed}
-        initialFeedingType={timerProps.initialFeedingType}
-        previousNotes={timerProps.previousNotes}
-      />
-    );
-  }
 
   return (
-    <div className="pb-20 min-h-screen bg-gradient-comfort">
-      {/* Hero Section */}
-      <div className="relative bg-gradient-nurture rounded-b-3xl overflow-hidden p-6">
-        <div className="flex flex-col items-center text-center space-y-4">
-          {/* Koala Image */}
-          <div className="relative">
-            <div className="w-28 h-28 bg-white rounded-full p-2 shadow-nurture backdrop-blur-sm border-2 border-white/30">
-              <img 
-                src={koalaHero} 
-                alt="Gentle koala companion" 
-                className="w-full h-full object-contain rounded-full drop-shadow-sm"
-              />
-            </div>
-          </div>
-          
-          {/* Greeting */}
-          <div>
-            <h1 className="text-2xl font-bold text-foreground mb-2 tracking-tight">
-              Hey, you <span className="text-primary animate-comfort-pulse">💛</span>
-            </h1>
-            <p className="text-muted-foreground text-base leading-relaxed">
-              Take a breath. How are you really doing today?
-            </p>
+    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white flex flex-col">
+      {/* Main Content - Centered */}
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-8">
+        
+        {/* Koala - Big and Central */}
+        <div className="mb-6">
+          <div className="w-36 h-36 bg-white rounded-full p-3 shadow-lg border-4 border-white">
+            <img 
+              src={koalaHero} 
+              alt="Nunu" 
+              className="w-full h-full object-contain rounded-full"
+            />
           </div>
         </div>
-      </div>
 
-      <div className="p-6 space-y-6">
-        {/* Ask Nunu - Quick Topic Starters */}
-        <div className="space-y-3">
-          <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-            <MessageCircle className="h-5 w-5 text-primary" />
-            Ask Nunu About...
-          </h3>
-          
-          <div className="grid grid-cols-2 gap-3">
-            <Card 
-              className="shadow-gentle border-none bg-card cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02]"
-              onClick={() => {
-                onTabChange?.('chat');
-                // This would pre-fill the chat with sleep support message
-              }}
-            >
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">😴</div>
-                <span className="text-sm font-medium">Sleep Support</span>
-                <p className="text-xs text-muted-foreground mt-1">Bedtime, naps, night wakes</p>
-              </CardContent>
-            </Card>
-            
-            <Card 
-              className="shadow-gentle border-none bg-gradient-to-r from-orange-50 to-amber-50 cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02] border border-orange-200/50"
-              onClick={() => {
-                onTabChange?.('chat');
-                onKitchenModeToggle?.();
-              }}
-            >
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">👩‍🍳</div>
-                <span className="text-sm font-bold text-orange-800">Nunu's Kitchen</span>
-                <p className="text-xs text-orange-600 mt-1">Weaning recipes & food safety</p>
-              </CardContent>
-            </Card>
-            
-            <Card 
-              className="shadow-gentle border-none bg-card cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02]"
-              onClick={() => {
-                onTabChange?.('chat');
-                // This would pre-fill the chat with potty training message
-              }}
-            >
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">🚽</div>
-                <span className="text-sm font-medium">Potty Training</span>
-                <p className="text-xs text-muted-foreground mt-1">Readiness, tips, accidents</p>
-              </CardContent>
-            </Card>
-            
-            <Card 
-              className="shadow-gentle border-none bg-card cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02]"
-              onClick={() => {
-                onTabChange?.('chat');
-                // This would pre-fill the chat with overwhelm message
-              }}
-            >
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">🤗</div>
-                <span className="text-sm font-medium">I'm Overwhelmed</span>
-                <p className="text-xs text-muted-foreground mt-1">Emotional support & care</p>
-              </CardContent>
-            </Card>
-          </div>
-          
-          <Card 
-            className="shadow-gentle border-none bg-gradient-to-r from-primary/5 to-accent/5 cursor-pointer hover:shadow-comfort transition-all duration-300 hover:scale-[1.02] col-span-2"
-            onClick={() => {
-              onTabChange?.('chat');
-              onKitchenModeToggle?.();
-            }}
-          >
-            <CardContent className="p-4">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-100 to-amber-100 rounded-full flex items-center justify-center border border-orange-200/50">
-                  <span className="text-2xl">👩‍🍳</span>
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-base text-orange-800 flex items-center gap-2">
-                    🍽️ Nunu's Kitchen - Weaning Guide
-                    <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-normal">NEW</span>
-                  </h4>
-                  <p className="text-sm text-orange-600 mt-1">AI-powered weaning support • Safe food prep • Recipe ideas • Allergen guidance</p>
-                  <div className="flex gap-1 mt-2">
-                    <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">BLW Tips</span>
-                    <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">Safety First</span>
-                    <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">Age-Appropriate</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Greeting */}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-slate-800 mb-2">
+            Hey, you 💛
+          </h1>
+          <p className="text-slate-500">
+            How are you feeling right now?
+          </p>
         </div>
 
-        {/* Quote of the Day */}
-        <Card className="shadow-gentle border-none bg-accent/20 backdrop-blur-sm">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <div className="text-lg">✨</div>
-              <div className="flex-1">
-                <p className="text-sm text-accent-foreground italic leading-relaxed">
-                  "{currentQuote.quote}" {currentQuote.emoji}
-                </p>
-              </div>
+        {/* Mood Selection */}
+        {!showMoodResponse ? (
+          <div className="w-full max-w-sm">
+            <div className="grid grid-cols-3 gap-3 mb-8">
+              {moods.map((mood) => (
+                <button
+                  key={mood.id}
+                  onClick={() => handleMoodSelect(mood.id)}
+                  className={`
+                    p-4 rounded-2xl border-2 transition-all duration-200
+                    hover:scale-105 active:scale-95
+                    ${mood.color}
+                  `}
+                >
+                  <div className="text-2xl mb-1">{mood.emoji}</div>
+                  <div className="text-xs font-medium text-slate-600">{mood.label}</div>
+                </button>
+              ))}
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Baby Summary Widget */}
-        <Card className="shadow-gentle border-none bg-gradient-to-r from-primary/5 to-primary/10">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <Baby className="h-6 w-6 text-primary" />
-              </div>
-              
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-semibold text-foreground">{babyData.name}</h3>
-                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
-                    {getBabyAge()}
-                  </span>
-                </div>
-                
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-blue-500/60 rounded-full"></div>
-                    <span>Fed {babyData.lastFeed}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-purple-500/60 rounded-full"></div>
-                    <span>Slept {babyData.lastSleep}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="text-xl">
-                👶
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Mood Check-in */}
-        {!hasCheckedIn ? (
-          <Card className="shadow-gentle border-none">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Heart className="h-5 w-5 text-primary animate-comfort-pulse" />
-                <h2 className="font-semibold">Daily Check-in</h2>
-              </div>
-              
-              <p className="text-muted-foreground text-sm mb-4">
-                Your feelings matter. Let's gently name them — no pressure, no judgment.
-              </p>
-
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                {moods.map((mood) => {
-                  const isSelected = selectedMood === mood.id;
-                  
-                  return (
-                    <button
-                      key={mood.id}
-                      onClick={() => handleMoodSelect(mood.id)}
-                      className={`
-                        p-4 rounded-2xl border-2 transition-all duration-300 text-left
-                        ${isSelected 
-                          ? 'border-primary bg-primary-soft shadow-gentle' 
-                          : 'border-border hover:border-primary/50 hover:bg-muted'
-                        }
-                      `}
-                    >
-                      {mood.icon === 'emoji' ? (
-                        <div className={`text-xl mb-2`}>{mood.emoji}</div>
-                      ) : (
-                        <mood.icon className={`h-6 w-6 mb-2 ${mood.color}`} />
-                      )}
-                      <span className="font-medium text-sm">{mood.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <Button 
-                onClick={handleCheckin}
-                disabled={!selectedMood}
-                className="w-full rounded-xl shadow-gentle"
-              >
-                Check In
-              </Button>
-            </CardContent>
-          </Card>
+          </div>
         ) : (
-          <Card className="shadow-gentle border-none bg-gradient-comfort">
-            <CardContent className="p-6 text-center">
-              <div className="animate-gentle-bounce mb-2">
-                <Heart className="h-8 w-8 text-primary mx-auto" />
+          <Card className="w-full max-w-sm mb-8 border-none shadow-md bg-white/80 backdrop-blur">
+            <CardContent className="p-5 text-center">
+              <div className="text-3xl mb-3">
+                {moods.find(m => m.id === selectedMood)?.emoji}
               </div>
-              <h3 className="font-semibold mb-2">Thank you for sharing</h3>
-              <p className="text-muted-foreground text-sm">
-                Remember, you're doing an amazing job. Every feeling is valid. 💝
+              <p className="text-slate-600 leading-relaxed">
+                {getMoodResponse(selectedMood || '')}
               </p>
+              <button 
+                onClick={() => setShowMoodResponse(false)}
+                className="text-sm text-slate-400 mt-4 hover:text-slate-600"
+              >
+                Check in again
+              </button>
             </CardContent>
           </Card>
         )}
 
-        {/* Quick Actions */}
-        <div className="space-y-3">
-          <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-            Quick Actions
-          </h3>
-          
-          <div className="grid grid-cols-2 gap-3">
-            <Card 
-              className="shadow-nurture border-none cursor-pointer hover:scale-105 transition-transform"
-              onClick={handleStartFeedingTimer}
-            >
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">🍼</div>
-                <span className="text-sm font-medium">Log Feeding</span>
-              </CardContent>
-            </Card>
-            
-            <Card className="shadow-nurture border-none cursor-pointer hover:scale-105 transition-transform">
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">😴</div>
-                <span className="text-sm font-medium">Sleep Log</span>
-              </CardContent>
-            </Card>
-            
-            <Card className="shadow-nurture border-none cursor-pointer hover:scale-105 transition-transform">
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl mb-2">🎵</div>
-                <span className="text-sm font-medium">Voice Note</span>
-              </CardContent>
-            </Card>
-          </div>
+        {/* Primary CTA */}
+        <Button 
+          onClick={handleTalkToNunu}
+          size="lg"
+          className="rounded-full px-8 py-6 text-base shadow-lg bg-slate-800 hover:bg-slate-700"
+        >
+          <MessageCircle className="h-5 w-5 mr-2" />
+          Talk to Nunu
+        </Button>
+
+        {/* Quick Access - Subtle */}
+        <div className="flex gap-4 mt-8">
+          <button 
+            onClick={() => onTabChange?.('chat')}
+            className="flex flex-col items-center text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            <Moon className="h-5 w-5 mb-1" />
+            <span className="text-xs">Sleep help</span>
+          </button>
+          <button 
+            onClick={() => onTabChange?.('chat')}
+            className="flex flex-col items-center text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            <Heart className="h-5 w-5 mb-1" />
+            <span className="text-xs">How I feel</span>
+          </button>
         </div>
+      </div>
 
-        {/* Today's Feeding Log */}
-        {feedingLogs.length > 0 && <FeedingLog feeds={feedingLogs} />}
-
-        {/* Breast Switch Prompt */}
-        <BreastSwitchPrompt
-          isVisible={showBreastSwitchPrompt}
-          onYes={handleBreastSwitchYes}
-          onNo={handleBreastSwitchNo}
-        />
+      {/* Bottom - Subtle encouragement */}
+      <div className="px-6 pb-24 text-center">
+        <p className="text-sm text-slate-400 italic">
+          You're doing better than you think.
+        </p>
       </div>
     </div>
   );
