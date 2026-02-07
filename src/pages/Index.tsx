@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import Onboarding from '@/components/Onboarding';
 import Home from '@/pages/Home';
+import Sleep from '@/pages/Sleep';
 import ChatAssistant from '@/pages/ChatAssistant';
 import Settings from '@/pages/Settings';
 
@@ -27,6 +28,8 @@ const Index = () => {
     switch (activeTab) {
       case 'home':
         return <Home onTabChange={setActiveTab} />;
+      case 'sleep':
+        return <Sleep onTabChange={setActiveTab} />;
       case 'chat':
         return <ChatAssistant />;
       case 'settings':
