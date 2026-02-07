@@ -24,7 +24,7 @@ const ChatAssistant = ({ isKitchenMode: initialKitchenMode = false, onKitchenMod
     {
       id: '1',
       type: 'assistant',
-      content: "Hello beautiful mama! I'm Nunu, your compassionate motherhood companion. I'm here to support you through all aspects of this journey - sleep, feeding, emotional wellness, development, and everything in between. What's on your heart today? 💙",
+      content: "Hey, I'm Nunu. I'm here whenever you need to talk — about sleep, feeding, how you're feeling, or just to vent. No judgment, no pressure. What's going on today? 💙",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -91,12 +91,12 @@ const ChatAssistant = ({ isKitchenMode: initialKitchenMode = false, onKitchenMod
       
       // General weaning responses with enhanced safety focus
       const weaningResponses = [
-        "Welcome to Nunu's Kitchen! 👩‍🍳 Weaning is such an exciting journey. Every baby develops at their own pace with eating. How old is your little one and what foods have you tried so far? I'll share age-appropriate, safe serving suggestions!",
-        "Starting solids can feel overwhelming, but you've got this! Remember, 'food before one is just for fun' - milk is still their main nutrition. **Safety first:** Always supervise eating and trust your instincts. What specific foods or textures are you curious about?",
-        "Baby-led weaning and spoon feeding both have amazing benefits - many families do a combination! What approach feels right for your family? I can share safe serving sizes and shapes for any food you're thinking about! 🍌",
-        "Gagging vs choking - such an important distinction! Gagging is normal and actually shows their reflexes are working to keep them safe. It sounds scary but it's different from choking. **Signs of normal gagging:** Loud, able to breathe/cry. What foods are you worried about?",
-        "Allergen introduction can feel nerve-wracking, but early exposure (around 6 months) is actually protective! **Top 8 allergens:** Peanuts, eggs, milk, fish, shellfish, tree nuts, wheat, soy. Start with small amounts mixed into familiar foods. How can I help you feel confident?",
-        "Kitchen prep tips coming right up! **Golden rules:** Soft enough to squish with your fingers, appropriate size (think grape-sized or smaller for round foods), and always supervise. What are you planning to prepare? I'll give you specific cutting and cooking guidance! 🔪✨"
+        "What's your little one's age? I can share some safe food ideas that work for their stage. Every baby's different with eating — no rush. 👩‍🍳",
+        "Starting solids can feel like a lot. Remember, 'food before one is just for fun' — milk is still doing the heavy lifting. What foods are you thinking about trying?",
+        "BLW, spoon feeding, or a mix — all valid. Most families end up combining approaches. What feels right for you? I can help with safe serving sizes for whatever you choose.",
+        "Gagging looks scary but it's actually a safety reflex doing its job. It's different from choking. **Gagging:** loud, breathing fine. **Choking:** silent, can't breathe. What foods are worrying you?",
+        "Allergen intro can be nerve-wracking. The current guidance is early exposure (around 6 months) is actually protective. **Top 8:** peanuts, eggs, milk, fish, shellfish, tree nuts, wheat, soy. Want me to walk through how to introduce any of these?",
+        "Golden rules for prep: soft enough to squish with your fingers, no round shapes bigger than a pea, and always supervise. What are you making? I'll give you specific cutting advice."
       ];
       return weaningResponses[Math.floor(Math.random() * weaningResponses.length)];
     }
@@ -239,7 +239,7 @@ const ChatAssistant = ({ isKitchenMode: initialKitchenMode = false, onKitchenMod
       const kitchenWelcome: Message = {
         id: Date.now().toString(),
         type: 'assistant',
-        content: "Welcome to Nunu's Kitchen! 👩‍🍳 Let's explore baby's next meal together. I'm here to help with safe food prep, age-appropriate recipes, and weaning guidance. Whether you're doing baby-led weaning or spoon feeding, I'll support you every step of the way! What would you like to know about feeding your little one?",
+        content: "Hey, welcome to Nunu's Kitchen 👩‍🍳 I can help with safe food prep, age-appropriate recipes, and weaning tips — BLW or spoon-fed, whatever works for your family. What's on the menu today?",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, kitchenWelcome]);

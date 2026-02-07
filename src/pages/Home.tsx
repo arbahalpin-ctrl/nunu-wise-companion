@@ -120,7 +120,7 @@ const Home = ({ onTabChange, onKitchenModeToggle }: HomeProps) => {
         <div className="flex flex-col items-center text-center space-y-4">
           {/* Koala Image */}
           <div className="relative">
-            <div className="w-20 h-20 bg-white rounded-full p-2 shadow-nurture backdrop-blur-sm border-2 border-white/30">
+            <div className="w-28 h-28 bg-white rounded-full p-2 shadow-nurture backdrop-blur-sm border-2 border-white/30">
               <img 
                 src={koalaHero} 
                 alt="Gentle koala companion" 
@@ -131,11 +131,11 @@ const Home = ({ onTabChange, onKitchenModeToggle }: HomeProps) => {
           
           {/* Greeting */}
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2 tracking-tight">
-              Hi, sweet mama <span className="text-primary animate-comfort-pulse">💛</span>
+            <h1 className="text-2xl font-bold text-foreground mb-2 tracking-tight">
+              Hey, you <span className="text-primary animate-comfort-pulse">💛</span>
             </h1>
             <p className="text-muted-foreground text-base leading-relaxed">
-              Take a moment just for you — how are you really feeling?
+              Take a breath. How are you really doing today?
             </p>
           </div>
         </div>

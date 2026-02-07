@@ -17,7 +17,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       subtitle: "Your gentle companion through motherhood",
       content: (
         <div className="text-center space-y-6">
-          <div className="w-32 h-32 mx-auto bg-white rounded-full p-4 shadow-comfort">
+          <div className="w-44 h-44 mx-auto bg-white rounded-full p-3 shadow-comfort">
             <img 
               src={heroImage} 
               alt="Nunu koala logo" 
@@ -25,15 +25,15 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             />
           </div>
           <div>
-            <h2 className="text-2xl font-bold mb-3">Hello, beautiful mama 💝</h2>
+            <h2 className="text-2xl font-bold mb-3">Hey, mama 💛</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Nunu is here to support you through the incredible journey of motherhood. 
-              From pregnancy to toddlerhood, you'll never walk alone.
+              I'm Nunu. I'm here to walk beside you through the beautiful chaos of motherhood — 
+              no judgment, just support.
             </p>
           </div>
           <div className="bg-accent-soft p-4 rounded-2xl">
             <p className="text-sm text-accent-foreground italic">
-              "You are braver than you believe, stronger than you seem, and loved more than you know."
+              "You don't have to be perfect. You just have to be present. And you already are."
             </p>
           </div>
         </div>
