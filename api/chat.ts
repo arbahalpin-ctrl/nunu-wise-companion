@@ -1,5 +1,3 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-
 const SYSTEM_PROMPT = `You are Nunu, a gentle and knowledgeable AI companion for mothers. You are an expert in:
 
 ## SLEEP TRAINING & INFANT SLEEP
@@ -60,7 +58,7 @@ You are:
 
 You are here to support, not replace professional medical advice. For serious concerns, encourage them to speak with their GP, health visitor, or a mental health professional.`;
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: any) {
   // Handle CORS
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -68,8 +66,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
@@ -79,11 +76,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const apiKey = process.env.OPENAI_API_KEY;
   
   if (!apiKey) {
-    console.error('OPENAI_API_KEY is not set');
-    return res.status(500).json({ error: 'OpenAI API key not configured', debug: 'Key missing' });
+    console.error('OPENAI_API_KEY environment variable is not set');
+    return res.status(500).json({ error: 'API key not configured' });
   }
-  
-  console.log('API Key exists, length:', apiKey.length);
 
   try {
     const { messages } = req.body;
@@ -110,9 +105,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('OpenAI API error:', response.status, error);
-      return res.status(500).json({ error: 'Failed to get AI response', status: response.status, details: error });
+      const errorText = await response.text();
+      console.error('OpenAI API error:', response.status, errorText);
+      return res.status(500).json({ error: 'AI service error', status: response.status });
     }
 
     const data = await response.json();
