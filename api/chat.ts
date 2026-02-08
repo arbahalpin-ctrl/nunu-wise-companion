@@ -79,8 +79,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const apiKey = process.env.OPENAI_API_KEY;
   
   if (!apiKey) {
-    return res.status(500).json({ error: 'OpenAI API key not configured' });
+    console.error('OPENAI_API_KEY is not set');
+    return res.status(500).json({ error: 'OpenAI API key not configured', debug: 'Key missing' });
   }
+  
+  console.log('API Key exists, length:', apiKey.length);
 
   try {
     const { messages } = req.body;
@@ -108,8 +111,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('OpenAI API error:', error);
-      return res.status(500).json({ error: 'Failed to get AI response' });
+      console.error('OpenAI API error:', response.status, error);
+      return res.status(500).json({ error: 'Failed to get AI response', status: response.status, details: error });
     }
 
     const data = await response.json();

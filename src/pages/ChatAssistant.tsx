@@ -61,11 +61,12 @@ const ChatAssistant = () => {
         body: JSON.stringify({ messages: conversationHistory }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to get response');
-      }
-
       const data = await response.json();
+      
+      if (!response.ok) {
+        console.error('API Error:', data);
+        throw new Error(data.error || 'Failed to get response');
+      }
       
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
