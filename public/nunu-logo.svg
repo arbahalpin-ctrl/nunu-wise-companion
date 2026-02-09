@@ -1,0 +1,28 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Minimal koala face - geometric, modern -->
+  
+  <!-- Left ear -->
+  <circle cx="24" cy="30" r="18" fill="#94a3b8"/>
+  <circle cx="24" cy="30" r="11" fill="#f1f5f9"/>
+  
+  <!-- Right ear -->
+  <circle cx="76" cy="30" r="18" fill="#94a3b8"/>
+  <circle cx="76" cy="30" r="11" fill="#f1f5f9"/>
+  
+  <!-- Main face -->
+  <circle cx="50" cy="54" r="34" fill="#cbd5e1"/>
+  
+  <!-- Muzzle area -->
+  <ellipse cx="50" cy="64" rx="18" ry="14" fill="#f1f5f9"/>
+  
+  <!-- Nose - the iconic koala feature -->
+  <ellipse cx="50" cy="60" rx="10" ry="8" fill="#475569"/>
+  
+  <!-- Eyes - simple dots -->
+  <circle cx="38" cy="48" r="4" fill="#1e293b"/>
+  <circle cx="62" cy="48" r="4" fill="#1e293b"/>
+  
+  <!-- Subtle eye highlights -->
+  <circle cx="36.5" cy="46.5" r="1.5" fill="#fff"/>
+  <circle cx="60.5" cy="46.5" r="1.5" fill="#fff"/>
+</svg>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, Shield, HelpCircle, Phone, Heart, ExternalLink, X, Mail, Baby, Trash2 } from 'lucide-react';
+import { Bell, Shield, HelpCircle, Phone, Heart, ExternalLink, X, Mail, Baby, Trash2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -7,6 +7,7 @@ import { Switch } from '@/components/ui/switch';
 const Settings = () => {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const handleClearOnboarding = () => {
     localStorage.removeItem('nunu-onboarding-completed');
@@ -14,10 +15,8 @@ const Settings = () => {
   };
 
   const handleClearAllData = () => {
-    if (confirm('This will clear all your data including baby age, conversations, and preferences. Are you sure?')) {
-      localStorage.clear();
-      window.location.reload();
-    }
+    localStorage.clear();
+    window.location.reload();
   };
 
   return (
@@ -154,7 +153,7 @@ const Settings = () => {
               <Button 
                 variant="ghost" 
                 className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
-                onClick={handleClearAllData}
+                onClick={() => setShowClearConfirm(true)}
               >
                 <Trash2 className="h-4 w-4 mr-3" />
                 Clear All Data
@@ -274,6 +273,38 @@ const Settings = () => {
                 <p className="text-sm text-slate-600">
                   Go to Settings → Your Data → Clear All Data. This removes everything stored on your device.
                 </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Clear Data Confirmation Modal */}
+      {showClearConfirm && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-sm rounded-2xl overflow-hidden">
+            <div className="p-6 text-center">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle className="h-6 w-6 text-red-600" />
+              </div>
+              <h2 className="font-semibold text-slate-800 text-lg mb-2">Clear All Data?</h2>
+              <p className="text-sm text-slate-600 mb-6">
+                This will permanently delete all your data including baby info, conversations, mood history, and saved recipes. This cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => setShowClearConfirm(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  className="flex-1 bg-red-600 hover:bg-red-700"
+                  onClick={handleClearAllData}
+                >
+                  Delete All
+                </Button>
               </div>
             </div>
           </div>
