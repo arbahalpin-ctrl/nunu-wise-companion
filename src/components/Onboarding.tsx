@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import heroImage from '@/assets/nunu-logo.svg';
 
@@ -9,12 +9,11 @@ interface OnboardingProps {
 
 const Onboarding = ({ onComplete }: OnboardingProps) => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-white flex flex-col items-center justify-center p-8">
+    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white flex flex-col items-center justify-center p-8">
       
-      {/* Koala with glow */}
-      <div className="mb-8 relative">
-        <div className="absolute inset-0 bg-orange-300/40 rounded-full blur-3xl scale-125"></div>
-        <div className="relative w-48 h-48 bg-white rounded-full p-4 shadow-xl border-4 border-orange-200">
+      {/* Koala - Big and Friendly */}
+      <div className="mb-8">
+        <div className="w-48 h-48 bg-white rounded-full p-4 shadow-xl border-4 border-white">
           <img 
             src={heroImage} 
             alt="Nunu" 
@@ -23,55 +22,45 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         </div>
       </div>
 
-      {/* Welcome - Gen Z/Millennial voice */}
-      <div className="text-center max-w-xs mb-10">
-        <h1 className="text-3xl font-bold text-slate-800 mb-3">
-          ok so hear me out ✨
+      {/* Simple Welcome */}
+      <div className="text-center max-w-xs mb-12">
+        <h1 className="text-3xl font-bold text-slate-800 mb-4">
+          Hey, I'm Nunu
         </h1>
-        <p className="text-slate-600 leading-relaxed mb-4">
-          motherhood is lowkey chaos but that doesn't mean you have to lose yourself in it. i'm nunu — think of me as your hype girl who actually knows stuff about babies lol
-        </p>
-        <p className="text-orange-600 font-semibold text-sm">
-          let's get your spark back bestie 💖
+        <p className="text-slate-500 leading-relaxed">
+          I'm here to listen, support, and help you through the tough moments of motherhood. No judgment — just a friend in your pocket.
         </p>
       </div>
 
-      {/* The journey pillars */}
-      <div className="flex gap-6 mb-12">
+      {/* What I help with - Simple list */}
+      <div className="flex gap-6 mb-12 text-slate-500">
         <div className="flex flex-col items-center">
-          <div className="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center mb-2">
-            <span className="text-2xl">😴</span>
-          </div>
-          <span className="text-xs font-medium text-slate-600">sleep</span>
+          <span className="text-2xl mb-1">😴</span>
+          <span className="text-xs">Sleep</span>
         </div>
         <div className="flex flex-col items-center">
-          <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center mb-2">
-            <span className="text-2xl">🧠</span>
-          </div>
-          <span className="text-xs font-medium text-slate-600">sanity</span>
+          <span className="text-2xl mb-1">💭</span>
+          <span className="text-xs">Worries</span>
         </div>
         <div className="flex flex-col items-center">
-          <div className="w-14 h-14 rounded-full bg-rose-100 flex items-center justify-center mb-2">
-            <span className="text-2xl">✨</span>
-          </div>
-          <span className="text-xs font-medium text-slate-600">you</span>
+          <span className="text-2xl mb-1">💛</span>
+          <span className="text-xs">Support</span>
         </div>
       </div>
 
-      {/* CTA */}
+      {/* Single CTA */}
       <Button 
         onClick={onComplete}
         size="lg"
-        className="rounded-full px-10 py-6 text-base shadow-lg bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 border-0"
+        className="rounded-full px-10 py-6 text-base shadow-lg bg-slate-800 hover:bg-slate-700"
       >
-        <Sparkles className="h-5 w-5 mr-2" />
-        let's gooo
+        Let's start
         <ArrowRight className="h-5 w-5 ml-2" />
       </Button>
 
-      {/* Privacy note */}
-      <p className="text-xs text-slate-500 mt-8 text-center max-w-xs">
-        ur convos stay private btw. this space is just for you 🔒
+      {/* Privacy note - subtle */}
+      <p className="text-xs text-slate-400 mt-8 text-center max-w-xs">
+        Your conversations are private. I'm here for you, not your data.
       </p>
     </div>
   );
