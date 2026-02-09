@@ -1,7 +1,6 @@
-import { useState } from 'react';
-import { ChevronRight, X, Clock, AlertTriangle, Check, Baby } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Search, ChevronRight, X, Clock, AlertTriangle, Check, Baby, Filter, Star, Flame } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 
 interface Food {
   id: string;
@@ -23,295 +22,538 @@ interface Recipe {
   id: string;
   name: string;
   emoji: string;
+  image?: string;
   ageFrom: number;
   prepTime: string;
+  cookTime?: string;
+  servings?: string;
+  category: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'dessert';
+  tags: string[];
   ingredients: string[];
   instructions: string[];
   tips?: string;
+  nutrition?: string;
+  freezable?: boolean;
+  popular?: boolean;
 }
 
+// Extensive food database
 const foods: Food[] = [
   {
-    id: 'banana',
-    name: 'Banana',
-    emoji: '🍌',
-    category: 'Fruits',
+    id: 'banana', name: 'Banana', emoji: '🍌', category: 'Fruits',
     serving: {
-      '6': 'Mash well or serve as long spears (half banana lengthways) for self-feeding',
-      '7-8': 'Soft chunks or spears, can be slightly less mashed',
-      '9-12': 'Small bite-sized pieces or whole banana to hold',
-      '12+': 'Sliced rounds, chunks, or whole to self-feed'
+      '6': 'Mash well or serve as long spears (half banana lengthways)',
+      '7-8': 'Soft chunks or spears, slightly less mashed',
+      '9-12': 'Small bite-sized pieces or whole to hold',
+      '12+': 'Sliced rounds, chunks, or whole'
     },
-    tips: ['Great first food - naturally soft', 'Can be slippery - roll in baby cereal for grip', 'Ripe bananas are easier to digest']
+    tips: ['Great first food', 'Roll in baby cereal for grip if slippery', 'Ripe = easier to digest']
   },
   {
-    id: 'avocado',
-    name: 'Avocado',
-    emoji: '🥑',
-    category: 'Fruits',
+    id: 'avocado', name: 'Avocado', emoji: '🥑', category: 'Fruits',
     serving: {
       '6': 'Mashed or long slices with skin on for grip',
       '7-8': 'Soft chunks or strips',
-      '9-12': 'Cubed pieces, can add to other foods',
+      '9-12': 'Cubed pieces, add to other foods',
       '12+': 'Slices, chunks, or spread on toast'
     },
-    tips: ['Nutrient-dense first food', 'Leave skin on spears for easier gripping', 'Roll in hemp seeds or breadcrumbs if too slippery']
+    tips: ['Nutrient-dense first food', 'Leave skin on for grip', 'Roll in hemp seeds if slippery']
   },
   {
-    id: 'broccoli',
-    name: 'Broccoli',
-    emoji: '🥦',
-    category: 'Vegetables',
+    id: 'broccoli', name: 'Broccoli', emoji: '🥦', category: 'Vegetables',
     serving: {
-      '6': 'Steam until very soft, serve as whole floret (tree shape) to hold',
+      '6': 'Steam until very soft, serve as whole floret',
       '7-8': 'Soft steamed florets',
-      '9-12': 'Slightly firmer florets, can be smaller pieces',
-      '12+': 'Lightly steamed or roasted pieces'
+      '9-12': 'Slightly firmer florets',
+      '12+': 'Lightly steamed or roasted'
     },
-    tips: ['Natural handle shape - perfect for BLW', 'Steam for 8-10 mins until soft', 'The stem is great for holding']
+    tips: ['Natural handle shape', 'Steam 8-10 mins', 'Stem is great for holding']
   },
   {
-    id: 'carrot',
-    name: 'Carrot',
-    emoji: '🥕',
-    category: 'Vegetables',
+    id: 'carrot', name: 'Carrot', emoji: '🥕', category: 'Vegetables',
     serving: {
-      '6': 'Steam until VERY soft (easily squished), serve as thick batons',
+      '6': 'Steam until VERY soft, thick batons',
       '7-8': 'Soft steamed batons or mashed',
-      '9-12': 'Softer cooked pieces, shredded raw is OK',
-      '12+': 'Cooked chunks, thin raw sticks OK if supervised'
+      '9-12': 'Softer cooked pieces, shredded raw OK',
+      '12+': 'Cooked chunks, thin raw sticks supervised'
     },
-    tips: ['Must be very soft for young babies - choking risk if hard', 'Test softness: should squish easily between fingers', 'Raw carrot not safe until 12m+ and even then, thinly sliced'],
-    warnings: ['Raw/hard carrot is a choking hazard under 12 months']
+    tips: ['Must be very soft for young babies', 'Should squish between fingers'],
+    warnings: ['Raw carrot is choking hazard under 12m']
   },
   {
-    id: 'chicken',
-    name: 'Chicken',
-    emoji: '🍗',
-    category: 'Protein',
+    id: 'sweetpotato', name: 'Sweet Potato', emoji: '🍠', category: 'Vegetables',
     serving: {
-      '6': 'Shredded or drumstick with bone in (they gnaw/suck on it)',
-      '7-8': 'Shredded, moist strips, or drumstick',
-      '9-12': 'Small shredded pieces or soft strips',
-      '12+': 'Bite-sized pieces, can be firmer texture'
+      '6': 'Steamed/roasted wedges, very soft',
+      '7-8': 'Soft wedges or mashed',
+      '9-12': 'Cubes or wedges',
+      '12+': 'Any preparation'
     },
-    tips: ['Keep it moist - dry chicken is hard to swallow', 'Drumstick method: they hold bone and gnaw meat off', 'Slow cooker chicken is naturally soft and shreddable']
+    tips: ['Great first food - naturally sweet', 'Roast with skin for easier gripping', 'High in vitamin A']
   },
   {
-    id: 'egg',
-    name: 'Eggs',
-    emoji: '🥚',
-    category: 'Protein',
-    allergen: true,
+    id: 'chicken', name: 'Chicken', emoji: '🍗', category: 'Protein',
     serving: {
-      '6': 'Well-cooked scrambled, omelette strips, or hard-boiled mashed',
-      '7-8': 'Scrambled, omelette strips, quartered hard-boiled',
-      '9-12': 'Scrambled, chopped hard-boiled, frittata pieces',
-      '12+': 'Any style, well-cooked'
+      '6': 'Shredded or drumstick (gnaw/suck)',
+      '7-8': 'Shredded, moist strips',
+      '9-12': 'Small shredded pieces',
+      '12+': 'Bite-sized pieces'
     },
-    tips: ['Top allergen - introduce early (around 6mo) to reduce allergy risk', 'Always well-cooked for babies (no runny yolk until 12m+)', 'Great source of iron and protein'],
-    warnings: ['Introduce as one of first foods to help prevent egg allergy', 'Watch for reactions: rash, swelling, vomiting']
+    tips: ['Keep moist - dry is hard to swallow', 'Drumstick method works great', 'Slow cooker = naturally soft']
   },
   {
-    id: 'peanut',
-    name: 'Peanut Butter',
-    emoji: '🥜',
-    category: 'Protein',
-    allergen: true,
+    id: 'beef', name: 'Beef', emoji: '🥩', category: 'Protein',
     serving: {
-      '6': 'Thin smear on toast or mixed into puree (never whole nuts or thick globs)',
-      '7-8': 'Thinly spread on soft foods or mixed in',
-      '9-12': 'Spread on toast strips, mixed into oatmeal',
-      '12+': 'Spread on foods, in sauces'
+      '6': 'Slow-cooked strips to suck/gnaw, or pureed',
+      '7-8': 'Shredded slow-cooked, mince',
+      '9-12': 'Small mince pieces, soft strips',
+      '12+': 'Ground beef, small pieces'
     },
-    tips: ['Major allergen - early introduction recommended', 'NEVER give whole nuts or chunks - choking hazard', 'Mix with breastmilk/formula to thin if needed'],
-    warnings: ['Never whole peanuts until 5+ years', 'Thick globs are a choking hazard', 'If family history of allergies, consult doctor first']
+    tips: ['Great iron source', 'Slow cook for tenderness', 'Mince is versatile']
   },
   {
-    id: 'toast',
-    name: 'Toast',
-    emoji: '🍞',
-    category: 'Grains',
+    id: 'salmon', name: 'Salmon', emoji: '🐟', category: 'Protein', allergen: true,
     serving: {
-      '6': 'Lightly toasted strips/fingers with toppings (avocado, nut butter)',
-      '7-8': 'Toast strips with soft toppings',
-      '9-12': 'Smaller pieces of toast, can be crustier',
-      '12+': 'Regular toast pieces'
-    },
-    tips: ['Light toast dissolves easier than bread', 'Great vehicle for other foods', 'Remove crusts initially if tough']
-  },
-  {
-    id: 'pasta',
-    name: 'Pasta',
-    emoji: '🍝',
-    category: 'Grains',
-    serving: {
-      '6': 'Large pasta shapes (fusilli, penne) cooked very soft',
-      '7-8': 'Soft pasta shapes, can try spaghetti',
-      '9-12': 'Various shapes, slightly firmer OK',
-      '12+': 'Regular pasta textures'
-    },
-    tips: ['Fusilli is great for beginners - easy to grip', 'Cook 2-3 mins longer than packet says', 'Toss in olive oil to prevent sticking']
-  },
-  {
-    id: 'strawberry',
-    name: 'Strawberries',
-    emoji: '🍓',
-    category: 'Fruits',
-    serving: {
-      '6': 'Mashed, or very large whole strawberry to gnaw (too big to choke)',
-      '7-8': 'Halved or quartered depending on size',
-      '9-12': 'Quartered or small pieces',
-      '12+': 'Halved or whole depending on size'
-    },
-    tips: ['Round foods should be quartered lengthways', 'Large strawberry = safer than small pieces for young babies', 'Can cause rash around mouth (contact reaction, not allergy usually)']
-  },
-  {
-    id: 'cheese',
-    name: 'Cheese',
-    emoji: '🧀',
-    category: 'Dairy',
-    serving: {
-      '6': 'Thin strips of firm cheese (cheddar) or grated/melted',
-      '7-8': 'Thin strips or grated onto food',
-      '9-12': 'Small cubes (pea-sized), grated',
-      '12+': 'Cubes, slices, sticks'
-    },
-    tips: ['Choose lower-salt options when possible', 'Melted cheese on toast/veg is easier', 'Avoid blue cheese and mould-ripened (listeria risk)'],
-    warnings: ['No unpasteurized cheese', 'No blue cheese or brie until 12m+']
-  },
-  {
-    id: 'fish',
-    name: 'Fish',
-    emoji: '🐟',
-    category: 'Protein',
-    allergen: true,
-    serving: {
-      '6': 'Flaked, de-boned, soft poached/baked fish',
-      '7-8': 'Flaked pieces, fish cakes',
-      '9-12': 'Small pieces, fish fingers (low salt)',
+      '6': 'Flaked, de-boned, soft baked',
+      '7-8': 'Flaked pieces, salmon cakes',
+      '9-12': 'Small pieces, patties',
       '12+': 'Various preparations'
     },
-    tips: ['Great source of omega-3 (especially salmon)', 'ALWAYS double-check for bones', 'Avoid high-mercury fish (shark, swordfish, marlin)'],
-    warnings: ['Check thoroughly for bones', 'Limit tuna to 1 portion per week (mercury)']
+    tips: ['Excellent omega-3 source', 'ALWAYS check for bones', 'Wild caught when possible'],
+    warnings: ['Check thoroughly for bones']
+  },
+  {
+    id: 'egg', name: 'Eggs', emoji: '🥚', category: 'Protein', allergen: true,
+    serving: {
+      '6': 'Well-cooked scrambled, omelette strips',
+      '7-8': 'Scrambled, quartered hard-boiled',
+      '9-12': 'Scrambled, chopped hard-boiled',
+      '12+': 'Any style, well-cooked'
+    },
+    tips: ['Introduce early to reduce allergy risk', 'Always well-cooked', 'Great protein & iron'],
+    warnings: ['Watch for reactions: rash, swelling']
+  },
+  {
+    id: 'peanut', name: 'Peanut Butter', emoji: '🥜', category: 'Protein', allergen: true,
+    serving: {
+      '6': 'Thin smear on toast or mixed in',
+      '7-8': 'Thinly spread on soft foods',
+      '9-12': 'Spread on toast, in oatmeal',
+      '12+': 'Spread on foods, sauces'
+    },
+    tips: ['Early introduction recommended', 'NEVER whole nuts', 'Thin with milk if needed'],
+    warnings: ['No whole peanuts until 5+ years', 'Thick globs = choking hazard']
+  },
+  {
+    id: 'toast', name: 'Toast', emoji: '🍞', category: 'Grains',
+    serving: {
+      '6': 'Lightly toasted strips with toppings',
+      '7-8': 'Toast strips with soft toppings',
+      '9-12': 'Smaller pieces',
+      '12+': 'Regular toast'
+    },
+    tips: ['Light toast dissolves easier', 'Great vehicle for toppings']
+  },
+  {
+    id: 'pasta', name: 'Pasta', emoji: '🍝', category: 'Grains',
+    serving: {
+      '6': 'Large shapes (fusilli) cooked very soft',
+      '7-8': 'Soft pasta shapes',
+      '9-12': 'Various shapes',
+      '12+': 'Regular textures'
+    },
+    tips: ['Fusilli easy to grip', 'Cook 2-3 mins longer than packet']
+  },
+  {
+    id: 'rice', name: 'Rice', emoji: '🍚', category: 'Grains',
+    serving: {
+      '6': 'Very soft, can mash slightly or form into balls',
+      '7-8': 'Soft cooked, sticky rice works well',
+      '9-12': 'Regular cooked rice',
+      '12+': 'Any preparation'
+    },
+    tips: ['Sticky rice easier for self-feeding', 'Form into balls for grip']
+  },
+  {
+    id: 'oats', name: 'Oats/Porridge', emoji: '🥣', category: 'Grains',
+    serving: {
+      '6': 'Smooth porridge, loaded on spoon',
+      '7-8': 'Thicker porridge',
+      '9-12': 'Chunky with toppings',
+      '12+': 'Any consistency'
+    },
+    tips: ['Great iron when made with formula/milk', 'Add fruit for flavor']
+  },
+  {
+    id: 'cheese', name: 'Cheese', emoji: '🧀', category: 'Dairy',
+    serving: {
+      '6': 'Thin strips or grated/melted',
+      '7-8': 'Thin strips or grated',
+      '9-12': 'Small cubes, grated',
+      '12+': 'Cubes, slices, sticks'
+    },
+    tips: ['Choose lower-salt options', 'Melted is easier'],
+    warnings: ['No unpasteurized', 'No blue cheese until 12m+']
+  },
+  {
+    id: 'yogurt', name: 'Yogurt', emoji: '🥛', category: 'Dairy',
+    serving: {
+      '6': 'Full-fat plain, loaded on spoon',
+      '7-8': 'Full-fat, can mix with fruit',
+      '9-12': 'Any full-fat yogurt',
+      '12+': 'Any yogurt'
+    },
+    tips: ['Choose full-fat, plain', 'Greek yogurt is thicker', 'Avoid added sugar']
+  },
+  {
+    id: 'strawberry', name: 'Strawberries', emoji: '🍓', category: 'Fruits',
+    serving: {
+      '6': 'Mashed or very large whole to gnaw',
+      '7-8': 'Halved or quartered',
+      '9-12': 'Quartered or small pieces',
+      '12+': 'Halved or whole'
+    },
+    tips: ['Quarter lengthways for safety', 'May cause contact rash (not allergy)']
+  },
+  {
+    id: 'blueberry', name: 'Blueberries', emoji: '🫐', category: 'Fruits',
+    serving: {
+      '6': 'Smash flat or quarter',
+      '7-8': 'Smashed or quartered',
+      '9-12': 'Quartered',
+      '12+': 'Halved, whole if supervised'
+    },
+    tips: ['Round = choking risk, always smash/cut', 'Frozen work great in cooking'],
+    warnings: ['Always smash or quarter - round shape is hazardous']
+  },
+  {
+    id: 'apple', name: 'Apple', emoji: '🍎', category: 'Fruits',
+    serving: {
+      '6': 'Steamed/roasted until very soft, or thin shreds',
+      '7-8': 'Soft cooked pieces, grated raw',
+      '9-12': 'Soft cooked, thin raw slices',
+      '12+': 'Thin slices, cooked'
+    },
+    tips: ['Raw apple is hard - cook for babies', 'Grate for texture'],
+    warnings: ['Raw apple chunks are choking hazard']
+  },
+  {
+    id: 'mango', name: 'Mango', emoji: '🥭', category: 'Fruits',
+    serving: {
+      '6': 'Ripe strips or pit with flesh to gnaw',
+      '7-8': 'Soft strips or chunks',
+      '9-12': 'Cubed pieces',
+      '12+': 'Any cut'
+    },
+    tips: ['Leave on large pit to gnaw safely', 'Very ripe = very soft']
+  },
+  {
+    id: 'cucumber', name: 'Cucumber', emoji: '🥒', category: 'Vegetables',
+    serving: {
+      '6': 'Large spears with skin (too big to choke)',
+      '7-8': 'Large spears',
+      '9-12': 'Thinner spears',
+      '12+': 'Slices, sticks'
+    },
+    tips: ['Keep skin on for grip', 'Cool and soothing for teething']
+  },
+  {
+    id: 'tomato', name: 'Tomatoes', emoji: '🍅', category: 'Vegetables',
+    serving: {
+      '6': 'Quartered cherry tomatoes or large wedges',
+      '7-8': 'Quartered, skinned if preferred',
+      '9-12': 'Small pieces',
+      '12+': 'Any cut'
+    },
+    tips: ['Quarter cherry tomatoes lengthways', 'Skin can be tough for some babies'],
+    warnings: ['Round cherry tomatoes must be quartered']
+  },
+  {
+    id: 'peas', name: 'Peas', emoji: '🟢', category: 'Vegetables',
+    serving: {
+      '6': 'Smash flat or blend into foods',
+      '7-8': 'Smashed',
+      '9-12': 'Lightly smashed',
+      '12+': 'Whole if chewing well'
+    },
+    tips: ['Smash to break skin', 'Great finger food when smashed'],
+    warnings: ['Whole peas can be choking hazard - smash them']
+  },
+  {
+    id: 'lentils', name: 'Lentils', emoji: '🫘', category: 'Protein',
+    serving: {
+      '6': 'Well-cooked, mashed or in sauce',
+      '7-8': 'Soft cooked lentils',
+      '9-12': 'In dishes, dal',
+      '12+': 'Any preparation'
+    },
+    tips: ['Great plant protein & iron', 'Red lentils cook softest']
+  },
+  {
+    id: 'tofu', name: 'Tofu', emoji: '🧈', category: 'Protein',
+    serving: {
+      '6': 'Firm tofu strips, pan-fried',
+      '7-8': 'Strips or cubes',
+      '9-12': 'Cubed',
+      '12+': 'Any preparation'
+    },
+    tips: ['Firm tofu holds shape better', 'Pan fry for better texture', 'Good protein source']
   }
 ];
 
+// Extensive recipe database
 const recipes: Recipe[] = [
+  // BREAKFAST
   {
-    id: 'banana-pancakes',
-    name: 'Baby Banana Pancakes',
-    emoji: '🥞',
-    ageFrom: 6,
-    prepTime: '10 mins',
-    ingredients: ['1 ripe banana', '1 egg', '2 tbsp oats (optional)'],
-    instructions: [
-      'Mash banana in a bowl until smooth',
-      'Beat in the egg until combined',
-      'Add oats if using for extra texture',
-      'Heat non-stick pan on medium, add small spoonfuls',
-      'Cook 2-3 mins each side until golden',
-      'Cool before serving'
-    ],
-    tips: 'No added sugar needed - banana provides sweetness!'
+    id: 'banana-pancakes', name: 'Banana Pancakes', emoji: '🥞',
+    ageFrom: 6, prepTime: '5 mins', cookTime: '10 mins', category: 'breakfast',
+    tags: ['egg-free option', 'freezable', 'quick'], popular: true, freezable: true,
+    ingredients: ['1 ripe banana', '1 egg', '2 tbsp oats (optional)', 'Pinch of cinnamon'],
+    instructions: ['Mash banana until smooth', 'Beat in egg', 'Add oats if using', 'Cook small spoonfuls 2-3 mins each side'],
+    tips: 'No added sugar needed! Freeze extras between parchment.'
   },
   {
-    id: 'veggie-fingers',
-    name: 'Veggie Fingers',
-    emoji: '🥕',
-    ageFrom: 6,
-    prepTime: '25 mins',
-    ingredients: ['1 sweet potato', '1 courgette', '1 egg', '3 tbsp flour', '2 tbsp cheese (optional)'],
-    instructions: [
-      'Grate sweet potato and courgette, squeeze out liquid',
-      'Mix with egg, flour, and cheese if using',
-      'Shape into finger-sized pieces',
-      'Bake at 180°C for 20 mins, flipping halfway',
-      'Cool until safe to handle'
-    ],
-    tips: 'Batch cook and freeze for quick meals!'
+    id: 'egg-muffins', name: 'Veggie Egg Muffins', emoji: '🧁',
+    ageFrom: 6, prepTime: '10 mins', cookTime: '15 mins', servings: '12 mini muffins', category: 'breakfast',
+    tags: ['meal prep', 'freezable', 'protein'], popular: true, freezable: true,
+    ingredients: ['4 eggs', '2 tbsp milk', 'Handful spinach, chopped', '2 tbsp cheese', '1/4 red pepper, diced'],
+    instructions: ['Preheat oven 180°C', 'Whisk eggs and milk', 'Stir in veggies and cheese', 'Pour into greased mini muffin tin', 'Bake 12-15 mins'],
+    tips: 'Freeze for up to 3 months. Reheat from frozen 30 secs.'
   },
   {
-    id: 'avocado-toast',
-    name: 'Loaded Avo Toast Fingers',
-    emoji: '🥑',
-    ageFrom: 6,
-    prepTime: '5 mins',
-    ingredients: ['1 slice bread', '¼ ripe avocado', 'Pinch of hemp seeds (optional)'],
-    instructions: [
-      'Toast bread lightly',
-      'Mash avocado and spread on toast',
-      'Sprinkle hemp seeds for extra nutrition',
-      'Cut into finger-sized strips',
-      'Serve immediately'
-    ],
-    tips: 'Add mashed banana for a sweeter version'
+    id: 'overnight-oats', name: 'Baby Overnight Oats', emoji: '🥣',
+    ageFrom: 6, prepTime: '5 mins', category: 'breakfast',
+    tags: ['no-cook', 'meal prep', 'dairy'],
+    ingredients: ['3 tbsp oats', '4 tbsp milk/formula', '1 tbsp yogurt', 'Mashed fruit of choice'],
+    instructions: ['Mix oats, milk, yogurt in jar', 'Add mashed fruit', 'Refrigerate overnight', 'Serve cold or warm slightly'],
+    tips: 'Prep 3-4 days worth at once!'
   },
   {
-    id: 'egg-muffins',
-    name: 'Mini Egg Muffins',
-    emoji: '🥚',
-    ageFrom: 7,
-    prepTime: '20 mins',
-    ingredients: ['3 eggs', '2 tbsp milk', 'Handful spinach (chopped fine)', '2 tbsp cheese'],
-    instructions: [
-      'Preheat oven to 180°C',
-      'Whisk eggs and milk together',
-      'Stir in spinach and cheese',
-      'Pour into greased mini muffin tin',
-      'Bake 12-15 mins until set',
-      'Cool before serving'
-    ],
-    tips: 'Perfect for batch prep - freeze extras!'
+    id: 'french-toast', name: 'Baby French Toast Sticks', emoji: '🍞',
+    ageFrom: 7, prepTime: '5 mins', cookTime: '10 mins', category: 'breakfast',
+    tags: ['finger food', 'egg'], freezable: true,
+    ingredients: ['1 egg', '2 tbsp milk', 'Pinch cinnamon', '1 slice bread'],
+    instructions: ['Whisk egg, milk, cinnamon', 'Cut bread into strips', 'Dip in egg mixture', 'Pan fry until golden, 2-3 mins each side'],
+    tips: 'Use whole grain bread for extra fiber.'
   },
   {
-    id: 'chicken-strips',
-    name: 'Soft Chicken Strips',
-    emoji: '🍗',
-    ageFrom: 6,
-    prepTime: '30 mins',
-    ingredients: ['1 chicken breast', 'Olive oil', 'Pinch of herbs (optional)'],
-    instructions: [
-      'Preheat oven to 190°C',
-      'Cut chicken into thick finger-sized strips',
-      'Coat lightly in olive oil and herbs',
-      'Bake for 20-25 mins until cooked through',
-      'Shred or serve as strips depending on age',
-      'Ensure chicken is moist - don\'t overcook'
-    ],
-    tips: 'Poach in stock for extra moisture if baking makes it dry'
+    id: 'chia-pudding', name: 'Chia Pudding', emoji: '🫐',
+    ageFrom: 8, prepTime: '5 mins', category: 'breakfast',
+    tags: ['no-cook', 'dairy-free option', 'omega-3'],
+    ingredients: ['2 tbsp chia seeds', '1/2 cup milk', 'Mashed banana or berries'],
+    instructions: ['Mix chia seeds and milk', 'Stir well to prevent clumps', 'Refrigerate 4 hours or overnight', 'Top with fruit before serving'],
+    tips: 'Texture may need getting used to - blend if baby prefers smooth.'
+  },
+  // LUNCH
+  {
+    id: 'avo-toast', name: 'Loaded Avo Toast', emoji: '🥑',
+    ageFrom: 6, prepTime: '5 mins', category: 'lunch',
+    tags: ['quick', 'finger food', 'healthy fats'], popular: true,
+    ingredients: ['1 slice bread', '1/4 avocado', 'Toppings: egg, cheese, hemp seeds'],
+    instructions: ['Toast bread lightly', 'Mash and spread avocado', 'Add toppings of choice', 'Cut into finger strips'],
+    tips: 'Sprinkle hemp seeds for extra omega-3 and grip.'
   },
   {
-    id: 'pasta-sauce',
-    name: 'Hidden Veggie Pasta Sauce',
-    emoji: '🍝',
-    ageFrom: 6,
-    prepTime: '25 mins',
-    ingredients: ['1 tin tomatoes', '1 carrot (grated)', '1 courgette (grated)', '1 garlic clove', 'Olive oil', 'Pinch of basil'],
-    instructions: [
-      'Sauté garlic in olive oil for 1 min',
-      'Add grated veg, cook 5 mins until soft',
-      'Add tinned tomatoes and basil',
-      'Simmer 15 mins, blend until smooth',
-      'Serve with soft-cooked pasta shapes',
-      'Freeze portions for quick meals'
-    ],
-    tips: 'Blend smooth for younger babies, leave chunky for older ones'
+    id: 'quesadilla', name: 'Baby Quesadilla', emoji: '🧀',
+    ageFrom: 7, prepTime: '5 mins', cookTime: '5 mins', category: 'lunch',
+    tags: ['quick', 'cheese', 'customizable'], popular: true,
+    ingredients: ['1 tortilla', 'Grated cheese', 'Optional: beans, avocado, chicken'],
+    instructions: ['Sprinkle cheese on half tortilla', 'Add any fillings', 'Fold in half', 'Pan fry 2 mins each side until golden', 'Cool and cut into strips'],
+    tips: 'Great way to use up leftovers!'
+  },
+  {
+    id: 'pasta-pesto', name: 'Pesto Pasta', emoji: '🍝',
+    ageFrom: 6, prepTime: '5 mins', cookTime: '15 mins', category: 'lunch',
+    tags: ['quick', 'batch cook', 'freezable'], freezable: true,
+    ingredients: ['Pasta shapes', '2 tbsp pesto (low salt)', 'Grated cheese', 'Optional: peas, chicken'],
+    instructions: ['Cook pasta very soft', 'Drain and toss with pesto', 'Add cheese and any extras', 'Serve warm or cold'],
+    tips: 'Make your own pesto to control salt. Basil + olive oil + parmesan.'
+  },
+  {
+    id: 'veggie-fingers', name: 'Veggie Fritters', emoji: '🥕',
+    ageFrom: 6, prepTime: '10 mins', cookTime: '20 mins', category: 'lunch',
+    tags: ['hidden veg', 'freezable', 'batch cook'], popular: true, freezable: true,
+    ingredients: ['1 courgette, grated', '1 carrot, grated', '1 egg', '3 tbsp flour', 'Optional: cheese'],
+    instructions: ['Grate veg, squeeze out water', 'Mix with egg, flour, cheese', 'Form into finger shapes', 'Bake 180°C 20 mins, flip halfway'],
+    tips: 'Squeeze veg really well or they will be soggy!'
+  },
+  {
+    id: 'mini-meatballs', name: 'Mini Meatballs', emoji: '🧆',
+    ageFrom: 6, prepTime: '15 mins', cookTime: '15 mins', servings: '20 meatballs', category: 'lunch',
+    tags: ['protein', 'iron', 'freezable', 'batch cook'], popular: true, freezable: true,
+    ingredients: ['250g beef or lamb mince', '1 grated courgette', '1 egg', '2 tbsp breadcrumbs', 'Herbs'],
+    instructions: ['Mix all ingredients', 'Roll into small balls', 'Bake 180°C 15 mins', 'Ensure cooked through'],
+    tips: 'Freeze raw or cooked. Great iron source!'
+  },
+  {
+    id: 'hummus-wrap', name: 'Hummus Veggie Wrap', emoji: '🌯',
+    ageFrom: 8, prepTime: '5 mins', category: 'lunch',
+    tags: ['no-cook', 'quick', 'plant protein'],
+    ingredients: ['1 tortilla', '2 tbsp hummus', 'Cucumber strips', 'Grated carrot', 'Avocado'],
+    instructions: ['Spread hummus on tortilla', 'Add veggies in a line', 'Roll up tightly', 'Cut into pinwheels or strips'],
+    tips: 'Make your own hummus for lower salt.'
+  },
+  {
+    id: 'salmon-cakes', name: 'Salmon Fish Cakes', emoji: '🐟',
+    ageFrom: 7, prepTime: '15 mins', cookTime: '10 mins', category: 'lunch',
+    tags: ['omega-3', 'protein', 'freezable'], freezable: true,
+    ingredients: ['1 tin salmon, drained', '1 small potato, mashed', '1 egg', 'Fresh dill or parsley'],
+    instructions: ['Flake salmon, remove any bones', 'Mix with mashed potato, egg, herbs', 'Form into small patties', 'Pan fry 4-5 mins each side'],
+    tips: 'Check thoroughly for bones! Tinned salmon is fine.'
+  },
+  // DINNER
+  {
+    id: 'hidden-veg-sauce', name: 'Hidden Veggie Pasta Sauce', emoji: '🍅',
+    ageFrom: 6, prepTime: '10 mins', cookTime: '25 mins', category: 'dinner',
+    tags: ['hidden veg', 'batch cook', 'freezable'], popular: true, freezable: true,
+    ingredients: ['1 tin tomatoes', '1 carrot', '1 courgette', '1 red pepper', 'Garlic, olive oil, basil'],
+    instructions: ['Sauté garlic 1 min', 'Add grated/diced veg, cook 5 mins', 'Add tomatoes and basil', 'Simmer 15 mins', 'Blend smooth'],
+    tips: 'Make big batch and freeze in portions.'
+  },
+  {
+    id: 'chicken-strips', name: 'Tender Chicken Strips', emoji: '🍗',
+    ageFrom: 6, prepTime: '10 mins', cookTime: '25 mins', category: 'dinner',
+    tags: ['protein', 'finger food', 'freezable'], freezable: true,
+    ingredients: ['1 chicken breast', 'Olive oil', 'Pinch herbs', '2 tbsp breadcrumbs (optional)'],
+    instructions: ['Cut chicken into strips', 'Coat in oil and herbs', 'Bake 190°C 20-25 mins', 'Ensure cooked through, shred for young babies'],
+    tips: 'Don\'t overcook or it gets dry. Poach in stock for extra moisture.'
+  },
+  {
+    id: 'lentil-dal', name: 'Baby Dal', emoji: '🍛',
+    ageFrom: 6, prepTime: '5 mins', cookTime: '25 mins', category: 'dinner',
+    tags: ['plant protein', 'iron', 'freezable', 'vegan'], freezable: true,
+    ingredients: ['1 cup red lentils', '2 cups water/stock', '1 tsp mild curry spices', 'Coconut milk splash'],
+    instructions: ['Rinse lentils', 'Simmer with water and spices 20-25 mins', 'Stir in coconut milk', 'Mash slightly or blend', 'Serve with rice'],
+    tips: 'Babies can have spices! Start mild and increase.'
+  },
+  {
+    id: 'shepherds-pie', name: 'Mini Shepherd\'s Pie', emoji: '🥧',
+    ageFrom: 7, prepTime: '15 mins', cookTime: '30 mins', category: 'dinner',
+    tags: ['comfort food', 'iron', 'freezable', 'one-pot'], freezable: true,
+    ingredients: ['200g lamb mince', '1 carrot, diced', 'Peas', 'Gravy/stock', 'Mashed potato topping'],
+    instructions: ['Brown mince, add veg', 'Add stock, simmer 15 mins', 'Transfer to dish, top with mash', 'Bake 180°C 15 mins until golden'],
+    tips: 'Make in muffin tin for individual portions.'
+  },
+  {
+    id: 'risotto', name: 'Baby Risotto', emoji: '🍚',
+    ageFrom: 7, prepTime: '5 mins', cookTime: '25 mins', category: 'dinner',
+    tags: ['one-pot', 'comfort food', 'customizable'],
+    ingredients: ['1/2 cup risotto rice', '1.5 cups low salt stock', 'Butter', 'Parmesan', 'Peas or veg'],
+    instructions: ['Toast rice in butter 1 min', 'Add stock gradually, stirring', 'Cook until creamy, ~20 mins', 'Stir in cheese and veg'],
+    tips: 'Naturally soft and easy to eat. Add any veg!'
+  },
+  {
+    id: 'fish-pie', name: 'Easy Fish Pie', emoji: '🐠',
+    ageFrom: 7, prepTime: '15 mins', cookTime: '25 mins', category: 'dinner',
+    tags: ['omega-3', 'comfort food', 'freezable'], freezable: true,
+    ingredients: ['White fish fillet', 'Salmon fillet', 'Peas', 'White sauce', 'Mashed potato'],
+    instructions: ['Poach fish in milk 8 mins', 'Flake fish, check for bones', 'Mix with peas and white sauce', 'Top with mash', 'Bake 180°C 15 mins'],
+    tips: 'Use any fish. Batch cook and freeze portions.'
+  },
+  {
+    id: 'mild-curry', name: 'Baby-Friendly Curry', emoji: '🍛',
+    ageFrom: 8, prepTime: '10 mins', cookTime: '25 mins', category: 'dinner',
+    tags: ['one-pot', 'spices', 'family meal'],
+    ingredients: ['Chicken or chickpeas', 'Coconut milk', 'Tomatoes', 'Mild curry powder', 'Veg of choice'],
+    instructions: ['Cook protein/chickpeas', 'Add veg, cook 5 mins', 'Add coconut milk, tomatoes, spices', 'Simmer 15 mins', 'Serve with rice'],
+    tips: 'Babies can handle spices! Just avoid chili heat.'
+  },
+  // SNACKS
+  {
+    id: 'energy-balls', name: 'No-Bake Energy Balls', emoji: '⚡',
+    ageFrom: 8, prepTime: '10 mins', category: 'snack',
+    tags: ['no-cook', 'healthy', 'nut-free option'], popular: true,
+    ingredients: ['1 cup oats', '1/2 cup nut/seed butter', '2 tbsp honey', 'Optional: coconut, choc chips'],
+    instructions: ['Mix all ingredients', 'Roll into small balls', 'Refrigerate 30 mins', 'Store in fridge up to 1 week'],
+    tips: 'Use sunflower seed butter for nut-free.'
+  },
+  {
+    id: 'fruit-lollies', name: 'Fruit Yogurt Lollies', emoji: '🍦',
+    ageFrom: 6, prepTime: '5 mins', category: 'snack',
+    tags: ['frozen', 'teething', 'no sugar'],
+    ingredients: ['1/2 cup yogurt', '1/2 cup fruit puree or mashed fruit'],
+    instructions: ['Mix yogurt and fruit', 'Pour into lolly moulds', 'Freeze 4+ hours', 'Run under warm water to release'],
+    tips: 'Great for teething! Use breast milk for younger babies.'
+  },
+  {
+    id: 'cheese-crackers', name: 'Homemade Cheese Crackers', emoji: '🧀',
+    ageFrom: 8, prepTime: '10 mins', cookTime: '12 mins', category: 'snack',
+    tags: ['baked', 'finger food'],
+    ingredients: ['100g cheese, grated', '100g flour', '50g butter', 'Water to bind'],
+    instructions: ['Mix cheese, flour, butter', 'Add water to form dough', 'Roll thin, cut shapes', 'Bake 180°C 10-12 mins'],
+    tips: 'Much lower salt than shop crackers!'
+  },
+  {
+    id: 'banana-bread', name: 'Healthy Banana Bread', emoji: '🍌',
+    ageFrom: 6, prepTime: '10 mins', cookTime: '45 mins', category: 'snack',
+    tags: ['baked', 'no added sugar', 'freezable'], freezable: true,
+    ingredients: ['3 ripe bananas', '2 eggs', '2 cups oats (blended to flour)', '1 tsp baking powder', 'Cinnamon'],
+    instructions: ['Blend oats to flour', 'Mash bananas, mix in eggs', 'Add oat flour, baking powder, cinnamon', 'Bake 180°C 40-45 mins'],
+    tips: 'Slice and freeze for quick breakfasts!'
+  },
+  {
+    id: 'sweet-potato-toast', name: 'Sweet Potato Toast', emoji: '🍠',
+    ageFrom: 6, prepTime: '2 mins', cookTime: '10 mins', category: 'snack',
+    tags: ['grain-free', 'quick'],
+    ingredients: ['1 sweet potato', 'Toppings: nut butter, avocado, banana'],
+    instructions: ['Slice sweet potato lengthways, 1cm thick', 'Toast in toaster 2-3 cycles until soft', 'Top with favourite toppings'],
+    tips: 'Great bread alternative! Keeps for a few days.'
+  },
+  // DESSERT
+  {
+    id: 'baked-apple', name: 'Baked Cinnamon Apple', emoji: '🍎',
+    ageFrom: 6, prepTime: '5 mins', cookTime: '25 mins', category: 'dessert',
+    tags: ['no sugar', 'simple', 'warm'],
+    ingredients: ['1 apple', 'Butter', 'Cinnamon', 'Optional: oat crumble topping'],
+    instructions: ['Core apple, score skin', 'Fill with butter and cinnamon', 'Bake 180°C 25 mins until soft', 'Cool slightly before serving'],
+    tips: 'Naturally sweet dessert. Serve with yogurt.'
+  },
+  {
+    id: 'rice-pudding', name: 'Creamy Rice Pudding', emoji: '🍚',
+    ageFrom: 6, prepTime: '5 mins', cookTime: '30 mins', category: 'dessert',
+    tags: ['comfort food', 'dairy'],
+    ingredients: ['1/2 cup pudding rice', '2 cups milk', 'Vanilla', 'Cinnamon'],
+    instructions: ['Combine rice and milk in pan', 'Simmer 25-30 mins, stirring often', 'Add vanilla and cinnamon', 'Serve warm or cold'],
+    tips: 'Top with fruit puree for natural sweetness.'
   }
 ];
 
-const categories = ['All', 'Fruits', 'Vegetables', 'Protein', 'Grains', 'Dairy'];
+const categoryEmojis: Record<string, string> = {
+  breakfast: '🍳', lunch: '🥪', dinner: '🍽️', snack: '🍪', dessert: '🍨'
+};
 
 const Weaning = () => {
   const [selectedFood, setSelectedFood] = useState<Food | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [activeTab, setActiveTab] = useState<'foods' | 'recipes'>('foods');
+  const [activeTab, setActiveTab] = useState<'foods' | 'recipes'>('recipes');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedMealType, setSelectedMealType] = useState<string>('all');
   const [babyAge, setBabyAge] = useState<string>('6');
+  const [showFilters, setShowFilters] = useState(false);
 
-  const filteredFoods = selectedCategory === 'All' 
-    ? foods 
-    : foods.filter(f => f.category === selectedCategory);
+  // Filter recipes
+  const filteredRecipes = useMemo(() => {
+    return recipes.filter(recipe => {
+      const matchesSearch = recipe.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        recipe.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        recipe.ingredients.some(ing => ing.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesMealType = selectedMealType === 'all' || recipe.category === selectedMealType;
+      const matchesAge = recipe.ageFrom <= parseInt(babyAge);
+      return matchesSearch && matchesMealType && matchesAge;
+    });
+  }, [searchQuery, selectedMealType, babyAge]);
+
+  // Filter foods
+  const filteredFoods = useMemo(() => {
+    return foods.filter(food => {
+      const matchesSearch = food.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === 'all' || food.category.toLowerCase() === selectedCategory.toLowerCase();
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchQuery, selectedCategory]);
+
+  const foodCategories = ['all', ...new Set(foods.map(f => f.category))];
+  const mealTypes = ['all', 'breakfast', 'lunch', 'dinner', 'snack', 'dessert'];
 
   const getServingForAge = (food: Food): string => {
     if (parseInt(babyAge) <= 6) return food.serving['6'];
@@ -323,54 +565,71 @@ const Weaning = () => {
   return (
     <div className="pb-24 min-h-screen bg-gradient-to-b from-sky-50 to-white">
       {/* Header */}
-      <div className="p-6">
+      <div className="p-6 pb-3">
         <h1 className="text-2xl font-bold text-slate-800">Weaning Guide</h1>
-        <p className="text-slate-500 mt-1">Foods & recipes for your little one</p>
+        <p className="text-slate-500 mt-1">Foods, recipes & serving guides</p>
       </div>
 
-      {/* Age Selector */}
-      <div className="px-6 mb-4">
-        <label className="text-sm text-slate-600 mb-2 block">Baby's age:</label>
+      {/* Search Bar */}
+      <div className="px-6 mb-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search foods or recipes..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 focus:outline-none focus:border-slate-400"
+          />
+        </div>
+      </div>
+
+      {/* Age & Filter Row */}
+      <div className="px-6 mb-3 flex gap-2">
         <select 
           value={babyAge}
           onChange={(e) => setBabyAge(e.target.value)}
-          className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-700"
+          className="flex-1 p-3 bg-white border border-slate-200 rounded-xl text-slate-700 text-sm"
         >
           <option value="6">6 months</option>
           <option value="7">7-8 months</option>
           <option value="9">9-12 months</option>
           <option value="13">12+ months</option>
         </select>
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className={`px-4 py-3 rounded-xl border flex items-center gap-2 text-sm ${
+            showFilters ? 'bg-slate-800 text-white border-slate-800' : 'bg-white border-slate-200 text-slate-600'
+          }`}
+        >
+          <Filter className="h-4 w-4" />
+          Filters
+        </button>
       </div>
 
-      {/* Tabs */}
-      <div className="px-6 mb-4">
-        <div className="flex gap-2 bg-slate-100 p-1 rounded-xl">
-          <button
-            onClick={() => setActiveTab('foods')}
-            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === 'foods' ? 'bg-white shadow text-slate-800' : 'text-slate-500'
-            }`}
-          >
-            Foods
-          </button>
-          <button
-            onClick={() => setActiveTab('recipes')}
-            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === 'recipes' ? 'bg-white shadow text-slate-800' : 'text-slate-500'
-            }`}
-          >
-            Recipes
-          </button>
-        </div>
-      </div>
-
-      {activeTab === 'foods' && (
-        <>
-          {/* Category Filter */}
-          <div className="px-6 mb-4 overflow-x-auto">
-            <div className="flex gap-2">
-              {categories.map(cat => (
+      {/* Expandable Filters */}
+      {showFilters && (
+        <div className="px-6 mb-3 space-y-2">
+          {activeTab === 'recipes' && (
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {mealTypes.map(type => (
+                <button
+                  key={type}
+                  onClick={() => setSelectedMealType(type)}
+                  className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
+                    selectedMealType === type 
+                      ? 'bg-slate-800 text-white' 
+                      : 'bg-white text-slate-600 border border-slate-200'
+                  }`}
+                >
+                  {type === 'all' ? 'All' : `${categoryEmojis[type]} ${type.charAt(0).toUpperCase() + type.slice(1)}`}
+                </button>
+              ))}
+            </div>
+          )}
+          {activeTab === 'foods' && (
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {foodCategories.map(cat => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
@@ -380,15 +639,106 @@ const Weaning = () => {
                       : 'bg-white text-slate-600 border border-slate-200'
                   }`}
                 >
-                  {cat}
+                  {cat === 'all' ? 'All Foods' : cat}
                 </button>
               ))}
             </div>
-          </div>
+          )}
+        </div>
+      )}
 
-          {/* Foods Grid */}
-          <div className="px-6 grid grid-cols-3 gap-3">
-            {filteredFoods.map(food => (
+      {/* Tabs */}
+      <div className="px-6 mb-4">
+        <div className="flex gap-2 bg-slate-100 p-1 rounded-xl">
+          <button
+            onClick={() => setActiveTab('recipes')}
+            className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+              activeTab === 'recipes' ? 'bg-white shadow text-slate-800' : 'text-slate-500'
+            }`}
+          >
+            Recipes ({filteredRecipes.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('foods')}
+            className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+              activeTab === 'foods' ? 'bg-white shadow text-slate-800' : 'text-slate-500'
+            }`}
+          >
+            Foods ({filteredFoods.length})
+          </button>
+        </div>
+      </div>
+
+      {/* Popular Section (Recipes only) */}
+      {activeTab === 'recipes' && !searchQuery && selectedMealType === 'all' && (
+        <div className="px-6 mb-4">
+          <h3 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
+            <Flame className="h-4 w-4 text-orange-500" /> Popular Recipes
+          </h3>
+          <div className="flex gap-3 overflow-x-auto pb-2">
+            {recipes.filter(r => r.popular && r.ageFrom <= parseInt(babyAge)).slice(0, 5).map(recipe => (
+              <button
+                key={recipe.id}
+                onClick={() => setSelectedRecipe(recipe)}
+                className="flex-shrink-0 w-32 bg-white rounded-xl p-3 shadow-sm border border-slate-100 text-center"
+              >
+                <div className="text-3xl mb-1">{recipe.emoji}</div>
+                <p className="text-xs font-medium text-slate-700 truncate">{recipe.name}</p>
+                <p className="text-xs text-slate-400">{recipe.prepTime}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'recipes' && (
+        <div className="px-6 space-y-2">
+          {filteredRecipes.length === 0 ? (
+            <div className="text-center py-8 text-slate-500">
+              <p>No recipes found matching your filters</p>
+            </div>
+          ) : (
+            filteredRecipes.map(recipe => (
+              <button
+                key={recipe.id}
+                onClick={() => setSelectedRecipe(recipe)}
+                className="w-full bg-white rounded-xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-shadow text-left flex items-center gap-4"
+              >
+                <div className="text-4xl">{recipe.emoji}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-slate-800">{recipe.name}</p>
+                    {recipe.freezable && <span className="text-xs text-blue-500">❄️</span>}
+                  </div>
+                  <div className="flex items-center gap-3 mt-1 flex-wrap">
+                    <span className="text-xs text-slate-500 flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {recipe.prepTime}
+                    </span>
+                    <span className="text-xs text-slate-500 flex items-center gap-1">
+                      <Baby className="h-3 w-3" />
+                      {recipe.ageFrom}m+
+                    </span>
+                    <span className="text-xs px-2 py-0.5 bg-slate-100 rounded-full text-slate-500">
+                      {recipe.category}
+                    </span>
+                  </div>
+                </div>
+                <ChevronRight className="h-5 w-5 text-slate-400" />
+              </button>
+            ))
+          )}
+        </div>
+      )}
+
+      {activeTab === 'foods' && (
+        <div className="px-6 grid grid-cols-3 gap-3">
+          {filteredFoods.length === 0 ? (
+            <div className="col-span-3 text-center py-8 text-slate-500">
+              <p>No foods found matching your search</p>
+            </div>
+          ) : (
+            filteredFoods.map(food => (
               <button
                 key={food.id}
                 onClick={() => setSelectedFood(food)}
@@ -397,39 +747,11 @@ const Weaning = () => {
                 <div className="text-3xl mb-2">{food.emoji}</div>
                 <p className="text-sm font-medium text-slate-700">{food.name}</p>
                 {food.allergen && (
-                  <span className="text-xs text-amber-600 mt-1 block">⚠️ Allergen</span>
+                  <span className="text-xs text-amber-600 mt-1 block">⚠️</span>
                 )}
               </button>
-            ))}
-          </div>
-        </>
-      )}
-
-      {activeTab === 'recipes' && (
-        <div className="px-6 space-y-3">
-          {recipes.map(recipe => (
-            <button
-              key={recipe.id}
-              onClick={() => setSelectedRecipe(recipe)}
-              className="w-full bg-white rounded-xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-shadow text-left flex items-center gap-4"
-            >
-              <div className="text-4xl">{recipe.emoji}</div>
-              <div className="flex-1">
-                <p className="font-medium text-slate-800">{recipe.name}</p>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className="text-xs text-slate-500 flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {recipe.prepTime}
-                  </span>
-                  <span className="text-xs text-slate-500 flex items-center gap-1">
-                    <Baby className="h-3 w-3" />
-                    {recipe.ageFrom}m+
-                  </span>
-                </div>
-              </div>
-              <ChevronRight className="h-5 w-5 text-slate-400" />
-            </button>
-          ))}
+            ))
+          )}
         </div>
       )}
 
@@ -447,21 +769,19 @@ const Weaning = () => {
                   )}
                 </div>
               </div>
-              <button onClick={() => setSelectedFood(null)} className="p-1 hover:bg-slate-100 rounded-full">
+              <button onClick={() => setSelectedFood(null)} className="p-2 hover:bg-slate-100 rounded-full">
                 <X className="h-5 w-5 text-slate-500" />
               </button>
             </div>
             
             <div className="p-5 overflow-y-auto max-h-[65vh] space-y-5">
-              {/* Serving for selected age */}
               <div className="bg-sky-50 rounded-xl p-4">
                 <p className="text-xs text-sky-600 font-medium mb-1">
-                  How to serve at {babyAge === '6' ? '6 months' : babyAge === '7' ? '7-8 months' : babyAge === '9' ? '9-12 months' : '12+ months'}:
+                  Serving at {babyAge === '6' ? '6 months' : babyAge === '7' ? '7-8 months' : babyAge === '9' ? '9-12 months' : '12+ months'}:
                 </p>
                 <p className="text-slate-700">{getServingForAge(selectedFood)}</p>
               </div>
 
-              {/* All ages reference */}
               <div>
                 <h3 className="font-medium text-slate-800 mb-3">By age:</h3>
                 <div className="space-y-2">
@@ -476,7 +796,6 @@ const Weaning = () => {
                 </div>
               </div>
 
-              {/* Tips */}
               <div>
                 <h3 className="font-medium text-slate-800 mb-2">Tips:</h3>
                 <ul className="space-y-2">
@@ -489,7 +808,6 @@ const Weaning = () => {
                 </ul>
               </div>
 
-              {/* Warnings */}
               {selectedFood.warnings && (
                 <div className="bg-amber-50 rounded-xl p-4">
                   <h3 className="font-medium text-amber-800 mb-2 flex items-center gap-2">
@@ -511,17 +829,20 @@ const Weaning = () => {
       {/* Recipe Detail Modal */}
       {selectedRecipe && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-          <div className="bg-white w-full max-w-lg max-h-[85vh] rounded-t-2xl sm:rounded-2xl overflow-hidden">
+          <div className="bg-white w-full max-w-lg max-h-[90vh] rounded-t-2xl sm:rounded-2xl overflow-hidden">
             <div className="flex items-center justify-between p-4 border-b">
               <div className="flex items-center gap-3">
                 <span className="text-3xl">{selectedRecipe.emoji}</span>
                 <div>
                   <h2 className="font-semibold text-slate-800">{selectedRecipe.name}</h2>
-                  <div className="flex items-center gap-3 text-xs text-slate-500">
+                  <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
                     <span className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
                       {selectedRecipe.prepTime}
                     </span>
+                    {selectedRecipe.cookTime && (
+                      <span>+ {selectedRecipe.cookTime} cook</span>
+                    )}
                     <span className="flex items-center gap-1">
                       <Baby className="h-3 w-3" />
                       {selectedRecipe.ageFrom}m+
@@ -529,19 +850,33 @@ const Weaning = () => {
                   </div>
                 </div>
               </div>
-              <button onClick={() => setSelectedRecipe(null)} className="p-1 hover:bg-slate-100 rounded-full">
+              <button onClick={() => setSelectedRecipe(null)} className="p-2 hover:bg-slate-100 rounded-full">
                 <X className="h-5 w-5 text-slate-500" />
               </button>
             </div>
             
-            <div className="p-5 overflow-y-auto max-h-[65vh] space-y-5">
+            <div className="p-5 overflow-y-auto max-h-[70vh] space-y-5">
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2">
+                {selectedRecipe.tags.map((tag, i) => (
+                  <span key={i} className="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded-full">
+                    {tag}
+                  </span>
+                ))}
+                {selectedRecipe.freezable && (
+                  <span className="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded-full">
+                    ❄️ Freezable
+                  </span>
+                )}
+              </div>
+
               {/* Ingredients */}
               <div>
                 <h3 className="font-medium text-slate-800 mb-2">Ingredients:</h3>
-                <ul className="space-y-1">
+                <ul className="space-y-1.5">
                   {selectedRecipe.ingredients.map((ing, i) => (
-                    <li key={i} className="text-sm text-slate-600 flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-slate-400 rounded-full" />
+                    <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 flex-shrink-0" />
                       {ing}
                     </li>
                   ))}
@@ -550,12 +885,14 @@ const Weaning = () => {
 
               {/* Instructions */}
               <div>
-                <h3 className="font-medium text-slate-800 mb-2">Instructions:</h3>
-                <ol className="space-y-2">
+                <h3 className="font-medium text-slate-800 mb-2">Method:</h3>
+                <ol className="space-y-3">
                   {selectedRecipe.instructions.map((step, i) => (
                     <li key={i} className="text-sm text-slate-600 flex gap-3">
-                      <span className="font-medium text-slate-400">{i + 1}.</span>
-                      {step}
+                      <span className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-medium text-slate-500 flex-shrink-0">
+                        {i + 1}
+                      </span>
+                      <span className="pt-0.5">{step}</span>
                     </li>
                   ))}
                 </ol>
