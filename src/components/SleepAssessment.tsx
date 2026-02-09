@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ChevronRight, ChevronLeft, Moon, Baby, Clock, Heart, AlertCircle, Users, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -147,6 +147,19 @@ const SleepAssessment = ({ onComplete, onSkip }: SleepAssessmentProps) => {
       setStep(step - 1);
     }
   };
+
+  // Handle Enter key to proceed
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && canProceed()) {
+        e.preventDefault();
+        handleNext();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [step, data]); // Re-attach when step or data changes
 
   const renderStep = () => {
     switch (step) {
