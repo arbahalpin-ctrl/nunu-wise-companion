@@ -164,14 +164,16 @@ const Home = ({ onTabChange }: HomeProps) => {
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white flex flex-col pb-24">
       {/* Header */}
       <div className="flex flex-col items-center pt-6 pb-3 px-6">
-        <div className="w-16 h-16 bg-white rounded-full p-2 shadow-md border-2 border-white mb-3">
+        <div className="w-16 h-16 bg-white rounded-full p-2 shadow-md border-2 border-white mb-2">
           <img 
             src={koalaHero} 
             alt="Nunu" 
             className="w-full h-full object-contain rounded-full"
           />
         </div>
-        <h1 className="text-lg font-bold text-slate-800">Hey, you 💛</h1>
+        <h1 className="text-xl font-bold text-slate-800">Nunu</h1>
+        <p className="text-sm text-slate-500 mb-3">The Motherhood Companion</p>
+        <p className="text-base font-medium text-slate-700">Hey, you 💛</p>
         <p className="text-sm text-slate-500">How are you feeling?</p>
       </div>
 
