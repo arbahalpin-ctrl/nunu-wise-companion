@@ -8,10 +8,10 @@ interface NavigationProps {
 const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const tabs = [
     { id: 'home', icon: Home, label: 'Home' },
+    { id: 'chat', icon: MessageCircle, label: 'Chat' },
     { id: 'sleep', icon: Moon, label: 'Sleep' },
     { id: 'weaning', icon: Utensils, label: 'Weaning' },
     { id: 'milestones', icon: Baby, label: 'Milestones' },
-    { id: 'chat', icon: MessageCircle, label: 'Chat' },
     { id: 'settings', icon: Settings, label: 'Settings' },
   ];
 
