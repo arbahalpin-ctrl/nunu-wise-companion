@@ -1,4 +1,4 @@
-export interface Food {
+﻿export interface Food {
   id: string;
   name: string;
   emoji: string;
@@ -17,7 +17,7 @@ export interface Food {
 export const foods: Food[] = [
   // ============ FRUITS ============
   {
-    id: 'banana', name: 'Banana', emoji: '🍌', category: 'Fruits',
+    id: 'banana', name: 'Banana', emoji: 'ðŸŒ', category: 'Fruits',
     serving: {
       '6': 'Mash well or serve as long spears (half banana lengthways)',
       '7-8': 'Soft chunks or spears, slightly less mashed',
@@ -27,7 +27,7 @@ export const foods: Food[] = [
     tips: ['Great first food', 'Roll in baby cereal for grip if slippery', 'Ripe = easier to digest']
   },
   {
-    id: 'avocado', name: 'Avocado', emoji: '🥑', category: 'Fruits',
+    id: 'avocado', name: 'Avocado', emoji: 'ðŸ¥‘', category: 'Fruits',
     serving: {
       '6': 'Mashed or long slices with skin on for grip',
       '7-8': 'Soft chunks or strips',
@@ -37,7 +37,7 @@ export const foods: Food[] = [
     tips: ['Nutrient-dense first food', 'Leave skin on for grip', 'Roll in hemp seeds if slippery']
   },
   {
-    id: 'strawberry', name: 'Strawberries', emoji: '🍓', category: 'Fruits',
+    id: 'strawberry', name: 'Strawberries', emoji: 'ðŸ“', category: 'Fruits',
     serving: {
       '6': 'Mashed or very large whole to gnaw',
       '7-8': 'Halved or quartered lengthways',
@@ -47,7 +47,7 @@ export const foods: Food[] = [
     tips: ['Quarter lengthways for safety', 'May cause contact rash (not allergy)', 'High in vitamin C']
   },
   {
-    id: 'blueberry', name: 'Blueberries', emoji: '🫐', category: 'Fruits',
+    id: 'blueberry', name: 'Blueberries', emoji: 'ðŸ«', category: 'Fruits',
     serving: {
       '6': 'Smash flat or quarter',
       '7-8': 'Smashed or quartered',
@@ -58,7 +58,7 @@ export const foods: Food[] = [
     warnings: ['Always smash or quarter - round shape is hazardous']
   },
   {
-    id: 'raspberry', name: 'Raspberries', emoji: '🫐', category: 'Fruits',
+    id: 'raspberry', name: 'Raspberries', emoji: 'ðŸ«', category: 'Fruits',
     serving: {
       '6': 'Smash lightly or serve whole (soft enough)',
       '7-8': 'Whole or lightly smashed',
@@ -68,7 +68,7 @@ export const foods: Food[] = [
     tips: ['Soft texture is baby-friendly', 'High in fiber', 'Can put on fingertip for fun!']
   },
   {
-    id: 'blackberry', name: 'Blackberries', emoji: '🫐', category: 'Fruits',
+    id: 'blackberry', name: 'Blackberries', emoji: 'ðŸ«', category: 'Fruits',
     serving: {
       '6': 'Smash or halve lengthways',
       '7-8': 'Halved or whole if soft',
@@ -78,7 +78,7 @@ export const foods: Food[] = [
     tips: ['Slightly firmer than raspberries', 'High in vitamin C', 'May stain!']
   },
   {
-    id: 'apple', name: 'Apple', emoji: '🍎', category: 'Fruits',
+    id: 'apple', name: 'Apple', emoji: 'ðŸŽ', category: 'Fruits',
     serving: {
       '6': 'Steamed/roasted until very soft, or thin shreds',
       '7-8': 'Soft cooked pieces, grated raw',
@@ -89,7 +89,7 @@ export const foods: Food[] = [
     warnings: ['Raw apple chunks are choking hazard until 2-3 years']
   },
   {
-    id: 'pear', name: 'Pear', emoji: '🍐', category: 'Fruits',
+    id: 'pear', name: 'Pear', emoji: 'ðŸ', category: 'Fruits',
     serving: {
       '6': 'Very ripe soft slices or steamed',
       '7-8': 'Ripe soft pieces',
@@ -99,7 +99,7 @@ export const foods: Food[] = [
     tips: ['Must be VERY ripe (soft)', 'Easier than apple when ripe', 'Great for constipation']
   },
   {
-    id: 'peach', name: 'Peach', emoji: '🍑', category: 'Fruits',
+    id: 'peach', name: 'Peach', emoji: 'ðŸ‘', category: 'Fruits',
     serving: {
       '6': 'Very ripe soft slices, skin removed',
       '7-8': 'Ripe slices or chunks',
@@ -109,7 +109,7 @@ export const foods: Food[] = [
     tips: ['Must be ripe and soft', 'Remove skin for young babies', 'Frozen peaches work well']
   },
   {
-    id: 'nectarine', name: 'Nectarine', emoji: '🍑', category: 'Fruits',
+    id: 'nectarine', name: 'Nectarine', emoji: 'ðŸ‘', category: 'Fruits',
     serving: {
       '6': 'Very ripe soft slices',
       '7-8': 'Ripe slices or chunks',
@@ -119,7 +119,7 @@ export const foods: Food[] = [
     tips: ['Similar to peach but no fuzz', 'Must be very ripe', 'High in vitamin A']
   },
   {
-    id: 'plum', name: 'Plum', emoji: '🍑', category: 'Fruits',
+    id: 'plum', name: 'Plum', emoji: 'ðŸ‘', category: 'Fruits',
     serving: {
       '6': 'Very ripe, skin removed, mashed or sliced',
       '7-8': 'Ripe pieces, skin on OK',
@@ -129,7 +129,7 @@ export const foods: Food[] = [
     tips: ['Skin can be tough - remove for young babies', 'Good for constipation', 'Choose very ripe']
   },
   {
-    id: 'apricot', name: 'Apricot', emoji: '🍑', category: 'Fruits',
+    id: 'apricot', name: 'Apricot', emoji: 'ðŸ‘', category: 'Fruits',
     serving: {
       '6': 'Very ripe fresh, mashed or dried (soaked, chopped)',
       '7-8': 'Fresh ripe pieces or soaked dried',
@@ -139,7 +139,7 @@ export const foods: Food[] = [
     tips: ['Dried apricots are high in iron', 'Soak dried ones to soften', 'Fresh must be very ripe']
   },
   {
-    id: 'mango', name: 'Mango', emoji: '🥭', category: 'Fruits',
+    id: 'mango', name: 'Mango', emoji: 'ðŸ¥­', category: 'Fruits',
     serving: {
       '6': 'Ripe strips or pit with flesh to gnaw',
       '7-8': 'Soft strips or chunks',
@@ -149,7 +149,7 @@ export const foods: Food[] = [
     tips: ['Leave on large pit to gnaw safely', 'Very ripe = very soft', 'High in vitamin A']
   },
   {
-    id: 'papaya', name: 'Papaya', emoji: '🍈', category: 'Fruits',
+    id: 'papaya', name: 'Papaya', emoji: 'ðŸˆ', category: 'Fruits',
     serving: {
       '6': 'Ripe mashed or strips',
       '7-8': 'Soft chunks',
@@ -159,7 +159,7 @@ export const foods: Food[] = [
     tips: ['Very soft when ripe', 'Contains digestive enzymes', 'Remove all seeds']
   },
   {
-    id: 'pineapple', name: 'Pineapple', emoji: '🍍', category: 'Fruits',
+    id: 'pineapple', name: 'Pineapple', emoji: 'ðŸ', category: 'Fruits',
     serving: {
       '6': 'Very ripe, soft pieces only',
       '7-8': 'Soft ripe chunks',
@@ -170,7 +170,7 @@ export const foods: Food[] = [
     warnings: ['Acidic - may cause skin irritation']
   },
   {
-    id: 'watermelon', name: 'Watermelon', emoji: '🍉', category: 'Fruits',
+    id: 'watermelon', name: 'Watermelon', emoji: 'ðŸ‰', category: 'Fruits',
     serving: {
       '6': 'Remove seeds, serve as large wedge to gnaw',
       '7-8': 'Seedless chunks',
@@ -181,7 +181,7 @@ export const foods: Food[] = [
     warnings: ['Seeds are choking hazard - remove all']
   },
   {
-    id: 'cantaloupe', name: 'Cantaloupe/Melon', emoji: '🍈', category: 'Fruits',
+    id: 'cantaloupe', name: 'Cantaloupe/Melon', emoji: 'ðŸˆ', category: 'Fruits',
     serving: {
       '6': 'Thin slices or chunks, very ripe',
       '7-8': 'Soft chunks',
@@ -191,7 +191,7 @@ export const foods: Food[] = [
     tips: ['Wash outside before cutting (bacteria)', 'Remove seeds', 'Good for hydration']
   },
   {
-    id: 'honeydew', name: 'Honeydew Melon', emoji: '🍈', category: 'Fruits',
+    id: 'honeydew', name: 'Honeydew Melon', emoji: 'ðŸˆ', category: 'Fruits',
     serving: {
       '6': 'Thin ripe slices',
       '7-8': 'Soft chunks',
@@ -201,7 +201,7 @@ export const foods: Food[] = [
     tips: ['Choose ripe for softness', 'Remove all seeds', 'Similar to cantaloupe prep']
   },
   {
-    id: 'grapes', name: 'Grapes', emoji: '🍇', category: 'Fruits',
+    id: 'grapes', name: 'Grapes', emoji: 'ðŸ‡', category: 'Fruits',
     serving: {
       '6': 'Quarter lengthways (into 4 pieces)',
       '7-8': 'Quartered lengthways',
@@ -212,7 +212,7 @@ export const foods: Food[] = [
     warnings: ['CRITICAL: Always quarter lengthways - grapes are #1 choking hazard. Never serve whole until age 4+']
   },
   {
-    id: 'cherries', name: 'Cherries', emoji: '🍒', category: 'Fruits',
+    id: 'cherries', name: 'Cherries', emoji: 'ðŸ’', category: 'Fruits',
     serving: {
       '6': 'Remove pit, quarter or mash',
       '7-8': 'Pitted and quartered',
@@ -223,7 +223,7 @@ export const foods: Food[] = [
     warnings: ['Pit is choking hazard - always remove']
   },
   {
-    id: 'kiwi', name: 'Kiwi', emoji: '🥝', category: 'Fruits',
+    id: 'kiwi', name: 'Kiwi', emoji: 'ðŸ¥', category: 'Fruits',
     serving: {
       '6': 'Ripe, peeled, mashed or thin slices',
       '7-8': 'Peeled chunks',
@@ -234,7 +234,7 @@ export const foods: Food[] = [
     warnings: ['May cause mouth irritation in some babies']
   },
   {
-    id: 'orange', name: 'Orange', emoji: '🍊', category: 'Fruits',
+    id: 'orange', name: 'Orange', emoji: 'ðŸŠ', category: 'Fruits',
     serving: {
       '6': 'Segments with membrane removed, or supremes',
       '7-8': 'Segments, membrane removed',
@@ -245,7 +245,7 @@ export const foods: Food[] = [
     warnings: ['Acidic - watch for rash around mouth']
   },
   {
-    id: 'clementine', name: 'Clementine/Mandarin', emoji: '🍊', category: 'Fruits',
+    id: 'clementine', name: 'Clementine/Mandarin', emoji: 'ðŸŠ', category: 'Fruits',
     serving: {
       '6': 'Segments with membrane removed',
       '7-8': 'Segments, break into smaller pieces',
@@ -255,7 +255,7 @@ export const foods: Food[] = [
     tips: ['Easier to peel than oranges', 'Remove any seeds', 'Less acidic than oranges usually']
   },
   {
-    id: 'grapefruit', name: 'Grapefruit', emoji: '🍊', category: 'Fruits',
+    id: 'grapefruit', name: 'Grapefruit', emoji: 'ðŸŠ', category: 'Fruits',
     serving: {
       '6': 'Segments with membrane removed (if offering)',
       '7-8': 'Segments, membrane removed',
@@ -266,7 +266,7 @@ export const foods: Food[] = [
     warnings: ['Very acidic and bitter']
   },
   {
-    id: 'lemon', name: 'Lemon', emoji: '🍋', category: 'Fruits',
+    id: 'lemon', name: 'Lemon', emoji: 'ðŸ‹', category: 'Fruits',
     serving: {
       '6': 'Wedge to suck on (supervised) or juice in foods',
       '7-8': 'In cooking or wedge to taste',
@@ -276,7 +276,7 @@ export const foods: Food[] = [
     tips: ['Fun facial expressions!', 'Use juice in cooking', 'Good flavor exposure']
   },
   {
-    id: 'lime', name: 'Lime', emoji: '🍋', category: 'Fruits',
+    id: 'lime', name: 'Lime', emoji: 'ðŸ‹', category: 'Fruits',
     serving: {
       '6': 'Wedge to suck or juice in foods',
       '7-8': 'In cooking or squeeze over foods',
@@ -286,7 +286,7 @@ export const foods: Food[] = [
     tips: ['Similar to lemon', 'Great in guacamole', 'Use juice for flavor']
   },
   {
-    id: 'dates', name: 'Dates', emoji: '🫘', category: 'Fruits',
+    id: 'dates', name: 'Dates', emoji: 'ðŸ«˜', category: 'Fruits',
     serving: {
       '6': 'Finely chopped or mashed, pit removed',
       '7-8': 'Small pieces, pitted',
@@ -297,7 +297,7 @@ export const foods: Food[] = [
     warnings: ['Always remove pit', 'Sticky - brush teeth after']
   },
   {
-    id: 'prunes', name: 'Prunes', emoji: '🫘', category: 'Fruits',
+    id: 'prunes', name: 'Prunes', emoji: 'ðŸ«˜', category: 'Fruits',
     serving: {
       '6': 'Finely chopped or pureed',
       '7-8': 'Small soft pieces',
@@ -307,7 +307,7 @@ export const foods: Food[] = [
     tips: ['Excellent for constipation', 'High in fiber and iron', 'Prune juice works too']
   },
   {
-    id: 'raisins', name: 'Raisins', emoji: '🍇', category: 'Fruits',
+    id: 'raisins', name: 'Raisins', emoji: 'ðŸ‡', category: 'Fruits',
     serving: {
       '6': 'Finely chopped or soaked and mashed',
       '7-8': 'Chopped or soaked',
@@ -318,7 +318,7 @@ export const foods: Food[] = [
     warnings: ['Sticky - can stick to teeth, brush after']
   },
   {
-    id: 'fig', name: 'Figs', emoji: '🫘', category: 'Fruits',
+    id: 'fig', name: 'Figs', emoji: 'ðŸ«˜', category: 'Fruits',
     serving: {
       '6': 'Fresh ripe mashed, or dried soaked and chopped',
       '7-8': 'Fresh soft pieces or dried soaked',
@@ -328,7 +328,7 @@ export const foods: Food[] = [
     tips: ['Fresh figs are very soft when ripe', 'Dried are high in fiber', 'Good calcium source']
   },
   {
-    id: 'coconut', name: 'Coconut', emoji: '🥥', category: 'Fruits',
+    id: 'coconut', name: 'Coconut', emoji: 'ðŸ¥¥', category: 'Fruits',
     serving: {
       '6': 'Unsweetened shredded in foods, coconut milk',
       '7-8': 'Shredded in cooking, strips to gnaw',
@@ -338,7 +338,7 @@ export const foods: Food[] = [
     tips: ['Coconut milk great in cooking', 'Unsweetened only', 'Good healthy fats']
   },
   {
-    id: 'pomegranate', name: 'Pomegranate', emoji: '🫐', category: 'Fruits',
+    id: 'pomegranate', name: 'Pomegranate', emoji: 'ðŸ«', category: 'Fruits',
     serving: {
       '6': 'Mash seeds to break skin or juice',
       '7-8': 'Smashed seeds',
@@ -349,7 +349,7 @@ export const foods: Food[] = [
     warnings: ['Seeds can be slippery - supervise carefully']
   },
   {
-    id: 'dragonfruit', name: 'Dragon Fruit', emoji: '🍈', category: 'Fruits',
+    id: 'dragonfruit', name: 'Dragon Fruit', emoji: 'ðŸˆ', category: 'Fruits',
     serving: {
       '6': 'Soft flesh mashed or in strips',
       '7-8': 'Soft chunks',
@@ -359,7 +359,7 @@ export const foods: Food[] = [
     tips: ['Very soft and mild flavored', 'Seeds are edible', 'Fun color!']
   },
   {
-    id: 'passionfruit', name: 'Passion Fruit', emoji: '🍈', category: 'Fruits',
+    id: 'passionfruit', name: 'Passion Fruit', emoji: 'ðŸˆ', category: 'Fruits',
     serving: {
       '6': 'Pulp mixed into yogurt (strain seeds if desired)',
       '7-8': 'Pulp with seeds',
@@ -371,7 +371,7 @@ export const foods: Food[] = [
 
   // ============ VEGETABLES ============
   {
-    id: 'broccoli', name: 'Broccoli', emoji: '🥦', category: 'Vegetables',
+    id: 'broccoli', name: 'Broccoli', emoji: 'ðŸ¥¦', category: 'Vegetables',
     serving: {
       '6': 'Steam until very soft, serve as whole floret',
       '7-8': 'Soft steamed florets',
@@ -381,7 +381,7 @@ export const foods: Food[] = [
     tips: ['Natural handle shape', 'Steam 8-10 mins until very soft', 'Stem is great for holding']
   },
   {
-    id: 'carrot', name: 'Carrot', emoji: '🥕', category: 'Vegetables',
+    id: 'carrot', name: 'Carrot', emoji: 'ðŸ¥•', category: 'Vegetables',
     serving: {
       '6': 'Steam until VERY soft, thick batons',
       '7-8': 'Soft steamed batons or mashed',
@@ -392,7 +392,7 @@ export const foods: Food[] = [
     warnings: ['Raw carrot is choking hazard until 2-3 years']
   },
   {
-    id: 'sweetpotato', name: 'Sweet Potato', emoji: '🍠', category: 'Vegetables',
+    id: 'sweetpotato', name: 'Sweet Potato', emoji: 'ðŸ ', category: 'Vegetables',
     serving: {
       '6': 'Steamed/roasted wedges, very soft',
       '7-8': 'Soft wedges or mashed',
@@ -402,7 +402,7 @@ export const foods: Food[] = [
     tips: ['Great first food - naturally sweet', 'Roast with skin for easier gripping', 'High in vitamin A']
   },
   {
-    id: 'potato', name: 'Potato', emoji: '🥔', category: 'Vegetables',
+    id: 'potato', name: 'Potato', emoji: 'ðŸ¥”', category: 'Vegetables',
     serving: {
       '6': 'Mashed, or soft roasted wedges',
       '7-8': 'Soft pieces, mashed',
@@ -412,7 +412,7 @@ export const foods: Food[] = [
     tips: ['Mash with butter/milk for nutrition', 'Leave skin on for nutrients', 'Can be slippery when plain']
   },
   {
-    id: 'cucumber', name: 'Cucumber', emoji: '🥒', category: 'Vegetables',
+    id: 'cucumber', name: 'Cucumber', emoji: 'ðŸ¥’', category: 'Vegetables',
     serving: {
       '6': 'Large spears with skin (too big to choke)',
       '7-8': 'Large spears',
@@ -422,7 +422,7 @@ export const foods: Food[] = [
     tips: ['Keep skin on for grip', 'Cool and soothing for teething', 'Mostly water - limited nutrition']
   },
   {
-    id: 'tomato', name: 'Tomatoes', emoji: '🍅', category: 'Vegetables',
+    id: 'tomato', name: 'Tomatoes', emoji: 'ðŸ…', category: 'Vegetables',
     serving: {
       '6': 'Quartered cherry tomatoes or large wedges',
       '7-8': 'Quartered, skinned if preferred',
@@ -433,7 +433,7 @@ export const foods: Food[] = [
     warnings: ['Round cherry tomatoes must be quartered lengthways']
   },
   {
-    id: 'peas', name: 'Peas', emoji: '🟢', category: 'Vegetables',
+    id: 'peas', name: 'Peas', emoji: 'ðŸŸ¢', category: 'Vegetables',
     serving: {
       '6': 'Smash flat or blend into foods',
       '7-8': 'Smashed',
@@ -444,7 +444,7 @@ export const foods: Food[] = [
     warnings: ['Whole peas can be choking hazard - smash them until 12m+']
   },
   {
-    id: 'spinach', name: 'Spinach', emoji: '🥬', category: 'Vegetables',
+    id: 'spinach', name: 'Spinach', emoji: 'ðŸ¥¬', category: 'Vegetables',
     serving: {
       '6': 'Wilted/cooked, finely chopped or blended into foods',
       '7-8': 'Chopped cooked spinach',
@@ -454,7 +454,7 @@ export const foods: Food[] = [
     tips: ['High in iron (pair with vitamin C)', 'Blend into sauces', 'Frozen spinach is convenient']
   },
   {
-    id: 'kale', name: 'Kale', emoji: '🥬', category: 'Vegetables',
+    id: 'kale', name: 'Kale', emoji: 'ðŸ¥¬', category: 'Vegetables',
     serving: {
       '6': 'Remove stems, cook well, finely chop or blend',
       '7-8': 'Cooked and chopped',
@@ -464,7 +464,7 @@ export const foods: Food[] = [
     tips: ['Remove tough stems', 'Massage if using raw (for older kids)', 'Very nutritious']
   },
   {
-    id: 'cauliflower', name: 'Cauliflower', emoji: '🥦', category: 'Vegetables',
+    id: 'cauliflower', name: 'Cauliflower', emoji: 'ðŸ¥¦', category: 'Vegetables',
     serving: {
       '6': 'Steamed very soft florets',
       '7-8': 'Soft florets',
@@ -474,7 +474,7 @@ export const foods: Food[] = [
     tips: ['Similar prep to broccoli', 'Can mash like potatoes', 'Mild flavor']
   },
   {
-    id: 'zucchini', name: 'Zucchini/Courgette', emoji: '🥒', category: 'Vegetables',
+    id: 'zucchini', name: 'Zucchini/Courgette', emoji: 'ðŸ¥’', category: 'Vegetables',
     serving: {
       '6': 'Steamed soft sticks or mashed',
       '7-8': 'Soft cooked pieces',
@@ -484,7 +484,7 @@ export const foods: Food[] = [
     tips: ['Very mild flavor', 'Blends well into sauces', 'Leave skin on for nutrients']
   },
   {
-    id: 'butternutsquash', name: 'Butternut Squash', emoji: '🎃', category: 'Vegetables',
+    id: 'butternutsquash', name: 'Butternut Squash', emoji: 'ðŸŽƒ', category: 'Vegetables',
     serving: {
       '6': 'Roasted until very soft, mashed or wedges',
       '7-8': 'Soft roasted pieces',
@@ -494,7 +494,7 @@ export const foods: Food[] = [
     tips: ['Naturally sweet', 'Great first food', 'Roasting brings out sweetness']
   },
   {
-    id: 'pumpkin', name: 'Pumpkin', emoji: '🎃', category: 'Vegetables',
+    id: 'pumpkin', name: 'Pumpkin', emoji: 'ðŸŽƒ', category: 'Vegetables',
     serving: {
       '6': 'Roasted very soft, mashed or puree',
       '7-8': 'Soft roasted pieces',
@@ -504,7 +504,7 @@ export const foods: Food[] = [
     tips: ['Use cooking pumpkins, not decorative', 'Canned pumpkin (plain) is fine', 'High in vitamin A']
   },
   {
-    id: 'acornsquash', name: 'Acorn Squash', emoji: '🎃', category: 'Vegetables',
+    id: 'acornsquash', name: 'Acorn Squash', emoji: 'ðŸŽƒ', category: 'Vegetables',
     serving: {
       '6': 'Roasted very soft, scooped flesh',
       '7-8': 'Soft pieces',
@@ -514,7 +514,7 @@ export const foods: Food[] = [
     tips: ['Similar to butternut squash', 'Roast cut-side down', 'Mild and sweet']
   },
   {
-    id: 'asparagus', name: 'Asparagus', emoji: '🥬', category: 'Vegetables',
+    id: 'asparagus', name: 'Asparagus', emoji: 'ðŸ¥¬', category: 'Vegetables',
     serving: {
       '6': 'Steamed very soft spears (natural handle)',
       '7-8': 'Soft steamed spears',
@@ -524,17 +524,17 @@ export const foods: Food[] = [
     tips: ['Perfect finger food shape', 'Steam until very soft', 'May make urine smell (normal!)']
   },
   {
-    id: 'greenbeans', name: 'Green Beans', emoji: '🥬', category: 'Vegetables',
+    id: 'greenbeans', name: 'Green Beans', emoji: 'ðŸ¥¬', category: 'Vegetables',
     serving: {
       '6': 'Steamed very soft, served whole',
       '7-8': 'Soft steamed',
-      '9-12': 'Steamed or sautéed',
+      '9-12': 'Steamed or sautÃ©ed',
       '12+': 'Any preparation'
     },
     tips: ['Good finger food shape', 'Steam until soft enough to squish', 'Frozen beans work well']
   },
   {
-    id: 'corn', name: 'Corn', emoji: '🌽', category: 'Vegetables',
+    id: 'corn', name: 'Corn', emoji: 'ðŸŒ½', category: 'Vegetables',
     serving: {
       '6': 'Cob to gnaw (no kernels will come off), or mashed kernels',
       '7-8': 'Cob to gnaw, smashed kernels',
@@ -544,7 +544,7 @@ export const foods: Food[] = [
     tips: ['Cob is great for teething', 'Kernels are hard to digest - will appear in diaper', 'Smash for young babies']
   },
   {
-    id: 'bellpepper', name: 'Bell Pepper', emoji: '🫑', category: 'Vegetables',
+    id: 'bellpepper', name: 'Bell Pepper', emoji: 'ðŸ«‘', category: 'Vegetables',
     serving: {
       '6': 'Roasted until very soft, skin removed, strips',
       '7-8': 'Soft roasted strips',
@@ -554,7 +554,7 @@ export const foods: Food[] = [
     tips: ['Roast to soften skin', 'Raw is crunchy - supervise', 'All colors are fine']
   },
   {
-    id: 'eggplant', name: 'Eggplant/Aubergine', emoji: '🍆', category: 'Vegetables',
+    id: 'eggplant', name: 'Eggplant/Aubergine', emoji: 'ðŸ†', category: 'Vegetables',
     serving: {
       '6': 'Roasted very soft, skin removed, mashed or strips',
       '7-8': 'Soft roasted pieces',
@@ -564,9 +564,9 @@ export const foods: Food[] = [
     tips: ['Absorbs lots of oil - be generous', 'Remove skin for young babies', 'Soft when cooked well']
   },
   {
-    id: 'mushroom', name: 'Mushrooms', emoji: '🍄', category: 'Vegetables',
+    id: 'mushroom', name: 'Mushrooms', emoji: 'ðŸ„', category: 'Vegetables',
     serving: {
-      '6': 'Sautéed until very soft, finely chopped',
+      '6': 'SautÃ©ed until very soft, finely chopped',
       '7-8': 'Soft cooked, chopped',
       '9-12': 'Sliced, cooked',
       '12+': 'Any preparation'
@@ -574,7 +574,7 @@ export const foods: Food[] = [
     tips: ['Cook thoroughly', 'Start with mild varieties (button, cremini)', 'Good source of vitamin D if exposed to sun']
   },
   {
-    id: 'onion', name: 'Onion', emoji: '🧅', category: 'Vegetables',
+    id: 'onion', name: 'Onion', emoji: 'ðŸ§…', category: 'Vegetables',
     serving: {
       '6': 'Well cooked in dishes (for flavor)',
       '7-8': 'Cooked, soft pieces',
@@ -584,7 +584,7 @@ export const foods: Food[] = [
     tips: ['Great for flavoring', 'Cook until very soft', 'Can cause gas in some babies']
   },
   {
-    id: 'garlic', name: 'Garlic', emoji: '🧄', category: 'Vegetables',
+    id: 'garlic', name: 'Garlic', emoji: 'ðŸ§„', category: 'Vegetables',
     serving: {
       '6': 'Cooked in dishes (for flavor)',
       '7-8': 'Cooked in dishes',
@@ -594,7 +594,7 @@ export const foods: Food[] = [
     tips: ['Safe and healthy from 6 months', 'Cook to mellow flavor', 'Immune-boosting properties']
   },
   {
-    id: 'leek', name: 'Leek', emoji: '🧅', category: 'Vegetables',
+    id: 'leek', name: 'Leek', emoji: 'ðŸ§…', category: 'Vegetables',
     serving: {
       '6': 'Well cooked, soft, in dishes',
       '7-8': 'Soft cooked pieces',
@@ -604,7 +604,7 @@ export const foods: Food[] = [
     tips: ['Milder than onion', 'Wash well - dirt hides in layers', 'Great in soups']
   },
   {
-    id: 'celery', name: 'Celery', emoji: '🥬', category: 'Vegetables',
+    id: 'celery', name: 'Celery', emoji: 'ðŸ¥¬', category: 'Vegetables',
     serving: {
       '6': 'Cooked very soft only',
       '7-8': 'Cooked soft',
@@ -615,7 +615,7 @@ export const foods: Food[] = [
     warnings: ['Raw celery strings are difficult - cook for young babies']
   },
   {
-    id: 'beetroot', name: 'Beetroot', emoji: '🟣', category: 'Vegetables',
+    id: 'beetroot', name: 'Beetroot', emoji: 'ðŸŸ£', category: 'Vegetables',
     serving: {
       '6': 'Roasted soft, wedges or mashed',
       '7-8': 'Soft roasted pieces',
@@ -626,7 +626,7 @@ export const foods: Food[] = [
     warnings: ['Red/pink diapers and urine are normal after eating']
   },
   {
-    id: 'parsnip', name: 'Parsnip', emoji: '🥕', category: 'Vegetables',
+    id: 'parsnip', name: 'Parsnip', emoji: 'ðŸ¥•', category: 'Vegetables',
     serving: {
       '6': 'Roasted very soft, wedges or mashed',
       '7-8': 'Soft roasted pieces',
@@ -636,7 +636,7 @@ export const foods: Food[] = [
     tips: ['Sweeter than carrots', 'Roast for best flavor', 'Great mixed with other root veg']
   },
   {
-    id: 'turnip', name: 'Turnip', emoji: '🥔', category: 'Vegetables',
+    id: 'turnip', name: 'Turnip', emoji: 'ðŸ¥”', category: 'Vegetables',
     serving: {
       '6': 'Roasted/steamed very soft, mashed or pieces',
       '7-8': 'Soft cooked pieces',
@@ -646,7 +646,7 @@ export const foods: Food[] = [
     tips: ['Slightly peppery flavor', 'Mash with potato', 'Young turnips are milder']
   },
   {
-    id: 'cabbage', name: 'Cabbage', emoji: '🥬', category: 'Vegetables',
+    id: 'cabbage', name: 'Cabbage', emoji: 'ðŸ¥¬', category: 'Vegetables',
     serving: {
       '6': 'Cooked very soft, finely shredded',
       '7-8': 'Soft cooked shreds',
@@ -656,7 +656,7 @@ export const foods: Food[] = [
     tips: ['Can cause gas', 'Cook well for young babies', 'Green, red, and savoy all fine']
   },
   {
-    id: 'brusselssprouts', name: 'Brussels Sprouts', emoji: '🥬', category: 'Vegetables',
+    id: 'brusselssprouts', name: 'Brussels Sprouts', emoji: 'ðŸ¥¬', category: 'Vegetables',
     serving: {
       '6': 'Steamed very soft, halved or quartered',
       '7-8': 'Soft halved',
@@ -666,7 +666,7 @@ export const foods: Food[] = [
     tips: ['Halve to prevent choking', 'Roasting reduces bitterness', 'May cause gas']
   },
   {
-    id: 'artichoke', name: 'Artichoke', emoji: '🥬', category: 'Vegetables',
+    id: 'artichoke', name: 'Artichoke', emoji: 'ðŸ¥¬', category: 'Vegetables',
     serving: {
       '6': 'Artichoke heart, cooked very soft, mashed',
       '7-8': 'Soft heart pieces',
@@ -676,7 +676,7 @@ export const foods: Food[] = [
     tips: ['Use hearts only for babies', 'Jarred/canned hearts work well', 'Rinse canned to reduce salt']
   },
   {
-    id: 'fennel', name: 'Fennel', emoji: '🥬', category: 'Vegetables',
+    id: 'fennel', name: 'Fennel', emoji: 'ðŸ¥¬', category: 'Vegetables',
     serving: {
       '6': 'Roasted very soft',
       '7-8': 'Soft roasted pieces',
@@ -686,7 +686,7 @@ export const foods: Food[] = [
     tips: ['Mild anise/licorice flavor', 'Roasting mellows flavor', 'Can help with gas']
   },
   {
-    id: 'radish', name: 'Radish', emoji: '🟣', category: 'Vegetables',
+    id: 'radish', name: 'Radish', emoji: 'ðŸŸ£', category: 'Vegetables',
     serving: {
       '6': 'Cooked soft only (raw is too hard)',
       '7-8': 'Cooked soft',
@@ -697,7 +697,7 @@ export const foods: Food[] = [
     warnings: ['Raw radish is hard - cook for young babies']
   },
   {
-    id: 'lettuce', name: 'Lettuce', emoji: '🥬', category: 'Vegetables',
+    id: 'lettuce', name: 'Lettuce', emoji: 'ðŸ¥¬', category: 'Vegetables',
     serving: {
       '6': 'Not recommended - no nutrition, hard to manage',
       '7-8': 'Can offer to play with',
@@ -707,7 +707,7 @@ export const foods: Food[] = [
     tips: ['Low nutrition', 'More of a textural experience', 'Romaine has more nutrients than iceberg']
   },
   {
-    id: 'bok-choy', name: 'Bok Choy', emoji: '🥬', category: 'Vegetables',
+    id: 'bok-choy', name: 'Bok Choy', emoji: 'ðŸ¥¬', category: 'Vegetables',
     serving: {
       '6': 'Cooked very soft, chopped',
       '7-8': 'Soft cooked',
@@ -719,7 +719,7 @@ export const foods: Food[] = [
 
   // ============ PROTEINS ============
   {
-    id: 'chicken', name: 'Chicken', emoji: '🍗', category: 'Protein',
+    id: 'chicken', name: 'Chicken', emoji: 'ðŸ—', category: 'Protein',
     serving: {
       '6': 'Shredded or drumstick (gnaw/suck)',
       '7-8': 'Shredded, moist strips',
@@ -729,7 +729,7 @@ export const foods: Food[] = [
     tips: ['Keep moist - dry is hard to swallow', 'Drumstick method works great', 'Slow cooker = naturally soft']
   },
   {
-    id: 'beef', name: 'Beef', emoji: '🥩', category: 'Protein',
+    id: 'beef', name: 'Beef', emoji: 'ðŸ¥©', category: 'Protein',
     serving: {
       '6': 'Slow-cooked strips to suck/gnaw, or pureed',
       '7-8': 'Shredded slow-cooked, mince',
@@ -739,7 +739,7 @@ export const foods: Food[] = [
     tips: ['Great iron source', 'Slow cook for tenderness', 'Mince is versatile']
   },
   {
-    id: 'lamb', name: 'Lamb', emoji: '🍖', category: 'Protein',
+    id: 'lamb', name: 'Lamb', emoji: 'ðŸ–', category: 'Protein',
     serving: {
       '6': 'Slow-cooked shredded, or mince',
       '7-8': 'Shredded, soft pieces',
@@ -749,7 +749,7 @@ export const foods: Food[] = [
     tips: ['High in iron and zinc', 'Slow cook for tenderness', 'Good flavor for babies']
   },
   {
-    id: 'pork', name: 'Pork', emoji: '🥓', category: 'Protein',
+    id: 'pork', name: 'Pork', emoji: 'ðŸ¥“', category: 'Protein',
     serving: {
       '6': 'Slow-cooked shredded pork',
       '7-8': 'Shredded, soft pieces',
@@ -759,7 +759,7 @@ export const foods: Food[] = [
     tips: ['Pulled pork is perfect texture', 'Avoid processed pork (bacon, ham) - high salt', 'Cook thoroughly']
   },
   {
-    id: 'turkey', name: 'Turkey', emoji: '🦃', category: 'Protein',
+    id: 'turkey', name: 'Turkey', emoji: 'ðŸ¦ƒ', category: 'Protein',
     serving: {
       '6': 'Shredded very moist, dark meat preferable',
       '7-8': 'Shredded, moist',
@@ -769,7 +769,7 @@ export const foods: Food[] = [
     tips: ['Dark meat is moister', 'Can dry out easily', 'Ground turkey is versatile']
   },
   {
-    id: 'duck', name: 'Duck', emoji: '🦆', category: 'Protein',
+    id: 'duck', name: 'Duck', emoji: 'ðŸ¦†', category: 'Protein',
     serving: {
       '6': 'Shredded, remove excess fat',
       '7-8': 'Shredded pieces',
@@ -779,7 +779,7 @@ export const foods: Food[] = [
     tips: ['Higher in fat than chicken', 'Very flavorful', 'Remove skin/excess fat']
   },
   {
-    id: 'liver', name: 'Liver', emoji: '🫀', category: 'Protein',
+    id: 'liver', name: 'Liver', emoji: 'ðŸ«€', category: 'Protein',
     serving: {
       '6': 'Pureed or finely minced, small amounts',
       '7-8': 'Finely chopped, in dishes',
@@ -790,7 +790,7 @@ export const foods: Food[] = [
     warnings: ['Limit intake - very high in vitamin A which can build up']
   },
   {
-    id: 'salmon', name: 'Salmon', emoji: '🐟', category: 'Protein', allergen: true,
+    id: 'salmon', name: 'Salmon', emoji: 'ðŸŸ', category: 'Protein', allergen: true,
     serving: {
       '6': 'Flaked, de-boned, soft baked',
       '7-8': 'Flaked pieces, salmon cakes',
@@ -801,7 +801,7 @@ export const foods: Food[] = [
     warnings: ['Check thoroughly for bones']
   },
   {
-    id: 'cod', name: 'Cod', emoji: '🐟', category: 'Protein', allergen: true,
+    id: 'cod', name: 'Cod', emoji: 'ðŸŸ', category: 'Protein', allergen: true,
     serving: {
       '6': 'Baked and flaked, check for bones',
       '7-8': 'Flaked pieces',
@@ -811,7 +811,7 @@ export const foods: Food[] = [
     tips: ['Mild white fish - great starter fish', 'Very few bones', 'Bake or poach to keep moist']
   },
   {
-    id: 'haddock', name: 'Haddock', emoji: '🐟', category: 'Protein', allergen: true,
+    id: 'haddock', name: 'Haddock', emoji: 'ðŸŸ', category: 'Protein', allergen: true,
     serving: {
       '6': 'Baked and flaked, de-boned',
       '7-8': 'Flaked',
@@ -821,7 +821,7 @@ export const foods: Food[] = [
     tips: ['Similar to cod', 'Check for bones', 'Avoid smoked (high salt)']
   },
   {
-    id: 'sardines', name: 'Sardines', emoji: '🐟', category: 'Protein', allergen: true,
+    id: 'sardines', name: 'Sardines', emoji: 'ðŸŸ', category: 'Protein', allergen: true,
     serving: {
       '6': 'Mashed, bones are soft and edible',
       '7-8': 'Mashed or flaked',
@@ -831,7 +831,7 @@ export const foods: Food[] = [
     tips: ['Bones are soft and great calcium source', 'Choose low-salt in water', 'High in omega-3']
   },
   {
-    id: 'mackerel', name: 'Mackerel', emoji: '🐟', category: 'Protein', allergen: true,
+    id: 'mackerel', name: 'Mackerel', emoji: 'ðŸŸ', category: 'Protein', allergen: true,
     serving: {
       '6': 'Flaked, check for bones',
       '7-8': 'Flaked',
@@ -842,7 +842,7 @@ export const foods: Food[] = [
     warnings: ['Limit to 2 portions per week (mercury)']
   },
   {
-    id: 'tuna', name: 'Tuna', emoji: '🐟', category: 'Protein', allergen: true,
+    id: 'tuna', name: 'Tuna', emoji: 'ðŸŸ', category: 'Protein', allergen: true,
     serving: {
       '6': 'Canned in water, flaked (limit frequency)',
       '7-8': 'Flaked',
@@ -853,7 +853,7 @@ export const foods: Food[] = [
     warnings: ['Limit intake due to mercury content']
   },
   {
-    id: 'shrimp', name: 'Shrimp/Prawns', emoji: '🦐', category: 'Protein', allergen: true,
+    id: 'shrimp', name: 'Shrimp/Prawns', emoji: 'ðŸ¦', category: 'Protein', allergen: true,
     serving: {
       '6': 'Finely chopped or minced',
       '7-8': 'Chopped small',
@@ -864,7 +864,7 @@ export const foods: Food[] = [
     warnings: ['Shellfish allergy is common - watch for reactions']
   },
   {
-    id: 'crab', name: 'Crab', emoji: '🦀', category: 'Protein', allergen: true,
+    id: 'crab', name: 'Crab', emoji: 'ðŸ¦€', category: 'Protein', allergen: true,
     serving: {
       '6': 'Finely flaked, check for shell',
       '7-8': 'Flaked',
@@ -875,7 +875,7 @@ export const foods: Food[] = [
     warnings: ['Shellfish allergen - introduce carefully']
   },
   {
-    id: 'egg', name: 'Eggs', emoji: '🥚', category: 'Protein', allergen: true,
+    id: 'egg', name: 'Eggs', emoji: 'ðŸ¥š', category: 'Protein', allergen: true,
     serving: {
       '6': 'Well-cooked scrambled, omelette strips',
       '7-8': 'Scrambled, quartered hard-boiled',
@@ -886,7 +886,7 @@ export const foods: Food[] = [
     warnings: ['Top allergen - watch for reactions (rash, swelling, vomiting)']
   },
   {
-    id: 'tofu', name: 'Tofu', emoji: '🧈', category: 'Protein', allergen: true,
+    id: 'tofu', name: 'Tofu', emoji: 'ðŸ§ˆ', category: 'Protein', allergen: true,
     serving: {
       '6': 'Firm tofu strips, pan-fried',
       '7-8': 'Strips or cubes',
@@ -896,9 +896,9 @@ export const foods: Food[] = [
     tips: ['Firm tofu holds shape better', 'Pan fry for better texture', 'Good protein source', 'Soy is allergen']
   },
   {
-    id: 'tempeh', name: 'Tempeh', emoji: '🧈', category: 'Protein', allergen: true,
+    id: 'tempeh', name: 'Tempeh', emoji: 'ðŸ§ˆ', category: 'Protein', allergen: true,
     serving: {
-      '6': 'Steamed/sautéed, cut into strips',
+      '6': 'Steamed/sautÃ©ed, cut into strips',
       '7-8': 'Strips or small pieces',
       '9-12': 'Cubed',
       '12+': 'Any preparation'
@@ -907,7 +907,7 @@ export const foods: Food[] = [
     warnings: ['Contains soy - allergen']
   },
   {
-    id: 'lentils', name: 'Lentils', emoji: '🫘', category: 'Protein',
+    id: 'lentils', name: 'Lentils', emoji: 'ðŸ«˜', category: 'Protein',
     serving: {
       '6': 'Well-cooked, mashed or in sauce',
       '7-8': 'Soft cooked lentils',
@@ -917,7 +917,7 @@ export const foods: Food[] = [
     tips: ['Great plant protein & iron', 'Red lentils cook softest and fastest', 'No pre-soaking needed']
   },
   {
-    id: 'chickpeas', name: 'Chickpeas', emoji: '🫘', category: 'Protein',
+    id: 'chickpeas', name: 'Chickpeas', emoji: 'ðŸ«˜', category: 'Protein',
     serving: {
       '6': 'Smashed or as hummus',
       '7-8': 'Smashed or halved',
@@ -928,7 +928,7 @@ export const foods: Food[] = [
     warnings: ['Round shape - smash or halve for young babies']
   },
   {
-    id: 'blackbeans', name: 'Black Beans', emoji: '🫘', category: 'Protein',
+    id: 'blackbeans', name: 'Black Beans', emoji: 'ðŸ«˜', category: 'Protein',
     serving: {
       '6': 'Smashed well',
       '7-8': 'Smashed or slightly mashed',
@@ -938,7 +938,7 @@ export const foods: Food[] = [
     tips: ['High in fiber and protein', 'Smash to break skin', 'Rinse canned to reduce salt']
   },
   {
-    id: 'kidneybeans', name: 'Kidney Beans', emoji: '🫘', category: 'Protein',
+    id: 'kidneybeans', name: 'Kidney Beans', emoji: 'ðŸ«˜', category: 'Protein',
     serving: {
       '6': 'Smashed well',
       '7-8': 'Smashed',
@@ -948,7 +948,7 @@ export const foods: Food[] = [
     tips: ['Must be cooked well (never raw)', 'Smash for young babies', 'Good in chili']
   },
   {
-    id: 'cannellinibeans', name: 'Cannellini Beans', emoji: '🫘', category: 'Protein',
+    id: 'cannellinibeans', name: 'Cannellini Beans', emoji: 'ðŸ«˜', category: 'Protein',
     serving: {
       '6': 'Smashed',
       '7-8': 'Smashed or mashed',
@@ -958,7 +958,7 @@ export const foods: Food[] = [
     tips: ['Mild flavor', 'Creamy texture', 'Great in purees']
   },
   {
-    id: 'edamame', name: 'Edamame', emoji: '🫛', category: 'Protein', allergen: true,
+    id: 'edamame', name: 'Edamame', emoji: 'ðŸ«›', category: 'Protein', allergen: true,
     serving: {
       '6': 'Shelled and smashed',
       '7-8': 'Shelled and smashed',
@@ -969,7 +969,7 @@ export const foods: Food[] = [
     warnings: ['Contains soy - allergen. Remove from pods.']
   },
   {
-    id: 'peanutbutter', name: 'Peanut Butter', emoji: '🥜', category: 'Protein', allergen: true,
+    id: 'peanutbutter', name: 'Peanut Butter', emoji: 'ðŸ¥œ', category: 'Protein', allergen: true,
     serving: {
       '6': 'Thin smear on toast or mixed into foods',
       '7-8': 'Thinly spread on soft foods',
@@ -980,7 +980,7 @@ export const foods: Food[] = [
     warnings: ['Top allergen - introduce early but carefully. Thick globs = choking hazard. No whole nuts until 5+']
   },
   {
-    id: 'almondbutter', name: 'Almond Butter', emoji: '🥜', category: 'Protein', allergen: true,
+    id: 'almondbutter', name: 'Almond Butter', emoji: 'ðŸ¥œ', category: 'Protein', allergen: true,
     serving: {
       '6': 'Thin smear on food or mixed in',
       '7-8': 'Thinly spread',
@@ -991,7 +991,7 @@ export const foods: Food[] = [
     warnings: ['Tree nut allergen. No whole almonds until 5+']
   },
   {
-    id: 'tahini', name: 'Tahini (Sesame)', emoji: '🥜', category: 'Protein', allergen: true,
+    id: 'tahini', name: 'Tahini (Sesame)', emoji: 'ðŸ¥œ', category: 'Protein', allergen: true,
     serving: {
       '6': 'Mixed into foods or thin spread',
       '7-8': 'In foods, spread',
@@ -1004,7 +1004,7 @@ export const foods: Food[] = [
 
   // ============ GRAINS ============
   {
-    id: 'toast', name: 'Toast/Bread', emoji: '🍞', category: 'Grains', allergen: true,
+    id: 'toast', name: 'Toast/Bread', emoji: 'ðŸž', category: 'Grains', allergen: true,
     serving: {
       '6': 'Lightly toasted strips with toppings',
       '7-8': 'Toast strips with soft toppings',
@@ -1015,7 +1015,7 @@ export const foods: Food[] = [
     warnings: ['Contains wheat/gluten']
   },
   {
-    id: 'pasta', name: 'Pasta', emoji: '🍝', category: 'Grains', allergen: true,
+    id: 'pasta', name: 'Pasta', emoji: 'ðŸ', category: 'Grains', allergen: true,
     serving: {
       '6': 'Large shapes (fusilli) cooked very soft',
       '7-8': 'Soft pasta shapes',
@@ -1026,7 +1026,7 @@ export const foods: Food[] = [
     warnings: ['Contains wheat/gluten']
   },
   {
-    id: 'rice', name: 'Rice', emoji: '🍚', category: 'Grains',
+    id: 'rice', name: 'Rice', emoji: 'ðŸš', category: 'Grains',
     serving: {
       '6': 'Very soft, can mash slightly or form into balls',
       '7-8': 'Soft cooked, sticky rice works well',
@@ -1036,7 +1036,7 @@ export const foods: Food[] = [
     tips: ['Sticky rice easier for self-feeding', 'Form into balls for grip', 'Brown rice has more nutrients']
   },
   {
-    id: 'oats', name: 'Oats/Porridge', emoji: '🥣', category: 'Grains',
+    id: 'oats', name: 'Oats/Porridge', emoji: 'ðŸ¥£', category: 'Grains',
     serving: {
       '6': 'Smooth porridge, loaded on spoon',
       '7-8': 'Thicker porridge',
@@ -1046,7 +1046,7 @@ export const foods: Food[] = [
     tips: ['Great iron when made with formula/milk', 'Add fruit for flavor', 'Can use as flour in baking']
   },
   {
-    id: 'quinoa', name: 'Quinoa', emoji: '🍚', category: 'Grains',
+    id: 'quinoa', name: 'Quinoa', emoji: 'ðŸš', category: 'Grains',
     serving: {
       '6': 'Well-cooked, served on loaded spoon',
       '7-8': 'Cooked quinoa',
@@ -1056,7 +1056,7 @@ export const foods: Food[] = [
     tips: ['Complete protein', 'Rinse before cooking', 'Can be sticky - easier for babies']
   },
   {
-    id: 'couscous', name: 'Couscous', emoji: '🍚', category: 'Grains', allergen: true,
+    id: 'couscous', name: 'Couscous', emoji: 'ðŸš', category: 'Grains', allergen: true,
     serving: {
       '6': 'Cooked, on loaded spoon',
       '7-8': 'Regular couscous',
@@ -1067,7 +1067,7 @@ export const foods: Food[] = [
     warnings: ['Contains wheat']
   },
   {
-    id: 'barley', name: 'Barley', emoji: '🌾', category: 'Grains', allergen: true,
+    id: 'barley', name: 'Barley', emoji: 'ðŸŒ¾', category: 'Grains', allergen: true,
     serving: {
       '6': 'Well-cooked, soft (pearl barley)',
       '7-8': 'Cooked soft',
@@ -1078,7 +1078,7 @@ export const foods: Food[] = [
     warnings: ['Contains gluten']
   },
   {
-    id: 'polenta', name: 'Polenta/Cornmeal', emoji: '🌽', category: 'Grains',
+    id: 'polenta', name: 'Polenta/Cornmeal', emoji: 'ðŸŒ½', category: 'Grains',
     serving: {
       '6': 'Soft polenta, loaded spoon or cooled/sliced',
       '7-8': 'Soft or cooled slices',
@@ -1088,7 +1088,7 @@ export const foods: Food[] = [
     tips: ['Naturally gluten-free', 'Cool and slice into sticks', 'Creamy when warm']
   },
   {
-    id: 'millet', name: 'Millet', emoji: '🌾', category: 'Grains',
+    id: 'millet', name: 'Millet', emoji: 'ðŸŒ¾', category: 'Grains',
     serving: {
       '6': 'Cooked soft, on spoon',
       '7-8': 'Cooked',
@@ -1098,7 +1098,7 @@ export const foods: Food[] = [
     tips: ['Gluten-free', 'Mild flavor', 'Good alternative to rice']
   },
   {
-    id: 'buckwheat', name: 'Buckwheat', emoji: '🌾', category: 'Grains',
+    id: 'buckwheat', name: 'Buckwheat', emoji: 'ðŸŒ¾', category: 'Grains',
     serving: {
       '6': 'Cooked soft (kasha) or as flour in pancakes',
       '7-8': 'Cooked groats',
@@ -1108,7 +1108,7 @@ export const foods: Food[] = [
     tips: ['Gluten-free despite name', 'Nutty flavor', 'High in protein']
   },
   {
-    id: 'crackers', name: 'Crackers', emoji: '🍘', category: 'Grains', allergen: true,
+    id: 'crackers', name: 'Crackers', emoji: 'ðŸ˜', category: 'Grains', allergen: true,
     serving: {
       '6': 'Soft puffed crackers that dissolve',
       '7-8': 'Teething crackers, soft crackers',
@@ -1119,7 +1119,7 @@ export const foods: Food[] = [
     warnings: ['Most contain wheat/gluten. Avoid hard crackers that can break into sharp pieces.']
   },
   {
-    id: 'pancakes', name: 'Pancakes', emoji: '🥞', category: 'Grains', allergen: true,
+    id: 'pancakes', name: 'Pancakes', emoji: 'ðŸ¥ž', category: 'Grains', allergen: true,
     serving: {
       '6': 'Soft strips or small pieces',
       '7-8': 'Strips',
@@ -1130,7 +1130,7 @@ export const foods: Food[] = [
     warnings: ['Usually contain wheat and egg']
   },
   {
-    id: 'tortilla', name: 'Tortilla', emoji: '🌯', category: 'Grains', allergen: true,
+    id: 'tortilla', name: 'Tortilla', emoji: 'ðŸŒ¯', category: 'Grains', allergen: true,
     serving: {
       '6': 'Soft strips or small pieces',
       '7-8': 'Strips, quesadilla pieces',
@@ -1143,7 +1143,7 @@ export const foods: Food[] = [
 
   // ============ DAIRY ============
   {
-    id: 'cheese', name: 'Cheese', emoji: '🧀', category: 'Dairy', allergen: true,
+    id: 'cheese', name: 'Cheese', emoji: 'ðŸ§€', category: 'Dairy', allergen: true,
     serving: {
       '6': 'Thin strips or grated/melted',
       '7-8': 'Thin strips or grated',
@@ -1154,7 +1154,7 @@ export const foods: Food[] = [
     warnings: ['Dairy allergen. No unpasteurized cheese. Avoid high-salt cheeses.']
   },
   {
-    id: 'yogurt', name: 'Yogurt', emoji: '🥛', category: 'Dairy', allergen: true,
+    id: 'yogurt', name: 'Yogurt', emoji: 'ðŸ¥›', category: 'Dairy', allergen: true,
     serving: {
       '6': 'Full-fat plain, loaded on spoon',
       '7-8': 'Full-fat, can mix with fruit',
@@ -1165,7 +1165,7 @@ export const foods: Food[] = [
     warnings: ['Dairy allergen']
   },
   {
-    id: 'cottagecheese', name: 'Cottage Cheese', emoji: '🧀', category: 'Dairy', allergen: true,
+    id: 'cottagecheese', name: 'Cottage Cheese', emoji: 'ðŸ§€', category: 'Dairy', allergen: true,
     serving: {
       '6': 'Full-fat, on spoon or mixed',
       '7-8': 'On spoon or with foods',
@@ -1176,7 +1176,7 @@ export const foods: Food[] = [
     warnings: ['Dairy allergen']
   },
   {
-    id: 'ricotta', name: 'Ricotta', emoji: '🧀', category: 'Dairy', allergen: true,
+    id: 'ricotta', name: 'Ricotta', emoji: 'ðŸ§€', category: 'Dairy', allergen: true,
     serving: {
       '6': 'Spread on toast or mixed into foods',
       '7-8': 'Spread or mixed',
@@ -1187,7 +1187,7 @@ export const foods: Food[] = [
     warnings: ['Dairy allergen']
   },
   {
-    id: 'creamcheese', name: 'Cream Cheese', emoji: '🧀', category: 'Dairy', allergen: true,
+    id: 'creamcheese', name: 'Cream Cheese', emoji: 'ðŸ§€', category: 'Dairy', allergen: true,
     serving: {
       '6': 'Spread thinly on toast',
       '7-8': 'Spread on foods',
@@ -1198,7 +1198,7 @@ export const foods: Food[] = [
     warnings: ['Dairy allergen']
   },
   {
-    id: 'butter', name: 'Butter', emoji: '🧈', category: 'Dairy', allergen: true,
+    id: 'butter', name: 'Butter', emoji: 'ðŸ§ˆ', category: 'Dairy', allergen: true,
     serving: {
       '6': 'Used in cooking or on toast',
       '7-8': 'In cooking, on foods',
@@ -1209,7 +1209,7 @@ export const foods: Food[] = [
     warnings: ['Dairy allergen']
   },
   {
-    id: 'milk', name: 'Cow\'s Milk', emoji: '🥛', category: 'Dairy', allergen: true,
+    id: 'milk', name: 'Cow\'s Milk', emoji: 'ðŸ¥›', category: 'Dairy', allergen: true,
     serving: {
       '6': 'In cooking only (not as drink)',
       '7-8': 'In cooking/foods',
@@ -1222,7 +1222,7 @@ export const foods: Food[] = [
 
   // ============ HERBS & SPICES ============
   {
-    id: 'cinnamon', name: 'Cinnamon', emoji: '🌿', category: 'Herbs & Spices',
+    id: 'cinnamon', name: 'Cinnamon', emoji: 'ðŸŒ¿', category: 'Herbs & Spices',
     serving: {
       '6': 'Pinch in foods',
       '7-8': 'In foods',
@@ -1232,7 +1232,7 @@ export const foods: Food[] = [
     tips: ['Great for flavor without sugar', 'Pairs well with fruit', 'Safe from 6 months']
   },
   {
-    id: 'ginger', name: 'Ginger', emoji: '🌿', category: 'Herbs & Spices',
+    id: 'ginger', name: 'Ginger', emoji: 'ðŸŒ¿', category: 'Herbs & Spices',
     serving: {
       '6': 'Small amounts, grated in cooking',
       '7-8': 'In cooking',
@@ -1242,7 +1242,7 @@ export const foods: Food[] = [
     tips: ['Start with small amounts', 'Can help with tummy upsets', 'Fresh or powdered']
   },
   {
-    id: 'turmeric', name: 'Turmeric', emoji: '🌿', category: 'Herbs & Spices',
+    id: 'turmeric', name: 'Turmeric', emoji: 'ðŸŒ¿', category: 'Herbs & Spices',
     serving: {
       '6': 'Small amounts in cooking',
       '7-8': 'In cooking',
@@ -1252,7 +1252,7 @@ export const foods: Food[] = [
     tips: ['Anti-inflammatory', 'Will stain everything!', 'Pairs with black pepper for absorption']
   },
   {
-    id: 'cumin', name: 'Cumin', emoji: '🌿', category: 'Herbs & Spices',
+    id: 'cumin', name: 'Cumin', emoji: 'ðŸŒ¿', category: 'Herbs & Spices',
     serving: {
       '6': 'Small amounts in cooking',
       '7-8': 'In cooking',
@@ -1262,7 +1262,7 @@ export const foods: Food[] = [
     tips: ['Common in many cuisines', 'Earthy flavor', 'Safe for babies']
   },
   {
-    id: 'basil', name: 'Basil', emoji: '🌿', category: 'Herbs & Spices',
+    id: 'basil', name: 'Basil', emoji: 'ðŸŒ¿', category: 'Herbs & Spices',
     serving: {
       '6': 'Fresh or dried in cooking',
       '7-8': 'In cooking',
@@ -1272,7 +1272,7 @@ export const foods: Food[] = [
     tips: ['Fresh has best flavor', 'Great in tomato dishes', 'Make pesto']
   },
   {
-    id: 'oregano', name: 'Oregano', emoji: '🌿', category: 'Herbs & Spices',
+    id: 'oregano', name: 'Oregano', emoji: 'ðŸŒ¿', category: 'Herbs & Spices',
     serving: {
       '6': 'Dried or fresh in cooking',
       '7-8': 'In cooking',
@@ -1282,7 +1282,7 @@ export const foods: Food[] = [
     tips: ['Works well dried', 'Italian and Greek dishes', 'Antibacterial properties']
   },
   {
-    id: 'mint', name: 'Mint', emoji: '🌿', category: 'Herbs & Spices',
+    id: 'mint', name: 'Mint', emoji: 'ðŸŒ¿', category: 'Herbs & Spices',
     serving: {
       '6': 'Fresh in cooking or water',
       '7-8': 'In cooking',
@@ -1292,7 +1292,7 @@ export const foods: Food[] = [
     tips: ['Refreshing flavor', 'Good in fruit dishes', 'Can help with digestion']
   },
   {
-    id: 'parsley', name: 'Parsley', emoji: '🌿', category: 'Herbs & Spices',
+    id: 'parsley', name: 'Parsley', emoji: 'ðŸŒ¿', category: 'Herbs & Spices',
     serving: {
       '6': 'Fresh or dried in cooking',
       '7-8': 'In cooking',
@@ -1302,7 +1302,7 @@ export const foods: Food[] = [
     tips: ['High in iron', 'Use flat-leaf for cooking', 'Fresh is more nutritious']
   },
   {
-    id: 'dill', name: 'Dill', emoji: '🌿', category: 'Herbs & Spices',
+    id: 'dill', name: 'Dill', emoji: 'ðŸŒ¿', category: 'Herbs & Spices',
     serving: {
       '6': 'Fresh in cooking',
       '7-8': 'In cooking',
@@ -1312,7 +1312,7 @@ export const foods: Food[] = [
     tips: ['Great with fish', 'Fresh is best', 'Mild anise flavor']
   },
   {
-    id: 'paprika', name: 'Paprika', emoji: '🌿', category: 'Herbs & Spices',
+    id: 'paprika', name: 'Paprika', emoji: 'ðŸŒ¿', category: 'Herbs & Spices',
     serving: {
       '6': 'Small amounts (sweet paprika)',
       '7-8': 'In cooking',
@@ -1324,7 +1324,7 @@ export const foods: Food[] = [
 
   // ============ MISCELLANEOUS ============
   {
-    id: 'hummus', name: 'Hummus', emoji: '🥙', category: 'Dips & Spreads', allergen: true,
+    id: 'hummus', name: 'Hummus', emoji: 'ðŸ¥™', category: 'Dips & Spreads', allergen: true,
     serving: {
       '6': 'As dip or spread',
       '7-8': 'Dip for veggies/bread',
@@ -1335,7 +1335,7 @@ export const foods: Food[] = [
     warnings: ['Contains sesame (tahini) - allergen']
   },
   {
-    id: 'guacamole', name: 'Guacamole', emoji: '🥑', category: 'Dips & Spreads',
+    id: 'guacamole', name: 'Guacamole', emoji: 'ðŸ¥‘', category: 'Dips & Spreads',
     serving: {
       '6': 'Plain avocado mash or mild guac',
       '7-8': 'As dip or spread',
@@ -1345,7 +1345,7 @@ export const foods: Food[] = [
     tips: ['Healthy fats', 'Skip the salt for babies', 'Great dip for veggies']
   },
   {
-    id: 'oliveoil', name: 'Olive Oil', emoji: '🫒', category: 'Fats & Oils',
+    id: 'oliveoil', name: 'Olive Oil', emoji: 'ðŸ«’', category: 'Fats & Oils',
     serving: {
       '6': 'Drizzle on foods',
       '7-8': 'In cooking, drizzled',
@@ -1355,7 +1355,7 @@ export const foods: Food[] = [
     tips: ['Great healthy fat', 'Extra virgin for drizzling', 'Good for constipation']
   },
   {
-    id: 'coconutoil', name: 'Coconut Oil', emoji: '🥥', category: 'Fats & Oils',
+    id: 'coconutoil', name: 'Coconut Oil', emoji: 'ðŸ¥¥', category: 'Fats & Oils',
     serving: {
       '6': 'In cooking',
       '7-8': 'In cooking',
@@ -1365,7 +1365,7 @@ export const foods: Food[] = [
     tips: ['Good for high-heat cooking', 'Mild coconut flavor', 'Solid at room temp']
   },
   {
-    id: 'honey', name: 'Honey', emoji: '🍯', category: 'Sweeteners',
+    id: 'honey', name: 'Honey', emoji: 'ðŸ¯', category: 'Sweeteners',
     serving: {
       '6': 'NOT SAFE',
       '7-8': 'NOT SAFE',
@@ -1376,5 +1376,3 @@ export const foods: Food[] = [
     warnings: ['NEVER give honey to babies under 12 months - risk of infant botulism']
   },
 ];
-/ /   F o r c e   r e b u i l d   0 2 / 0 9 / 2 0 2 6   1 9 : 4 2 : 2 8  
- 
