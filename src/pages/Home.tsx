@@ -177,35 +177,36 @@ const Home = ({ onTabChange }: HomeProps) => {
 
       <div className="flex-1 px-6 space-y-4">
         {/* Mood Check-in */}
-        <Card className="border-none shadow-sm bg-white/80">
-          <CardContent className="p-4">
+        <Card className="border-none shadow-md bg-white">
+          <CardContent className="p-5">
             {!selectedMood ? (
-              <div className="grid grid-cols-6 gap-2">
+              <div className="grid grid-cols-3 gap-3">
                 {moods.map((mood) => (
                   <button
                     key={mood.id}
                     onClick={() => setSelectedMood(mood.id)}
                     className={`
-                      p-2 rounded-xl border transition-all duration-200
-                      hover:scale-105 active:scale-95
+                      p-4 rounded-2xl border-2 transition-all duration-200
+                      hover:scale-[1.02] hover:shadow-md active:scale-[0.98]
                       ${mood.color}
                     `}
                   >
-                    <div className="text-xl">{mood.emoji}</div>
+                    <div className="text-2xl mb-1">{mood.emoji}</div>
+                    <div className="text-xs font-medium text-slate-600">{mood.label}</div>
                   </button>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-2">
-                <div className="text-2xl mb-2">
+              <div className="text-center py-4">
+                <div className="text-4xl mb-3">
                   {moods.find(m => m.id === selectedMood)?.emoji}
                 </div>
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <p className="text-slate-600 leading-relaxed max-w-xs mx-auto">
                   {getMoodResponse(selectedMood)}
                 </p>
                 <button 
                   onClick={() => setSelectedMood(null)}
-                  className="text-xs text-slate-400 mt-3 hover:text-slate-600"
+                  className="text-sm text-slate-400 mt-4 hover:text-slate-600"
                 >
                   Check in again
                 </button>
