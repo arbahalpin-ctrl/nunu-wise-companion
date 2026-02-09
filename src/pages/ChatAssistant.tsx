@@ -23,7 +23,7 @@ const STORAGE_KEY = 'nunu-conversations';
 const getInitialMessage = (): Message => ({
   id: '1',
   role: 'assistant',
-  content: "heyyy ✨ ok so i'm nunu — basically ur personal hype girl who also happens to know way too much about baby sleep lol. whether u need help with the tiny human, a pep talk, or just someone to vent to, i got u. what's going on babe?",
+  content: "Hi there! I'm Nunu — a sleep and wellbeing expert here to help you navigate motherhood and find yourself again along the way. Whether you need advice on baby sleep, feeding, or just want to talk through how you're feeling, I'm here for you. What's on your mind?",
   timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 });
 
