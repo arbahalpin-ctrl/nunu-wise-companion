@@ -5,6 +5,76 @@ import { Card, CardContent } from '@/components/ui/card';
 
 const SLEEP_STORAGE_KEY = 'nunu-sleep-data';
 
+// 50+ sleep tips that rotate daily
+const SLEEP_TIPS = [
+  "Watch for sleepy cues like yawning, eye rubbing, or fussiness. Catching the sleep window helps avoid overtiredness.",
+  "A dark room signals to your baby's brain that it's time to sleep. Consider blackout curtains for naps too.",
+  "White noise can help mask household sounds and create a consistent sleep environment.",
+  "A consistent bedtime routine (even just 10-15 minutes) helps signal to your baby that sleep is coming.",
+  "The ideal room temperature for baby sleep is 68-72°F (20-22°C).",
+  "Overtired babies often fight sleep harder. Watch for that first yawn and act on it.",
+  "Drowsy but awake is the goal, but don't stress if you're not there yet — it takes practice.",
+  "Early bedtimes (6-7pm) often lead to better night sleep than later ones.",
+  "Motion sleep (car, stroller, swing) is still sleep. Don't feel guilty about contact naps.",
+  "The 4-month sleep regression is actually a progression — your baby's sleep cycles are maturing.",
+  "Babies wake between sleep cycles naturally. Giving them a moment before responding can help them learn to resettle.",
+  "Day/night confusion is normal in newborns. Keep days bright and active, nights dark and calm.",
+  "A feed-play-sleep routine can help prevent feed-to-sleep associations if that's a concern for you.",
+  "Short naps (30-45 mins) are developmentally normal until around 5-6 months.",
+  "Your baby's last wake window before bed is usually the longest one.",
+  "Sleep begets sleep — a well-rested baby often sleeps better than an overtired one.",
+  "Swaddling can help newborns feel secure, but stop once they show signs of rolling.",
+  "Night wakings are biologically normal for babies — their stomachs are small and they need to eat.",
+  "A lovey or comfort object can help with sleep after 12 months (not safe before then).",
+  "Red or dim orange light is less disruptive to melatonin than white or blue light.",
+  "Babies often have a \"witching hour\" in the evening — this is normal and temporary.",
+  "Split nights (long wakeful periods at night) often mean too much day sleep or too early bedtime.",
+  "The 8-10 month regression often coincides with crawling, standing, and separation anxiety.",
+  "Teething can disrupt sleep, but usually only for a few days around tooth eruption.",
+  "Sleep training isn't required — it's a personal choice. Do what works for your family.",
+  "Contact naps are not a bad habit — they're biologically normal and won't last forever.",
+  "A snack before bed (for older babies on solids) can help them sleep longer stretches.",
+  "Bedtime resistance often means bedtime is too early or too late — experiment with timing.",
+  "Wake windows are guidelines, not rules. Your baby's cues matter most.",
+  "The 2-to-1 nap transition is one of the hardest — expect some rough weeks.",
+  "Illness, travel, and developmental leaps can all temporarily disrupt sleep.",
+  "Babies often sleep better in their own space, but room-sharing is recommended until 6-12 months.",
+  "A pre-nap routine (even just 2-3 minutes) can help signal sleep time during the day.",
+  "Cluster feeding in the evening is normal and can help babies sleep longer at night.",
+  "Dream feeds (feeding while baby is still asleep) work for some babies but not others.",
+  "Standing in the crib is a new skill — practice during the day so it's less exciting at night.",
+  "Separation anxiety peaks around 8-10 months and 18 months. Extra comfort is okay.",
+  "Crib hour (leaving baby in crib for an hour even if they wake early) can help extend naps.",
+  "Sleep pressure builds during wake windows — that's why timing matters.",
+  "Your presence is calming to your baby. Gradual retreat methods work well for some families.",
+  "Consistency is more important than perfection. Pick a routine and stick with it.",
+  "Babies often wake 45 minutes into a nap — this is one sleep cycle. They may resettle.",
+  "Night weaning and sleep training are separate things. You can do one without the other.",
+  "Screen time before bed can interfere with melatonin production — avoid for 1-2 hours before sleep.",
+  "A full belly helps, but don't force feeds. Babies know when they're hungry.",
+  "The first nap of the day usually comes easiest. Protect that one if you can.",
+  "Nap transitions (4→3→2→1) are often bumpy. Expect some overtiredness during shifts.",
+  "Your baby's temperament affects sleep. Some babies are just more sensitive sleepers.",
+  "Fresh air and sunlight during the day can help regulate your baby's circadian rhythm.",
+  "Pacifiers can be helpful for sleep and are associated with reduced SIDS risk.",
+  "Bath time can be stimulating for some babies — move it earlier if bedtime is a struggle.",
+  "Growth spurts can temporarily increase night waking and hunger. It passes.",
+  "The \"pick up put down\" method works well for some babies — worth a try if gentle approaches appeal to you.",
+  "Sleep regressions are temporary. Most last 2-6 weeks, though it feels like forever.",
+  "Your baby's circadian rhythm starts developing around 2-3 months. Before that, sleep is chaotic.",
+  "Keeping one hand on baby's chest can help them feel secure when placed in the crib.",
+  "Shushing, swaying, and side-lying (the 5 S's) can help calm fussy babies.",
+  "A too-late bedtime often causes more night waking, not less.",
+  "Nursing or bottle-feeding to sleep isn't a problem unless it's a problem for you.",
+  "Daylight savings transitions are hard — shift schedules by 15 mins over several days.",
+];
+
+const getDailyTip = () => {
+  const today = new Date();
+  const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000);
+  return SLEEP_TIPS[dayOfYear % SLEEP_TIPS.length];
+};
+
 interface SleepSession {
   id: string;
   startTime: string; // ISO string for storage
@@ -457,12 +527,12 @@ const Sleep = ({ onTabChange }: SleepProps) => {
           </div>
         )}
 
-        {/* Quick Tips */}
+        {/* Daily Tip */}
         <Card className="border-none shadow-sm bg-indigo-50">
           <CardContent className="p-4">
+            <p className="text-xs text-indigo-500 mb-1">Daily tip</p>
             <p className="text-sm text-indigo-800 leading-relaxed">
-              💡 <strong>Tip:</strong> Watch for sleepy cues like yawning, eye rubbing, or fussiness. 
-              Catching the sleep window helps avoid overtiredness.
+              💡 {getDailyTip()}
             </p>
           </CardContent>
         </Card>
