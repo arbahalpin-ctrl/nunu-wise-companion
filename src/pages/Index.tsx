@@ -4,6 +4,7 @@ import Onboarding from '@/components/Onboarding';
 import Home from '@/pages/Home';
 import Sleep from '@/pages/Sleep';
 import Weaning from '@/pages/Weaning';
+import Milestones from '@/pages/Milestones';
 import ChatAssistant from '@/pages/ChatAssistant';
 import Settings from '@/pages/Settings';
 
@@ -33,6 +34,8 @@ const Index = () => {
         return <Sleep onTabChange={setActiveTab} />;
       case 'weaning':
         return <Weaning />;
+      case 'milestones':
+        return <Milestones />;
       case 'chat':
         return <ChatAssistant />;
       case 'settings':
