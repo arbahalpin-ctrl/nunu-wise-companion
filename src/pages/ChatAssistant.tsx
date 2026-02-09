@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Clock, Trash2, Plus, MessageSquare, X } from 'lucide-react';
+import { Send, Bot, User, Clock, Trash2, Plus, MessageSquare, X, Bookmark, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -19,6 +19,14 @@ interface Conversation {
 }
 
 const STORAGE_KEY = 'nunu-conversations';
+const SAVED_RECIPES_KEY = 'nunu-saved-recipes';
+
+interface SavedRecipe {
+  id: string;
+  content: string;
+  savedAt: number;
+  conversationTitle: string;
+}
 
 const getInitialMessage = (): Message => ({
   id: '1',
@@ -60,6 +68,16 @@ const ChatAssistant = () => {
   
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [savedMessageIds, setSavedMessageIds] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem(SAVED_RECIPES_KEY);
+      if (saved) {
+        const recipes: SavedRecipe[] = JSON.parse(saved);
+        return new Set(recipes.map(r => r.id));
+      }
+    } catch (e) {}
+    return new Set();
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const activeConversation = conversations.find(c => c.id === activeConversationId);
@@ -185,6 +203,29 @@ const ChatAssistant = () => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
+    }
+  };
+
+  const saveRecipe = (message: Message) => {
+    try {
+      const saved = localStorage.getItem(SAVED_RECIPES_KEY);
+      const recipes: SavedRecipe[] = saved ? JSON.parse(saved) : [];
+      
+      // Check if already saved
+      if (recipes.some(r => r.id === message.id)) return;
+      
+      const newRecipe: SavedRecipe = {
+        id: message.id,
+        content: message.content,
+        savedAt: Date.now(),
+        conversationTitle: activeConversation?.title || 'Chat'
+      };
+      
+      recipes.unshift(newRecipe);
+      localStorage.setItem(SAVED_RECIPES_KEY, JSON.stringify(recipes));
+      setSavedMessageIds(prev => new Set([...prev, message.id]));
+    } catch (e) {
+      console.error('Failed to save recipe:', e);
     }
   };
 
@@ -341,11 +382,30 @@ const ChatAssistant = () => {
               `}>
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
                 <div className={`
-                  flex items-center gap-1 mt-2 text-xs
+                  flex items-center justify-between mt-2
                   ${message.role === 'user' ? 'text-slate-300' : 'text-slate-400'}
                 `}>
-                  <Clock className="h-3 w-3" />
-                  {message.timestamp}
+                  <div className="flex items-center gap-1 text-xs">
+                    <Clock className="h-3 w-3" />
+                    {message.timestamp}
+                  </div>
+                  {message.role === 'assistant' && message.id !== '1' && (
+                    <button
+                      onClick={() => saveRecipe(message)}
+                      className={`p-1.5 rounded-full transition-colors ${
+                        savedMessageIds.has(message.id)
+                          ? 'text-emerald-500 bg-emerald-50'
+                          : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+                      }`}
+                      title={savedMessageIds.has(message.id) ? 'Saved!' : 'Save to My Recipes'}
+                    >
+                      {savedMessageIds.has(message.id) ? (
+                        <Check className="h-3.5 w-3.5" />
+                      ) : (
+                        <Bookmark className="h-3.5 w-3.5" />
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
 
