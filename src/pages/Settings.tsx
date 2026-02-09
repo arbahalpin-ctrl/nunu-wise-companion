@@ -85,7 +85,7 @@ const Settings = () => {
                   <span className="text-xs text-rose-500">Tap to call</span>
                 </Button>
               </a>
-              <a href="https://www.nhs.uk/service-search/mental-health/find-a-perinatal-mental-health-service/" target="_blank" rel="noopener noreferrer" className="block">
+              <a href="https://www.nhs.uk/pregnancy/mental-health-in-pregnancy-and-after-the-birth/mental-health/" target="_blank" rel="noopener noreferrer" className="block">
                 <Button 
                   variant="outline" 
                   className="w-full justify-between border-rose-200 text-rose-700 hover:bg-rose-100"
