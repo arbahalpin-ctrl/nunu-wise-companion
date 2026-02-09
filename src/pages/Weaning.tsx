@@ -1,8 +1,18 @@
-import { useState, useMemo, useEffect } from 'react';
-import { Search, ChevronRight, X, Clock, AlertTriangle, Check, Baby, Filter, Star, Flame, Bookmark, Trash2, MessageSquare } from 'lucide-react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { Search, ChevronRight, X, Clock, AlertTriangle, Check, Baby, Filter, Star, Flame, Bookmark, Trash2, MessageSquare, Send, Bot } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const SAVED_RECIPES_KEY = 'nunu-saved-recipes';
+const WEANING_CHAT_KEY = 'nunu-weaning-chat';
+
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+}
 
 interface SavedRecipe {
   id: string;
@@ -530,17 +540,49 @@ const categoryEmojis: Record<string, string> = {
   breakfast: '🍳', lunch: '🥪', dinner: '🍽️', snack: '🍪', dessert: '🍨'
 };
 
+const getInitialChatMessage = (): ChatMessage => ({
+  id: '1',
+  role: 'assistant',
+  content: "Hey! I'm here to help with weaning recipes. Tell me what ingredients you have, your baby's age, or any dietary needs — and I'll suggest something!",
+  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+});
+
 const Weaning = () => {
   const [selectedFood, setSelectedFood] = useState<Food | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [selectedSavedRecipe, setSelectedSavedRecipe] = useState<SavedRecipe | null>(null);
-  const [activeTab, setActiveTab] = useState<'recipes' | 'foods' | 'saved'>('recipes');
+  const [activeTab, setActiveTab] = useState<'recipes' | 'foods' | 'saved' | 'chat'>('recipes');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedMealType, setSelectedMealType] = useState<string>('all');
   const [babyAge, setBabyAge] = useState<string>('6');
   const [showFilters, setShowFilters] = useState(false);
   const [savedRecipes, setSavedRecipes] = useState<SavedRecipe[]>([]);
+  
+  // Chat state
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(() => {
+    try {
+      const saved = localStorage.getItem(WEANING_CHAT_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return [getInitialChatMessage()];
+  });
+  const [newMessage, setNewMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [savedMessageIds, setSavedMessageIds] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem(SAVED_RECIPES_KEY);
+      if (saved) {
+        const recipes: SavedRecipe[] = JSON.parse(saved);
+        return new Set(recipes.map(r => r.id));
+      }
+    } catch (e) {}
+    return new Set();
+  });
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Load saved recipes from localStorage
   useEffect(() => {
@@ -569,6 +611,100 @@ const Weaning = () => {
     } catch (e) {
       console.error('Failed to delete recipe:', e);
     }
+  };
+
+  // Save chat messages to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(WEANING_CHAT_KEY, JSON.stringify(chatMessages));
+    } catch (e) {
+      console.error('Failed to save chat:', e);
+    }
+  }, [chatMessages]);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
+
+  const sendChatMessage = async () => {
+    if (!newMessage.trim() || isTyping) return;
+    
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: newMessage.trim(),
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    
+    const updatedMessages = [...chatMessages, userMessage];
+    setChatMessages(updatedMessages);
+    setNewMessage('');
+    setIsTyping(true);
+    
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            { role: 'system', content: 'You are Nunu, a baby weaning and recipe expert. Focus on age-appropriate recipes, ingredients, and feeding tips. Give practical, easy recipes with clear ingredients and steps. Keep responses concise but helpful.' },
+            ...updatedMessages.map(m => ({ role: m.role, content: m.content }))
+          ]
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) throw new Error(data.error || 'Failed to get response');
+      
+      const aiMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: data.message,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      
+      setChatMessages([...updatedMessages, aiMessage]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: "I'm having trouble connecting. Try again in a moment? 💛",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setChatMessages([...updatedMessages, errorMessage]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  const saveRecipeFromChat = (message: ChatMessage) => {
+    try {
+      const saved = localStorage.getItem(SAVED_RECIPES_KEY);
+      const recipes: SavedRecipe[] = saved ? JSON.parse(saved) : [];
+      
+      if (recipes.some(r => r.id === message.id)) return;
+      
+      const newRecipe: SavedRecipe = {
+        id: message.id,
+        content: message.content,
+        savedAt: Date.now(),
+        conversationTitle: 'Recipe Chat'
+      };
+      
+      const updated = [newRecipe, ...recipes];
+      localStorage.setItem(SAVED_RECIPES_KEY, JSON.stringify(updated));
+      setSavedRecipes(updated);
+      setSavedMessageIds(prev => new Set([...prev, message.id]));
+    } catch (e) {
+      console.error('Failed to save recipe:', e);
+    }
+  };
+
+  const clearChat = () => {
+    setChatMessages([getInitialChatMessage()]);
   };
 
   // Filter recipes
@@ -610,45 +746,49 @@ const Weaning = () => {
         <p className="text-slate-500 mt-1">Foods, recipes & serving guides</p>
       </div>
 
-      {/* Search Bar */}
-      <div className="px-6 mb-3">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search foods or recipes..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 focus:outline-none focus:border-slate-400"
-          />
+      {/* Search Bar - hide on chat/saved tabs */}
+      {(activeTab === 'recipes' || activeTab === 'foods') && (
+        <div className="px-6 mb-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search foods or recipes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 focus:outline-none focus:border-slate-400"
+            />
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Age & Filter Row */}
-      <div className="px-6 mb-3 flex gap-2">
-        <select 
-          value={babyAge}
-          onChange={(e) => setBabyAge(e.target.value)}
-          className="flex-1 p-3 bg-white border border-slate-200 rounded-xl text-slate-700 text-sm"
-        >
-          <option value="6">6 months</option>
-          <option value="7">7-8 months</option>
-          <option value="9">9-12 months</option>
-          <option value="13">12+ months</option>
-        </select>
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className={`px-4 py-3 rounded-xl border flex items-center gap-2 text-sm ${
-            showFilters ? 'bg-slate-800 text-white border-slate-800' : 'bg-white border-slate-200 text-slate-600'
-          }`}
-        >
-          <Filter className="h-4 w-4" />
-          Filters
-        </button>
-      </div>
+      {/* Age & Filter Row - hide on chat/saved tabs */}
+      {(activeTab === 'recipes' || activeTab === 'foods') && (
+        <div className="px-6 mb-3 flex gap-2">
+          <select 
+            value={babyAge}
+            onChange={(e) => setBabyAge(e.target.value)}
+            className="flex-1 p-3 bg-white border border-slate-200 rounded-xl text-slate-700 text-sm"
+          >
+            <option value="6">6 months</option>
+            <option value="7">7-8 months</option>
+            <option value="9">9-12 months</option>
+            <option value="13">12+ months</option>
+          </select>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`px-4 py-3 rounded-xl border flex items-center gap-2 text-sm ${
+              showFilters ? 'bg-slate-800 text-white border-slate-800' : 'bg-white border-slate-200 text-slate-600'
+            }`}
+          >
+            <Filter className="h-4 w-4" />
+            Filters
+          </button>
+        </div>
+      )}
 
       {/* Expandable Filters */}
-      {showFilters && (
+      {showFilters && (activeTab === 'recipes' || activeTab === 'foods') && (
         <div className="px-6 mb-3 space-y-2">
           {activeTab === 'recipes' && (
             <div className="flex gap-2 overflow-x-auto pb-1">
@@ -691,6 +831,15 @@ const Weaning = () => {
       <div className="px-6 mb-4">
         <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
           <button
+            onClick={() => setActiveTab('chat')}
+            className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${
+              activeTab === 'chat' ? 'bg-white shadow text-slate-800' : 'text-slate-500'
+            }`}
+          >
+            <MessageSquare className="h-3.5 w-3.5" />
+            Ask
+          </button>
+          <button
             onClick={() => setActiveTab('recipes')}
             className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
               activeTab === 'recipes' ? 'bg-white shadow text-slate-800' : 'text-slate-500'
@@ -713,10 +862,122 @@ const Weaning = () => {
             }`}
           >
             <Bookmark className="h-3.5 w-3.5" />
-            Saved {savedRecipes.length > 0 && `(${savedRecipes.length})`}
+            {savedRecipes.length > 0 && savedRecipes.length}
           </button>
         </div>
       </div>
+
+      {/* Chat Tab */}
+      {activeTab === 'chat' && (
+        <div className="flex flex-col h-[calc(100vh-280px)]">
+          {/* Chat Messages */}
+          <div className="flex-1 overflow-y-auto px-4 py-2 space-y-3">
+            {chatMessages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex gap-2 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                {message.role === 'assistant' && (
+                  <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Bot className="h-4 w-4 text-white" />
+                  </div>
+                )}
+                
+                <div className={`
+                  max-w-[80%] rounded-2xl p-3
+                  ${message.role === 'user' 
+                    ? 'bg-slate-800 text-white' 
+                    : 'bg-white shadow-sm border border-slate-100'
+                  }
+                `}>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                  <div className={`
+                    flex items-center justify-between mt-2
+                    ${message.role === 'user' ? 'text-slate-300' : 'text-slate-400'}
+                  `}>
+                    <span className="text-xs flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {message.timestamp}
+                    </span>
+                    {message.role === 'assistant' && message.id !== '1' && (
+                      <button
+                        onClick={() => saveRecipeFromChat(message)}
+                        className={`p-1.5 rounded-full transition-colors ${
+                          savedMessageIds.has(message.id)
+                            ? 'text-emerald-500 bg-emerald-50'
+                            : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+                        }`}
+                        title={savedMessageIds.has(message.id) ? 'Saved!' : 'Save recipe'}
+                      >
+                        {savedMessageIds.has(message.id) ? (
+                          <Check className="h-3.5 w-3.5" />
+                        ) : (
+                          <Bookmark className="h-3.5 w-3.5" />
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {isTyping && (
+              <div className="flex gap-2 justify-start">
+                <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Bot className="h-4 w-4 text-white" />
+                </div>
+                <div className="bg-white shadow-sm border border-slate-100 rounded-2xl p-3">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-slate-300 rounded-full animate-pulse" />
+                    <div className="w-2 h-2 bg-slate-300 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
+                    <div className="w-2 h-2 bg-slate-300 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Quick Prompts */}
+          {chatMessages.length <= 1 && (
+            <div className="px-4 py-2 border-t border-slate-100">
+              <div className="flex flex-wrap gap-2">
+                {['What can I make with banana?', 'Iron-rich recipes', 'Easy finger foods', 'Breakfast ideas'].map((prompt, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setNewMessage(prompt)}
+                    className="px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-full text-slate-600 hover:bg-slate-50"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Chat Input */}
+          <div className="p-4 border-t border-slate-100 bg-white">
+            <div className="flex gap-2">
+              <Input
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Ask about recipes..."
+                className="rounded-full bg-slate-50 border-slate-200"
+                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendChatMessage())}
+                disabled={isTyping}
+              />
+              <Button 
+                onClick={sendChatMessage}
+                disabled={!newMessage.trim() || isTyping}
+                className="rounded-full w-12 h-10 p-0 bg-slate-800 hover:bg-slate-700"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Popular Section (Recipes only) */}
       {activeTab === 'recipes' && !searchQuery && selectedMealType === 'all' && (
