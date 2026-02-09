@@ -1,9 +1,128 @@
 import { useState, useEffect } from 'react';
-import { Moon, Sun, Clock, Plus, MessageCircle, Baby, Trash2, Timer, AlertCircle } from 'lucide-react';
+import { Moon, Sun, Clock, Plus, MessageCircle, Baby, Trash2, Timer, AlertCircle, ChevronDown, ChevronUp, Calendar, Settings2, Info, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 const SLEEP_STORAGE_KEY = 'nunu-sleep-data';
+
+// Sleep training methods with descriptions and guidance
+interface SleepMethod {
+  id: string;
+  name: string;
+  shortName: string;
+  description: string;
+  howItWorks: string[];
+  napGuidance: string;
+  bedtimeGuidance: string;
+  checkInIntervals?: number[]; // For Ferber method
+  gentlenessLevel: 'very-gentle' | 'gentle' | 'moderate' | 'direct';
+  bestFor: string;
+}
+
+const SLEEP_METHODS: SleepMethod[] = [
+  {
+    id: 'cues',
+    name: 'Following Baby\'s Cues',
+    shortName: 'Cues',
+    description: 'No formal sleep training — respond to your baby naturally and follow their lead.',
+    howItWorks: [
+      'Watch for sleepy cues (yawning, eye rubbing, fussiness)',
+      'Respond to your baby\'s needs as they arise',
+      'Use whatever soothing methods work for your family',
+      'No pressure to change sleep associations'
+    ],
+    napGuidance: 'Put baby down when you see sleepy cues. Contact naps, motion sleep, and feeding to sleep are all fine.',
+    bedtimeGuidance: 'Follow your usual soothing routine. There\'s no wrong way to help your baby sleep.',
+    gentlenessLevel: 'very-gentle',
+    bestFor: 'Parents who prefer a natural approach without formal training'
+  },
+  {
+    id: 'ferber',
+    name: 'Ferber / Graduated Extinction',
+    shortName: 'Ferber',
+    description: 'Timed check-ins at increasing intervals to help baby learn to self-settle.',
+    howItWorks: [
+      'Put baby down drowsy but awake',
+      'Leave the room after a brief soothing routine',
+      'If baby cries, wait before checking in',
+      'Checks are brief (1-2 mins) — reassure but don\'t pick up',
+      'Gradually increase wait times between checks'
+    ],
+    napGuidance: 'Try for 30-60 mins using check-ins. If baby hasn\'t slept, end the attempt and try again next wake window.',
+    bedtimeGuidance: 'Use timed check-ins. Night 1: 3-5-10 mins. Night 2: 5-10-12 mins. Night 3+: 10-12-15 mins.',
+    checkInIntervals: [3, 5, 10, 12, 15],
+    gentlenessLevel: 'moderate',
+    bestFor: 'Parents who want structure but still want to provide reassurance'
+  },
+  {
+    id: 'chair',
+    name: 'Chair Method / Gradual Retreat',
+    shortName: 'Chair',
+    description: 'Stay in the room and gradually move farther away over time.',
+    howItWorks: [
+      'Start with chair right next to the crib',
+      'Offer verbal/physical comfort as needed',
+      'Every 2-3 nights, move chair farther away',
+      'Eventually move outside the room',
+      'Takes 2-3 weeks typically'
+    ],
+    napGuidance: 'Sit in your designated spot. Offer quiet comfort if needed but try not to pick up unless very distressed.',
+    bedtimeGuidance: 'Stay in your chair position. Use shushing and gentle words. Move chair every 2-3 nights.',
+    gentlenessLevel: 'gentle',
+    bestFor: 'Parents who want to stay close but encourage independence'
+  },
+  {
+    id: 'pupd',
+    name: 'Pick Up / Put Down',
+    shortName: 'PUPD',
+    description: 'Pick baby up to calm, put down once calm, repeat as needed.',
+    howItWorks: [
+      'Put baby down drowsy but awake',
+      'If baby cries, pick up and comfort until calm',
+      'Once calm, put back down immediately',
+      'Repeat as many times as needed',
+      'Can be tiring but very responsive'
+    ],
+    napGuidance: 'Pick up when crying, put down when calm. May need many repetitions at first. Be patient and consistent.',
+    bedtimeGuidance: 'Stay committed to the pattern: crying = pick up, calm = put down. It may take 30+ repetitions initially.',
+    gentlenessLevel: 'very-gentle',
+    bestFor: 'Parents who want a very hands-on, responsive approach'
+  },
+  {
+    id: 'fading',
+    name: 'Gentle Fading',
+    shortName: 'Fading',
+    description: 'Gradually reduce sleep associations over time (slow and gentle).',
+    howItWorks: [
+      'Identify current sleep associations (feeding, rocking, etc.)',
+      'Very slowly reduce the association',
+      'E.g., rock until drowsy instead of fully asleep',
+      'Takes weeks but very low stress',
+      'Follow baby\'s pace'
+    ],
+    napGuidance: 'Use your soothing method but try to stop slightly earlier than usual. Very gradual changes over days/weeks.',
+    bedtimeGuidance: 'Continue your routine but slowly fade your involvement. This week: rock until drowsy. Next week: rock less.',
+    gentlenessLevel: 'very-gentle',
+    bestFor: 'Parents who want minimal crying and aren\'t in a rush'
+  },
+  {
+    id: 'cio',
+    name: 'Extinction (CIO)',
+    shortName: 'CIO',
+    description: 'Put baby down and don\'t return until morning (or scheduled feed time).',
+    howItWorks: [
+      'Complete bedtime routine',
+      'Put baby down awake',
+      'Leave the room and don\'t return',
+      'Baby learns to self-settle without intervention',
+      'Often fastest but can be emotionally hard'
+    ],
+    napGuidance: 'Put down and leave for the nap duration. If no sleep after 1 hour, end the attempt.',
+    bedtimeGuidance: 'Commit fully — no checks, no returning. Most babies adjust within 3-5 nights.',
+    gentlenessLevel: 'direct',
+    bestFor: 'Parents who want the quickest results and can handle some crying'
+  }
+];
 
 // 50+ sleep tips that rotate daily
 const SLEEP_TIPS = [
@@ -80,6 +199,7 @@ interface SleepSession {
   startTime: string; // ISO string for storage
   endTime?: string;
   duration?: number; // in minutes
+  type?: 'nap' | 'night';
 }
 
 interface SleepData {
@@ -89,6 +209,9 @@ interface SleepData {
   currentSleepStart: string | null;
   lastWakeTime: string;
   sessions: SleepSession[];
+  sleepMethod: string;
+  morningWakeTime: string; // Typical morning wake time (HH:MM)
+  targetBedtime: string; // Target bedtime (HH:MM)
 }
 
 interface SleepProps {
@@ -99,7 +222,14 @@ const loadSleepData = (): SleepData => {
   try {
     const saved = localStorage.getItem(SLEEP_STORAGE_KEY);
     if (saved) {
-      return JSON.parse(saved);
+      const data = JSON.parse(saved);
+      // Migrate old data
+      return {
+        ...data,
+        sleepMethod: data.sleepMethod || 'cues',
+        morningWakeTime: data.morningWakeTime || '07:00',
+        targetBedtime: data.targetBedtime || '19:00'
+      };
     }
   } catch (e) {
     console.error('Failed to load sleep data:', e);
@@ -110,16 +240,24 @@ const loadSleepData = (): SleepData => {
     isAsleep: false,
     currentSleepStart: null,
     lastWakeTime: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    sessions: []
+    sessions: [],
+    sleepMethod: 'cues',
+    morningWakeTime: '07:00',
+    targetBedtime: '19:00'
   };
 };
 
 const Sleep = ({ onTabChange }: SleepProps) => {
   const [sleepData, setSleepData] = useState<SleepData>(loadSleepData);
   const [now, setNow] = useState(new Date());
+  const [showMethodPicker, setShowMethodPicker] = useState(false);
+  const [showSchedule, setShowSchedule] = useState(false);
+  const [showMethodInfo, setShowMethodInfo] = useState(false);
   
   // Destructure for easier use
-  const { babyAge, napCount, isAsleep, currentSleepStart, lastWakeTime, sessions } = sleepData;
+  const { babyAge, napCount, isAsleep, currentSleepStart, lastWakeTime, sessions, sleepMethod, morningWakeTime, targetBedtime } = sleepData;
+  
+  const currentMethod = SLEEP_METHODS.find(m => m.id === sleepMethod) || SLEEP_METHODS[0];
   
   // Update time every minute for live countdown
   useEffect(() => {
@@ -255,6 +393,99 @@ const Sleep = ({ onTabChange }: SleepProps) => {
     updateSleepData({ napCount: count });
   };
 
+  const setSleepMethod = (method: string) => {
+    updateSleepData({ sleepMethod: method });
+    setShowMethodPicker(false);
+  };
+
+  const setMorningWakeTime = (time: string) => {
+    updateSleepData({ morningWakeTime: time });
+  };
+
+  const setTargetBedtime = (time: string) => {
+    updateSleepData({ targetBedtime: time });
+  };
+
+  // Generate personalized schedule based on settings
+  const generateSchedule = () => {
+    const [wakeHour, wakeMin] = morningWakeTime.split(':').map(Number);
+    const [bedHour, bedMin] = targetBedtime.split(':').map(Number);
+    
+    const wakeTime = new Date();
+    wakeTime.setHours(wakeHour, wakeMin, 0, 0);
+    
+    const bedTime = new Date();
+    bedTime.setHours(bedHour, bedMin, 0, 0);
+    
+    const wakeWindow = getWakeWindow();
+    const avgWakeWindow = (wakeWindow.min + wakeWindow.max) / 2;
+    
+    const schedule: { time: string; event: string; type: 'wake' | 'nap' | 'bed' }[] = [];
+    
+    schedule.push({ 
+      time: formatTime(wakeTime), 
+      event: 'Morning wake', 
+      type: 'wake' 
+    });
+    
+    let currentTime = new Date(wakeTime);
+    
+    // Generate nap times based on wake windows
+    const wakeWindows = napCount === 4 
+      ? [60, 75, 90, 105] // 4 naps
+      : napCount === 3 
+        ? [90, 120, 150] // 3 naps  
+        : napCount === 2 
+          ? [150, 180, 210] // 2 naps
+          : [270, 300]; // 1 nap
+    
+    const napDurations = napCount === 4
+      ? [45, 45, 45, 30]
+      : napCount === 3
+        ? [60, 60, 45]
+        : napCount === 2
+          ? [90, 60]
+          : [120];
+    
+    for (let i = 0; i < napCount; i++) {
+      // Add wake window
+      currentTime = new Date(currentTime.getTime() + wakeWindows[i] * 60000);
+      
+      schedule.push({ 
+        time: formatTime(currentTime), 
+        event: `Nap ${i + 1} start`, 
+        type: 'nap' 
+      });
+      
+      // Add nap duration
+      currentTime = new Date(currentTime.getTime() + napDurations[i] * 60000);
+      
+      schedule.push({ 
+        time: formatTime(currentTime), 
+        event: `Nap ${i + 1} wake`, 
+        type: 'wake' 
+      });
+    }
+    
+    schedule.push({ 
+      time: formatTime(bedTime), 
+      event: 'Bedtime', 
+      type: 'bed' 
+    });
+    
+    return schedule;
+  };
+
+  const getGentlenessColor = (level: string) => {
+    switch (level) {
+      case 'very-gentle': return 'bg-emerald-100 text-emerald-700';
+      case 'gentle': return 'bg-sky-100 text-sky-700';
+      case 'moderate': return 'bg-amber-100 text-amber-700';
+      case 'direct': return 'bg-rose-100 text-rose-700';
+      default: return 'bg-slate-100 text-slate-700';
+    }
+  };
+
   const wakeWindow = getWakeWindow();
   const timeSinceWake = getTimeSinceWake();
   const isInWakeWindow = timeSinceWake >= wakeWindow.min && timeSinceWake <= wakeWindow.max;
@@ -348,6 +579,150 @@ const Sleep = ({ onTabChange }: SleepProps) => {
           </CardContent>
         </Card>
 
+        {/* Sleep Method Card */}
+        <Card className="border-none shadow-sm">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Heart className="h-5 w-5 text-rose-400" />
+                <span className="font-medium text-slate-700">Sleep approach</span>
+              </div>
+              <button
+                onClick={() => setShowMethodInfo(!showMethodInfo)}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <Info className="h-4 w-4" />
+              </button>
+            </div>
+            
+            <button
+              onClick={() => setShowMethodPicker(!showMethodPicker)}
+              className="w-full flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+            >
+              <div className="text-left">
+                <p className="font-medium text-slate-800">{currentMethod.name}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{currentMethod.description.slice(0, 50)}...</p>
+              </div>
+              {showMethodPicker ? <ChevronUp className="h-5 w-5 text-slate-400" /> : <ChevronDown className="h-5 w-5 text-slate-400" />}
+            </button>
+            
+            {showMethodPicker && (
+              <div className="mt-3 space-y-2 max-h-64 overflow-y-auto">
+                {SLEEP_METHODS.map((method) => (
+                  <button
+                    key={method.id}
+                    onClick={() => setSleepMethod(method.id)}
+                    className={`w-full text-left p-3 rounded-lg border-2 transition-colors ${
+                      sleepMethod === method.id
+                        ? 'border-indigo-500 bg-indigo-50'
+                        : 'border-slate-100 hover:border-slate-200'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-medium text-slate-800 text-sm">{method.name}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${getGentlenessColor(method.gentlenessLevel)}`}>
+                        {method.gentlenessLevel === 'very-gentle' ? 'Very Gentle' : 
+                         method.gentlenessLevel === 'gentle' ? 'Gentle' :
+                         method.gentlenessLevel === 'moderate' ? 'Moderate' : 'Direct'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500">{method.description}</p>
+                  </button>
+                ))}
+              </div>
+            )}
+            
+            {showMethodInfo && !showMethodPicker && (
+              <div className="mt-3 p-3 bg-indigo-50 rounded-lg space-y-3">
+                <div>
+                  <p className="text-xs font-medium text-indigo-800 mb-1">How it works:</p>
+                  <ul className="space-y-1">
+                    {currentMethod.howItWorks.map((step, i) => (
+                      <li key={i} className="text-xs text-indigo-700 flex items-start gap-2">
+                        <span className="text-indigo-400">•</span>
+                        {step}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-indigo-800">Best for:</p>
+                  <p className="text-xs text-indigo-700">{currentMethod.bestFor}</p>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Personalized Schedule Card */}
+        <Card className="border-none shadow-sm">
+          <CardContent className="p-4">
+            <button
+              onClick={() => setShowSchedule(!showSchedule)}
+              className="w-full flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-indigo-500" />
+                <span className="font-medium text-slate-700">Today's schedule</span>
+              </div>
+              {showSchedule ? <ChevronUp className="h-5 w-5 text-slate-400" /> : <ChevronDown className="h-5 w-5 text-slate-400" />}
+            </button>
+            
+            {showSchedule && (
+              <div className="mt-4 space-y-4">
+                {/* Schedule Settings */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs text-slate-500 block mb-1">Morning wake</label>
+                    <input
+                      type="time"
+                      value={morningWakeTime}
+                      onChange={(e) => setMorningWakeTime(e.target.value)}
+                      className="w-full p-2 bg-slate-50 rounded-lg text-sm text-slate-700 border-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-slate-500 block mb-1">Target bedtime</label>
+                    <input
+                      type="time"
+                      value={targetBedtime}
+                      onChange={(e) => setTargetBedtime(e.target.value)}
+                      className="w-full p-2 bg-slate-50 rounded-lg text-sm text-slate-700 border-none"
+                    />
+                  </div>
+                </div>
+                
+                {/* Generated Schedule */}
+                <div className="relative">
+                  <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-slate-200" />
+                  <div className="space-y-3">
+                    {generateSchedule().map((item, i) => (
+                      <div key={i} className="flex items-center gap-3 relative">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center z-10 ${
+                          item.type === 'wake' ? 'bg-amber-100' :
+                          item.type === 'nap' ? 'bg-indigo-100' : 'bg-slate-800'
+                        }`}>
+                          {item.type === 'wake' ? <Sun className="h-4 w-4 text-amber-600" /> :
+                           item.type === 'nap' ? <Moon className="h-4 w-4 text-indigo-600" /> :
+                           <Moon className="h-4 w-4 text-white" />}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-slate-700">{item.event}</p>
+                          <p className="text-xs text-slate-500">{item.time}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <p className="text-xs text-slate-400 text-center">
+                  💡 Suggested schedule for {napCount} nap{napCount !== 1 ? 's' : ''}. Adjust based on baby's cues.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Current Status Card */}
         <Card className={`border-none shadow-md ${isAsleep ? 'bg-indigo-100' : 'bg-white'}`}>
           <CardContent className="p-6">
@@ -357,9 +732,16 @@ const Sleep = ({ onTabChange }: SleepProps) => {
                   <Moon className="h-8 w-8 text-indigo-600" />
                 </div>
                 <h2 className="text-xl font-semibold text-indigo-800 mb-1">Sleeping</h2>
-                <p className="text-indigo-600 mb-4">
+                <p className="text-indigo-600 mb-2">
                   Started at {currentSleepStart && formatTime(new Date(currentSleepStart))}
                 </p>
+                
+                {/* Method-specific guidance while sleeping */}
+                <div className="bg-indigo-200/50 rounded-lg p-3 mb-4 text-left">
+                  <p className="text-xs font-medium text-indigo-800 mb-1">{currentMethod.shortName} tip:</p>
+                  <p className="text-xs text-indigo-700">{currentMethod.napGuidance}</p>
+                </div>
+                
                 <Button 
                   onClick={handleWakeUp}
                   className="bg-indigo-600 hover:bg-indigo-700 rounded-full px-8"
