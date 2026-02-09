@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { MessageCircle, Moon, Heart, Clock, Baby, Lightbulb, ChevronRight, Settings } from 'lucide-react';
+import { MessageCircle, Moon, Heart, Clock, Baby, Lightbulb, ChevronRight, Settings, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import MoodCalendar, { MoodEntry } from '@/components/MoodCalendar';
 import koalaHero from '@/assets/nunu-logo.svg';
 
 interface HomeProps {
@@ -10,6 +11,7 @@ interface HomeProps {
 
 const BABY_AGE_KEY = 'nunu-baby-age-months';
 const LAST_NAP_KEY = 'nunu-last-nap-time';
+const MOOD_ENTRIES_KEY = 'nunu-mood-entries';
 
 // Wake windows by age in months (in minutes)
 const getWakeWindow = (ageMonths: number): { min: number; max: number; label: string } => {
@@ -93,6 +95,11 @@ const Home = ({ onTabChange }: HomeProps) => {
   const [timeSinceNap, setTimeSinceNap] = useState<string>('');
   const [dailyTip, setDailyTip] = useState<string>('');
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [showMoodCalendar, setShowMoodCalendar] = useState(false);
+  const [moodEntries, setMoodEntries] = useState<MoodEntry[]>(() => {
+    const saved = localStorage.getItem(MOOD_ENTRIES_KEY);
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const moods = [
     { id: 'good', emoji: '😊', label: 'Good', color: 'bg-emerald-100 border-emerald-200' },
@@ -178,7 +185,10 @@ const Home = ({ onTabChange }: HomeProps) => {
       </div>
 
       <div className="flex-1 px-6 space-y-4">
-        {/* Mood Check-in */}
+        {/* Mood Check-in / Calendar */}
+        {showMoodCalendar ? (
+          <MoodCalendar entries={moodEntries} onClose={() => setShowMoodCalendar(false)} />
+        ) : (
         <Card className="border-none shadow-md bg-white">
           <CardContent className="p-5">
             {!selectedMood ? (
@@ -186,7 +196,14 @@ const Home = ({ onTabChange }: HomeProps) => {
                 {moods.map((mood) => (
                   <button
                     key={mood.id}
-                    onClick={() => setSelectedMood(mood.id)}
+                    onClick={() => {
+                      setSelectedMood(mood.id);
+                      // Save mood entry
+                      const newEntry: MoodEntry = { mood: mood.id, timestamp: Date.now() };
+                      const updatedEntries = [...moodEntries, newEntry];
+                      setMoodEntries(updatedEntries);
+                      localStorage.setItem(MOOD_ENTRIES_KEY, JSON.stringify(updatedEntries));
+                    }}
                     className={`
                       p-4 rounded-2xl border-2 transition-all duration-200
                       hover:scale-[1.02] hover:shadow-md active:scale-[0.98]
@@ -206,16 +223,27 @@ const Home = ({ onTabChange }: HomeProps) => {
                 <p className="text-slate-600 leading-relaxed max-w-xs mx-auto">
                   {getMoodResponse(selectedMood)}
                 </p>
-                <button 
-                  onClick={() => setSelectedMood(null)}
-                  className="text-sm text-slate-400 mt-4 hover:text-slate-600"
-                >
-                  Check in again
-                </button>
+                <div className="flex gap-3 justify-center mt-4">
+                  <button 
+                    onClick={() => setSelectedMood(null)}
+                    className="text-sm text-slate-400 hover:text-slate-600"
+                  >
+                    Check in again
+                  </button>
+                  <span className="text-slate-300">•</span>
+                  <button 
+                    onClick={() => setShowMoodCalendar(true)}
+                    className="text-sm text-slate-400 hover:text-slate-600 flex items-center gap-1"
+                  >
+                    <Calendar className="h-3 w-3" />
+                    View history
+                  </button>
+                </div>
               </div>
             )}
           </CardContent>
         </Card>
+        )}
 
         {/* Baby Age & Wake Window Card */}
         <Card className="border-none shadow-md bg-white">
