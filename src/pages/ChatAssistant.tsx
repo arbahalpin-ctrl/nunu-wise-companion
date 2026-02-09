@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Clock } from 'lucide-react';
+import { Send, Bot, User, Clock, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -10,15 +10,32 @@ interface Message {
   timestamp: string;
 }
 
-const ChatAssistant = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      role: 'assistant',
-      content: "Hey. I'm Nunu — here to help with sleep, feeding, or just to listen when things feel hard. What's on your mind?",
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+const STORAGE_KEY = 'nunu-chat-history';
+
+const getInitialMessage = (): Message => ({
+  id: '1',
+  role: 'assistant',
+  content: "Hey. I'm Nunu — here to help with sleep, feeding, or just to listen when things feel hard. What's on your mind?",
+  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+});
+
+const loadMessages = (): Message[] => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
     }
-  ]);
+  } catch (e) {
+    console.error('Failed to load chat history:', e);
+  }
+  return [getInitialMessage()];
+};
+
+const ChatAssistant = () => {
+  const [messages, setMessages] = useState<Message[]>(loadMessages);
   
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -28,9 +45,23 @@ const ChatAssistant = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    } catch (e) {
+      console.error('Failed to save chat history:', e);
+    }
+  }, [messages]);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const clearChat = () => {
+    const initialMessage = getInitialMessage();
+    setMessages([initialMessage]);
+  };
 
   const sendMessage = async () => {
     if (!newMessage.trim() || isTyping) return;
@@ -112,17 +143,28 @@ const ChatAssistant = () => {
     <div className="pb-20 h-screen bg-gradient-to-b from-sky-50 to-white flex flex-col">
       {/* Header */}
       <div className="p-6 flex-shrink-0 border-b border-slate-100 bg-white/80 backdrop-blur">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center">
-            <Bot className="h-5 w-5 text-white" />
-          </div>
-          <div>
-            <h1 className="text-lg font-semibold text-slate-800">Nunu</h1>
-            <div className="flex items-center gap-1 text-xs text-slate-400">
-              <div className="w-2 h-2 bg-emerald-400 rounded-full" />
-              Sleep & wellbeing expert
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center">
+              <Bot className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-semibold text-slate-800">Nunu</h1>
+              <div className="flex items-center gap-1 text-xs text-slate-400">
+                <div className="w-2 h-2 bg-emerald-400 rounded-full" />
+                Sleep & wellbeing expert
+              </div>
             </div>
           </div>
+          {messages.length > 1 && (
+            <button
+              onClick={clearChat}
+              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+              title="Clear chat"
+            >
+              <Trash2 className="h-5 w-5" />
+            </button>
+          )}
         </div>
       </div>
 
