@@ -551,7 +551,7 @@ const Weaning = () => {
   const [selectedFood, setSelectedFood] = useState<Food | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [selectedSavedRecipe, setSelectedSavedRecipe] = useState<SavedRecipe | null>(null);
-  const [activeTab, setActiveTab] = useState<'recipes' | 'foods' | 'saved' | 'chat'>('recipes');
+  const [activeTab, setActiveTab] = useState<'recipes' | 'foods' | 'saved' | 'chat'>('foods');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedMealType, setSelectedMealType] = useState<string>('all');
@@ -831,13 +831,12 @@ const Weaning = () => {
       <div className="px-6 mb-4">
         <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
           <button
-            onClick={() => setActiveTab('chat')}
-            className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${
-              activeTab === 'chat' ? 'bg-white shadow text-slate-800' : 'text-slate-500'
+            onClick={() => setActiveTab('foods')}
+            className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+              activeTab === 'foods' ? 'bg-white shadow text-slate-800' : 'text-slate-500'
             }`}
           >
-            <MessageSquare className="h-3.5 w-3.5" />
-            Ask
+            Foods
           </button>
           <button
             onClick={() => setActiveTab('recipes')}
@@ -848,12 +847,13 @@ const Weaning = () => {
             Recipes
           </button>
           <button
-            onClick={() => setActiveTab('foods')}
-            className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === 'foods' ? 'bg-white shadow text-slate-800' : 'text-slate-500'
+            onClick={() => setActiveTab('chat')}
+            className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${
+              activeTab === 'chat' ? 'bg-white shadow text-slate-800' : 'text-slate-500'
             }`}
           >
-            Foods
+            <MessageSquare className="h-3.5 w-3.5" />
+            Ask
           </button>
           <button
             onClick={() => setActiveTab('saved')}
