@@ -1,31 +1,72 @@
 import { useState, useEffect } from 'react';
-import { Moon, Sun, Clock, Plus, MessageCircle, Baby, Trash2 } from 'lucide-react';
+import { Moon, Sun, Clock, Plus, MessageCircle, Baby, Trash2, Timer, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
-interface SleepLog {
-  id: string;
-  type: 'sleep' | 'wake';
-  time: Date;
-}
+const SLEEP_STORAGE_KEY = 'nunu-sleep-data';
 
 interface SleepSession {
   id: string;
-  startTime: Date;
-  endTime?: Date;
+  startTime: string; // ISO string for storage
+  endTime?: string;
   duration?: number; // in minutes
+}
+
+interface SleepData {
+  babyAge: number;
+  isAsleep: boolean;
+  currentSleepStart: string | null;
+  lastWakeTime: string;
+  sessions: SleepSession[];
 }
 
 interface SleepProps {
   onTabChange?: (tab: string) => void;
 }
 
+const loadSleepData = (): SleepData => {
+  try {
+    const saved = localStorage.getItem(SLEEP_STORAGE_KEY);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch (e) {
+    console.error('Failed to load sleep data:', e);
+  }
+  return {
+    babyAge: 6,
+    isAsleep: false,
+    currentSleepStart: null,
+    lastWakeTime: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    sessions: []
+  };
+};
+
 const Sleep = ({ onTabChange }: SleepProps) => {
-  const [babyAge, setBabyAge] = useState(6); // months
-  const [isAsleep, setIsAsleep] = useState(false);
-  const [currentSleepStart, setCurrentSleepStart] = useState<Date | null>(null);
-  const [sleepSessions, setSleepSessions] = useState<SleepSession[]>([]);
-  const [lastWakeTime, setLastWakeTime] = useState<Date>(new Date(Date.now() - 2 * 60 * 60 * 1000)); // 2 hours ago
+  const [sleepData, setSleepData] = useState<SleepData>(loadSleepData);
+  const [now, setNow] = useState(new Date());
+  
+  // Destructure for easier use
+  const { babyAge, isAsleep, currentSleepStart, lastWakeTime, sessions } = sleepData;
+  
+  // Update time every minute for live countdown
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(interval);
+  }, []);
+  
+  // Save to localStorage whenever sleepData changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(SLEEP_STORAGE_KEY, JSON.stringify(sleepData));
+    } catch (e) {
+      console.error('Failed to save sleep data:', e);
+    }
+  }, [sleepData]);
+  
+  const updateSleepData = (updates: Partial<SleepData>) => {
+    setSleepData(prev => ({ ...prev, ...updates }));
+  };
 
   // Wake window recommendations by age (in minutes)
   const wakeWindows: Record<number, { min: number; max: number; naps: string }> = {
@@ -50,9 +91,34 @@ const Sleep = ({ onTabChange }: SleepProps) => {
   };
 
   const getTimeSinceWake = () => {
-    const now = new Date();
-    const diff = now.getTime() - lastWakeTime.getTime();
+    const wakeDate = new Date(lastWakeTime);
+    const diff = now.getTime() - wakeDate.getTime();
     return Math.floor(diff / (1000 * 60)); // minutes
+  };
+  
+  const getTimeUntilNextNap = () => {
+    const wakeWindow = getWakeWindow();
+    const timeSinceWake = getTimeSinceWake();
+    const minTimeUntil = wakeWindow.min - timeSinceWake;
+    const maxTimeUntil = wakeWindow.max - timeSinceWake;
+    return { minTimeUntil, maxTimeUntil };
+  };
+  
+  const getWakeWindowProgress = () => {
+    const wakeWindow = getWakeWindow();
+    const timeSinceWake = getTimeSinceWake();
+    // Progress from 0 to min wake window
+    if (timeSinceWake < wakeWindow.min) {
+      return (timeSinceWake / wakeWindow.min) * 50; // 0-50%
+    }
+    // Progress from min to max (ideal zone is 50-100%)
+    if (timeSinceWake <= wakeWindow.max) {
+      const inWindow = timeSinceWake - wakeWindow.min;
+      const windowSize = wakeWindow.max - wakeWindow.min;
+      return 50 + (inWindow / windowSize) * 50;
+    }
+    // Past max
+    return 100;
   };
 
   const formatDuration = (minutes: number) => {
@@ -69,33 +135,48 @@ const Sleep = ({ onTabChange }: SleepProps) => {
   };
 
   const handleSleepStart = () => {
-    const now = new Date();
-    setIsAsleep(true);
-    setCurrentSleepStart(now);
+    updateSleepData({
+      isAsleep: true,
+      currentSleepStart: new Date().toISOString()
+    });
   };
 
   const handleWakeUp = () => {
     if (currentSleepStart) {
-      const now = new Date();
-      const duration = Math.floor((now.getTime() - currentSleepStart.getTime()) / (1000 * 60));
+      const startDate = new Date(currentSleepStart);
+      const nowDate = new Date();
+      const duration = Math.floor((nowDate.getTime() - startDate.getTime()) / (1000 * 60));
       
       const newSession: SleepSession = {
         id: Date.now().toString(),
         startTime: currentSleepStart,
-        endTime: now,
+        endTime: nowDate.toISOString(),
         duration
       };
       
-      setSleepSessions(prev => [newSession, ...prev]);
-      setLastWakeTime(now);
+      updateSleepData({
+        isAsleep: false,
+        currentSleepStart: null,
+        lastWakeTime: nowDate.toISOString(),
+        sessions: [newSession, ...sessions]
+      });
+    } else {
+      updateSleepData({
+        isAsleep: false,
+        currentSleepStart: null,
+        lastWakeTime: new Date().toISOString()
+      });
     }
-    
-    setIsAsleep(false);
-    setCurrentSleepStart(null);
   };
 
   const deleteSession = (id: string) => {
-    setSleepSessions(prev => prev.filter(s => s.id !== id));
+    updateSleepData({
+      sessions: sessions.filter(s => s.id !== id)
+    });
+  };
+  
+  const setBabyAgeValue = (age: number) => {
+    updateSleepData({ babyAge: age });
   };
 
   const wakeWindow = getWakeWindow();
@@ -107,9 +188,18 @@ const Sleep = ({ onTabChange }: SleepProps) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    const todaySessions = sleepSessions.filter(s => s.startTime >= today);
+    const todaySessions = sessions.filter(s => new Date(s.startTime) >= today);
     return todaySessions.reduce((acc, s) => acc + (s.duration || 0), 0);
   };
+  
+  const getTodayNapCount = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return sessions.filter(s => new Date(s.startTime) >= today).length;
+  };
+  
+  const nextNap = getTimeUntilNextNap();
+  const wakeWindowProgress = getWakeWindowProgress();
 
   return (
     <div className="pb-24 min-h-screen bg-gradient-to-b from-indigo-50 to-white">
@@ -143,7 +233,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
               </div>
               <select 
                 value={babyAge}
-                onChange={(e) => setBabyAge(Number(e.target.value))}
+                onChange={(e) => setBabyAgeValue(Number(e.target.value))}
                 className="bg-slate-100 border-none rounded-lg px-3 py-2 text-slate-700 font-medium"
               >
                 {[...Array(25)].map((_, i) => (
@@ -164,14 +254,14 @@ const Sleep = ({ onTabChange }: SleepProps) => {
                 </div>
                 <h2 className="text-xl font-semibold text-indigo-800 mb-1">Sleeping</h2>
                 <p className="text-indigo-600 mb-4">
-                  Started at {currentSleepStart && formatTime(currentSleepStart)}
+                  Started at {currentSleepStart && formatTime(new Date(currentSleepStart))}
                 </p>
                 <Button 
                   onClick={handleWakeUp}
                   className="bg-indigo-600 hover:bg-indigo-700 rounded-full px-8"
                 >
                   <Sun className="h-4 w-4 mr-2" />
-                  Wake up
+                  Baby woke up
                 </Button>
               </div>
             ) : (
@@ -184,23 +274,76 @@ const Sleep = ({ onTabChange }: SleepProps) => {
                   }`} />
                 </div>
                 <h2 className="text-xl font-semibold text-slate-800 mb-1">Awake</h2>
-                <p className={`mb-4 ${
+                <p className={`mb-1 ${
                   isPastWakeWindow ? 'text-amber-600 font-medium' : 'text-slate-500'
                 }`}>
                   {formatDuration(timeSinceWake)} since last wake
-                  {isPastWakeWindow && ' — may be overtired'}
                 </p>
+                {isPastWakeWindow && (
+                  <p className="text-amber-600 text-sm mb-3 flex items-center justify-center gap-1">
+                    <AlertCircle className="h-4 w-4" />
+                    May be overtired
+                  </p>
+                )}
                 <Button 
                   onClick={handleSleepStart}
-                  className="bg-slate-800 hover:bg-slate-700 rounded-full px-8"
+                  className="bg-slate-800 hover:bg-slate-700 rounded-full px-8 mt-2"
                 >
                   <Moon className="h-4 w-4 mr-2" />
-                  Start sleep
+                  Baby fell asleep
                 </Button>
               </div>
             )}
           </CardContent>
         </Card>
+        
+        {/* Next Nap Prediction - only show when awake */}
+        {!isAsleep && (
+          <Card className={`border-none shadow-sm ${
+            isInWakeWindow ? 'bg-emerald-50 border-emerald-200' : 
+            isPastWakeWindow ? 'bg-amber-50 border-amber-200' : 'bg-slate-50'
+          }`}>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Timer className={`h-4 w-4 ${
+                  isInWakeWindow ? 'text-emerald-600' : 
+                  isPastWakeWindow ? 'text-amber-600' : 'text-slate-500'
+                }`} />
+                <span className={`font-medium ${
+                  isInWakeWindow ? 'text-emerald-800' : 
+                  isPastWakeWindow ? 'text-amber-800' : 'text-slate-700'
+                }`}>Next nap</span>
+              </div>
+              
+              {/* Progress bar */}
+              <div className="h-3 bg-slate-200 rounded-full mb-3 overflow-hidden">
+                <div 
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    isPastWakeWindow ? 'bg-amber-500' : 
+                    isInWakeWindow ? 'bg-emerald-500' : 'bg-slate-400'
+                  }`}
+                  style={{ width: `${Math.min(wakeWindowProgress, 100)}%` }}
+                />
+              </div>
+              
+              <div className="text-center">
+                {nextNap.minTimeUntil > 0 ? (
+                  <p className="text-slate-600">
+                    Nap window opens in <strong className="text-slate-800">{formatDuration(nextNap.minTimeUntil)}</strong>
+                  </p>
+                ) : nextNap.maxTimeUntil > 0 ? (
+                  <p className="text-emerald-700">
+                    ✓ <strong>Ideal nap time now!</strong> Window closes in {formatDuration(nextNap.maxTimeUntil)}
+                  </p>
+                ) : (
+                  <p className="text-amber-700">
+                    <strong>Past ideal window</strong> — baby may be overtired
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Wake Window Guide */}
         <Card className="border-none shadow-sm bg-slate-50">
@@ -235,11 +378,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
                 <p className="text-sm text-slate-500">Total logged</p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold text-slate-800">{sleepSessions.filter(s => {
-                  const today = new Date();
-                  today.setHours(0, 0, 0, 0);
-                  return s.startTime >= today;
-                }).length}</p>
+                <p className="text-2xl font-bold text-slate-800">{getTodayNapCount()}</p>
                 <p className="text-sm text-slate-500">Naps</p>
               </div>
             </div>
@@ -247,11 +386,11 @@ const Sleep = ({ onTabChange }: SleepProps) => {
         </Card>
 
         {/* Sleep Log */}
-        {sleepSessions.length > 0 && (
+        {sessions.length > 0 && (
           <div>
             <h3 className="font-medium text-slate-700 mb-3 px-1">Recent sleep</h3>
             <div className="space-y-2">
-              {sleepSessions.slice(0, 5).map((session) => (
+              {sessions.slice(0, 5).map((session) => (
                 <Card key={session.id} className="border-none shadow-sm">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
@@ -261,7 +400,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
                         </div>
                         <div>
                           <p className="font-medium text-slate-800">
-                            {formatTime(session.startTime)} – {session.endTime && formatTime(session.endTime)}
+                            {formatTime(new Date(session.startTime))} – {session.endTime && formatTime(new Date(session.endTime))}
                           </p>
                           <p className="text-sm text-slate-500">
                             {session.duration && formatDuration(session.duration)}
