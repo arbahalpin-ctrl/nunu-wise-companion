@@ -14,6 +14,7 @@ interface SleepSession {
 
 interface SleepData {
   babyAge: number;
+  napCount: number; // 1, 2, or 3 naps per day
   isAsleep: boolean;
   currentSleepStart: string | null;
   lastWakeTime: string;
@@ -35,6 +36,7 @@ const loadSleepData = (): SleepData => {
   }
   return {
     babyAge: 6,
+    napCount: 2,
     isAsleep: false,
     currentSleepStart: null,
     lastWakeTime: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
@@ -47,7 +49,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
   const [now, setNow] = useState(new Date());
   
   // Destructure for easier use
-  const { babyAge, isAsleep, currentSleepStart, lastWakeTime, sessions } = sleepData;
+  const { babyAge, napCount, isAsleep, currentSleepStart, lastWakeTime, sessions } = sleepData;
   
   // Update time every minute for live countdown
   useEffect(() => {
@@ -68,26 +70,26 @@ const Sleep = ({ onTabChange }: SleepProps) => {
     setSleepData(prev => ({ ...prev, ...updates }));
   };
 
-  // Wake window recommendations by age (in minutes)
-  const wakeWindows: Record<number, { min: number; max: number; naps: string }> = {
-    0: { min: 45, max: 60, naps: "4-5 naps" },
-    1: { min: 45, max: 75, naps: "4-5 naps" },
-    2: { min: 60, max: 90, naps: "4-5 naps" },
-    3: { min: 75, max: 105, naps: "3-4 naps" },
-    4: { min: 90, max: 120, naps: "3-4 naps" },
-    5: { min: 105, max: 150, naps: "3 naps" },
-    6: { min: 120, max: 180, naps: "2-3 naps" },
-    7: { min: 135, max: 195, naps: "2-3 naps" },
-    8: { min: 150, max: 210, naps: "2 naps" },
-    9: { min: 165, max: 225, naps: "2 naps" },
-    10: { min: 180, max: 240, naps: "2 naps" },
-    11: { min: 195, max: 270, naps: "2 naps" },
-    12: { min: 210, max: 300, naps: "1-2 naps" },
+  // Wake window recommendations by nap count (in minutes)
+  // These are typical ranges - first window is usually shortest, last is longest
+  const wakeWindowsByNaps: Record<number, { min: number; max: number; pattern: string; typical: string }> = {
+    4: { min: 45, max: 90, pattern: "1-1.5h / 1.5h / 1.5h / 1.5-2h", typical: "0-3 months" },
+    3: { min: 90, max: 150, pattern: "1.5-2h / 2-2.5h / 2.5-3h", typical: "4-8 months" },
+    2: { min: 150, max: 240, pattern: "2.5-3h / 3-3.5h / 3.5-4h", typical: "8-14 months" },
+    1: { min: 270, max: 360, pattern: "4.5-5h / 5-6h", typical: "14+ months" },
   };
 
   const getWakeWindow = () => {
-    const ageKey = Math.min(babyAge, 12);
-    return wakeWindows[ageKey] || wakeWindows[12];
+    return wakeWindowsByNaps[napCount] || wakeWindowsByNaps[2];
+  };
+  
+  // Suggest nap count based on age
+  const getSuggestedNapCount = () => {
+    if (babyAge <= 3) return 4;
+    if (babyAge <= 5) return 3;
+    if (babyAge <= 8) return 3;
+    if (babyAge <= 14) return 2;
+    return 1;
   };
 
   const getTimeSinceWake = () => {
@@ -178,6 +180,10 @@ const Sleep = ({ onTabChange }: SleepProps) => {
   const setBabyAgeValue = (age: number) => {
     updateSleepData({ babyAge: age });
   };
+  
+  const setNapCountValue = (count: number) => {
+    updateSleepData({ napCount: count });
+  };
 
   const wakeWindow = getWakeWindow();
   const timeSinceWake = getTimeSinceWake();
@@ -223,9 +229,9 @@ const Sleep = ({ onTabChange }: SleepProps) => {
       </div>
 
       <div className="px-6 space-y-4">
-        {/* Baby Age Selector */}
+        {/* Baby Settings */}
         <Card className="border-none shadow-sm">
-          <CardContent className="p-4">
+          <CardContent className="p-4 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Baby className="h-5 w-5 text-slate-400" />
@@ -241,6 +247,34 @@ const Sleep = ({ onTabChange }: SleepProps) => {
                 ))}
               </select>
             </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Moon className="h-5 w-5 text-slate-400" />
+                <span className="text-slate-600">Naps per day</span>
+              </div>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4].map((count) => (
+                  <button
+                    key={count}
+                    onClick={() => setNapCountValue(count)}
+                    className={`w-10 h-10 rounded-lg font-medium transition-colors ${
+                      napCount === count 
+                        ? 'bg-indigo-600 text-white' 
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    {count}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            {napCount !== getSuggestedNapCount() && (
+              <p className="text-xs text-slate-400 text-right">
+                💡 Typical for {babyAge}m: {getSuggestedNapCount()} nap{getSuggestedNapCount() !== 1 ? 's' : ''}
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -350,20 +384,22 @@ const Sleep = ({ onTabChange }: SleepProps) => {
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-3">
               <Clock className="h-4 w-4 text-slate-500" />
-              <span className="font-medium text-slate-700">Wake window guide</span>
-              <span className="text-xs text-slate-400">({babyAge} months)</span>
+              <span className="font-medium text-slate-700">Wake windows for {napCount} nap{napCount !== 1 ? 's' : ''}</span>
             </div>
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="space-y-3 text-sm">
               <div>
-                <p className="text-slate-500">Ideal awake time</p>
+                <p className="text-slate-500">Wake window range</p>
                 <p className="font-semibold text-slate-800">
                   {formatDuration(wakeWindow.min)} – {formatDuration(wakeWindow.max)}
                 </p>
               </div>
               <div>
-                <p className="text-slate-500">Typical naps</p>
-                <p className="font-semibold text-slate-800">{wakeWindow.naps}</p>
+                <p className="text-slate-500">Typical pattern</p>
+                <p className="font-medium text-slate-700">{wakeWindow.pattern}</p>
               </div>
+              <p className="text-xs text-slate-400">
+                💡 First wake window is usually shortest, last is longest
+              </p>
             </div>
           </CardContent>
         </Card>
