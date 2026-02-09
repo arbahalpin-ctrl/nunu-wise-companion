@@ -23,7 +23,7 @@ const STORAGE_KEY = 'nunu-conversations';
 const getInitialMessage = (): Message => ({
   id: '1',
   role: 'assistant',
-  content: "Hey. I'm Nunu — here to help with sleep, feeding, or just to listen when things feel hard. What's on your mind?",
+  content: "Hey superstar! 🌟 I'm Nunu — your personal cheerleader and expert wingwoman for all things motherhood. Sleep struggles, feeding wins, or just need someone in your corner? I've got you. What's on your mind?",
   timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 });
 
@@ -213,7 +213,7 @@ const ChatAssistant = () => {
       <div className="p-3">
         <button
           onClick={startNewConversation}
-          className="w-full flex items-center gap-2 px-3 py-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors"
+          className="w-full flex items-center gap-2 px-3 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg hover:from-orange-600 hover:to-amber-600 transition-colors"
         >
           <Plus className="h-4 w-4" />
           New conversation
@@ -227,7 +227,7 @@ const ChatAssistant = () => {
             onClick={() => switchConversation(convo.id)}
             className={`
               group flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer mb-1
-              ${convo.id === activeConversationId ? 'bg-slate-100' : 'hover:bg-slate-50'}
+              ${convo.id === activeConversationId ? 'bg-orange-100' : 'hover:bg-orange-50'}
             `}
           >
             <MessageSquare className="h-4 w-4 text-slate-400 flex-shrink-0" />
@@ -250,7 +250,7 @@ const ChatAssistant = () => {
   );
 
   return (
-    <div className="pb-20 h-screen bg-gradient-to-b from-sky-50 to-white flex">
+    <div className="pb-20 h-screen bg-gradient-to-b from-amber-50 to-white flex">
       {/* Desktop Sidebar - Always visible on md+ screens */}
       <div className="hidden md:flex md:flex-col w-64 bg-white border-r border-slate-200 flex-shrink-0">
         <div className="p-4 border-b border-slate-100">
@@ -327,7 +327,7 @@ const ChatAssistant = () => {
               className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {message.role === 'assistant' && (
-                <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                   <Bot className="h-4 w-4 text-white" />
                 </div>
               )}
@@ -335,8 +335,8 @@ const ChatAssistant = () => {
               <div className={`
                 max-w-[85%] md:max-w-[70%] rounded-2xl p-4
                 ${message.role === 'user' 
-                  ? 'bg-slate-800 text-white' 
-                  : 'bg-white shadow-sm border border-slate-100'
+                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white' 
+                  : 'bg-white shadow-sm border border-orange-100'
                 }
               `}>
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
@@ -359,14 +359,14 @@ const ChatAssistant = () => {
 
           {isTyping && (
             <div className="flex gap-3 justify-start">
-              <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <Bot className="h-4 w-4 text-white" />
               </div>
-              <div className="bg-white shadow-sm border border-slate-100 rounded-2xl p-4">
+              <div className="bg-white shadow-sm border border-orange-100 rounded-2xl p-4">
                 <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-slate-300 rounded-full animate-pulse" />
-                  <div className="w-2 h-2 bg-slate-300 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
-                  <div className="w-2 h-2 bg-slate-300 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
+                  <div className="w-2 h-2 bg-orange-300 rounded-full animate-pulse" />
+                  <div className="w-2 h-2 bg-orange-300 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
+                  <div className="w-2 h-2 bg-orange-300 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
                 </div>
               </div>
             </div>
@@ -384,7 +384,7 @@ const ChatAssistant = () => {
                 <button
                   key={index}
                   onClick={() => setNewMessage(prompt)}
-                  className="px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-full text-slate-600 hover:bg-slate-50 transition-colors"
+                  className="px-3 py-1.5 text-xs bg-white border border-orange-200 rounded-full text-slate-700 hover:bg-orange-50 hover:border-orange-300 transition-colors"
                 >
                   {prompt}
                 </button>
@@ -407,7 +407,7 @@ const ChatAssistant = () => {
             <Button 
               onClick={sendMessage}
               disabled={!newMessage.trim() || isTyping}
-              className="rounded-full w-12 h-10 p-0 bg-slate-800 hover:bg-slate-700 disabled:opacity-50"
+              className="rounded-full w-12 h-10 p-0 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 disabled:opacity-50"
             >
               <Send className="h-4 w-4" />
             </Button>
