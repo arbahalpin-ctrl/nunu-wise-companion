@@ -43,9 +43,11 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
-      {renderActiveTab()}
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+    <div className="min-h-screen bg-slate-100 flex justify-center">
+      <div className="w-full max-w-md min-h-screen bg-gradient-to-b from-sky-50 to-white shadow-xl relative">
+        {renderActiveTab()}
+        <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      </div>
     </div>
   );
 };

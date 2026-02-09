@@ -9,7 +9,8 @@ interface OnboardingProps {
 
 const Onboarding = ({ onComplete }: OnboardingProps) => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white flex flex-col items-center justify-center p-8">
+    <div className="min-h-screen bg-slate-100 flex justify-center">
+      <div className="w-full max-w-md min-h-screen bg-gradient-to-b from-sky-50 to-white shadow-xl flex flex-col items-center justify-center p-8">
       
       {/* Koala - Big and Friendly */}
       <div className="mb-8">
@@ -58,10 +59,11 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         <ArrowRight className="h-5 w-5 ml-2" />
       </Button>
 
-      {/* Privacy note - subtle */}
-      <p className="text-xs text-slate-400 mt-8 text-center max-w-xs">
-        Your conversations are private. I'm here for you, not your data.
-      </p>
+        {/* Privacy note - subtle */}
+        <p className="text-xs text-slate-400 mt-8 text-center max-w-xs">
+          Your conversations are private. I'm here for you, not your data.
+        </p>
+      </div>
     </div>
   );
 };
