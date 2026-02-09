@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Clock, Trash2 } from 'lucide-react';
+import { Send, Bot, User, Clock, Trash2, Plus, MessageSquare, ChevronLeft, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -10,7 +10,15 @@ interface Message {
   timestamp: string;
 }
 
-const STORAGE_KEY = 'nunu-chat-history';
+interface Conversation {
+  id: string;
+  title: string;
+  messages: Message[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+const STORAGE_KEY = 'nunu-conversations';
 
 const getInitialMessage = (): Message => ({
   id: '1',
@@ -19,7 +27,15 @@ const getInitialMessage = (): Message => ({
   timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 });
 
-const loadMessages = (): Message[] => {
+const createNewConversation = (): Conversation => ({
+  id: Date.now().toString(),
+  title: 'New conversation',
+  messages: [getInitialMessage()],
+  createdAt: Date.now(),
+  updatedAt: Date.now()
+});
+
+const loadConversations = (): Conversation[] => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -29,38 +45,88 @@ const loadMessages = (): Message[] => {
       }
     }
   } catch (e) {
-    console.error('Failed to load chat history:', e);
+    console.error('Failed to load conversations:', e);
   }
-  return [getInitialMessage()];
+  return [createNewConversation()];
 };
 
 const ChatAssistant = () => {
-  const [messages, setMessages] = useState<Message[]>(loadMessages);
+  const [conversations, setConversations] = useState<Conversation[]>(loadConversations);
+  const [activeConversationId, setActiveConversationId] = useState<string>(() => {
+    const convos = loadConversations();
+    return convos[0]?.id || '';
+  });
+  const [showSidebar, setShowSidebar] = useState(false);
   
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const activeConversation = conversations.find(c => c.id === activeConversationId);
+  const messages = activeConversation?.messages || [];
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Save messages to localStorage whenever they change
+  // Save conversations to localStorage whenever they change
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
     } catch (e) {
-      console.error('Failed to save chat history:', e);
+      console.error('Failed to save conversations:', e);
     }
-  }, [messages]);
+  }, [conversations]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const clearChat = () => {
-    const initialMessage = getInitialMessage();
-    setMessages([initialMessage]);
+  const startNewConversation = () => {
+    const newConvo = createNewConversation();
+    setConversations(prev => [newConvo, ...prev]);
+    setActiveConversationId(newConvo.id);
+    setShowSidebar(false);
+  };
+
+  const switchConversation = (id: string) => {
+    setActiveConversationId(id);
+    setShowSidebar(false);
+  };
+
+  const deleteConversation = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setConversations(prev => {
+      const filtered = prev.filter(c => c.id !== id);
+      // If we deleted the active one, switch to first remaining or create new
+      if (id === activeConversationId) {
+        if (filtered.length > 0) {
+          setActiveConversationId(filtered[0].id);
+        } else {
+          const newConvo = createNewConversation();
+          setActiveConversationId(newConvo.id);
+          return [newConvo];
+        }
+      }
+      return filtered;
+    });
+  };
+
+  const updateConversationMessages = (newMessages: Message[]) => {
+    setConversations(prev => prev.map(c => {
+      if (c.id === activeConversationId) {
+        // Generate title from first user message if still default
+        let title = c.title;
+        if (title === 'New conversation') {
+          const firstUserMsg = newMessages.find(m => m.role === 'user');
+          if (firstUserMsg) {
+            title = firstUserMsg.content.slice(0, 30) + (firstUserMsg.content.length > 30 ? '...' : '');
+          }
+        }
+        return { ...c, messages: newMessages, title, updatedAt: Date.now() };
+      }
+      return c;
+    }));
   };
 
   const sendMessage = async () => {
@@ -73,13 +139,14 @@ const ChatAssistant = () => {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
     
-    setMessages(prev => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    updateConversationMessages(updatedMessages);
     setNewMessage('');
     setIsTyping(true);
     
     try {
       // Prepare conversation history for API
-      const conversationHistory = [...messages, userMessage].map(msg => ({
+      const conversationHistory = updatedMessages.map(msg => ({
         role: msg.role,
         content: msg.content
       }));
@@ -106,7 +173,7 @@ const ChatAssistant = () => {
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       
-      setMessages(prev => [...prev, aiMessage]);
+      updateConversationMessages([...updatedMessages, aiMessage]);
     } catch (error) {
       console.error('Chat error:', error);
       
@@ -118,7 +185,7 @@ const ChatAssistant = () => {
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       
-      setMessages(prev => [...prev, errorMessage]);
+      updateConversationMessages([...updatedMessages, errorMessage]);
     } finally {
       setIsTyping(false);
     }
@@ -139,12 +206,98 @@ const ChatAssistant = () => {
     "Sleep regression help"
   ];
 
+  const formatDate = (timestamp: number) => {
+    const date = new Date(timestamp);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    if (date.toDateString() === today.toDateString()) {
+      return 'Today';
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return 'Yesterday';
+    } else {
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+  };
+
   return (
-    <div className="pb-20 h-screen bg-gradient-to-b from-sky-50 to-white flex flex-col">
+    <div className="pb-20 h-screen bg-gradient-to-b from-sky-50 to-white flex flex-col relative">
+      {/* Sidebar Overlay */}
+      {showSidebar && (
+        <div 
+          className="absolute inset-0 bg-black/30 z-40"
+          onClick={() => setShowSidebar(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`
+        absolute top-0 left-0 h-full w-72 bg-white shadow-xl z-50 
+        transform transition-transform duration-300 ease-in-out
+        ${showSidebar ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+          <h2 className="font-semibold text-slate-800">Conversations</h2>
+          <button
+            onClick={() => setShowSidebar(false)}
+            className="p-1 text-slate-400 hover:text-slate-600 rounded"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        
+        <div className="p-3">
+          <button
+            onClick={startNewConversation}
+            className="w-full flex items-center gap-2 px-3 py-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            New conversation
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-3 pb-20">
+          {conversations.map((convo) => (
+            <div
+              key={convo.id}
+              onClick={() => switchConversation(convo.id)}
+              className={`
+                group flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer mb-1
+                ${convo.id === activeConversationId 
+                  ? 'bg-slate-100' 
+                  : 'hover:bg-slate-50'
+                }
+              `}
+            >
+              <MessageSquare className="h-4 w-4 text-slate-400 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-slate-700 truncate">{convo.title}</p>
+                <p className="text-xs text-slate-400">{formatDate(convo.updatedAt)}</p>
+              </div>
+              {conversations.length > 1 && (
+                <button
+                  onClick={(e) => deleteConversation(convo.id, e)}
+                  className="p-1 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Header */}
       <div className="p-6 flex-shrink-0 border-b border-slate-100 bg-white/80 backdrop-blur">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowSidebar(true)}
+              className="p-2 -ml-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+            >
+              <MessageSquare className="h-5 w-5" />
+            </button>
             <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center">
               <Bot className="h-5 w-5 text-white" />
             </div>
@@ -156,15 +309,13 @@ const ChatAssistant = () => {
               </div>
             </div>
           </div>
-          {messages.length > 1 && (
-            <button
-              onClick={clearChat}
-              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
-              title="Clear chat"
-            >
-              <Trash2 className="h-5 w-5" />
-            </button>
-          )}
+          <button
+            onClick={startNewConversation}
+            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+            title="New conversation"
+          >
+            <Plus className="h-5 w-5" />
+          </button>
         </div>
       </div>
 
