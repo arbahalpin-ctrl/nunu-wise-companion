@@ -23,16 +23,16 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         </div>
       </div>
 
-      {/* Welcome - Journey focused */}
+      {/* Welcome - Gen Z/Millennial voice */}
       <div className="text-center max-w-xs mb-10">
         <h1 className="text-3xl font-bold text-slate-800 mb-3">
-          Get your spark back ✨
+          ok so hear me out ✨
         </h1>
         <p className="text-slate-600 leading-relaxed mb-4">
-          Motherhood changed you — but you're still in there. I'm Nunu, and I'm here to help you rediscover yourself while crushing this whole mum thing.
+          motherhood is lowkey chaos but that doesn't mean you have to lose yourself in it. i'm nunu — think of me as your hype girl who actually knows stuff about babies lol
         </p>
         <p className="text-orange-600 font-semibold text-sm">
-          This is your journey back to you. 💖
+          let's get your spark back bestie 💖
         </p>
       </div>
 
@@ -42,19 +42,19 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
           <div className="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center mb-2">
             <span className="text-2xl">😴</span>
           </div>
-          <span className="text-xs font-medium text-slate-600">Rest</span>
+          <span className="text-xs font-medium text-slate-600">sleep</span>
         </div>
         <div className="flex flex-col items-center">
           <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center mb-2">
-            <span className="text-2xl">💪</span>
+            <span className="text-2xl">🧠</span>
           </div>
-          <span className="text-xs font-medium text-slate-600">Strength</span>
+          <span className="text-xs font-medium text-slate-600">sanity</span>
         </div>
         <div className="flex flex-col items-center">
           <div className="w-14 h-14 rounded-full bg-rose-100 flex items-center justify-center mb-2">
             <span className="text-2xl">✨</span>
           </div>
-          <span className="text-xs font-medium text-slate-600">You</span>
+          <span className="text-xs font-medium text-slate-600">you</span>
         </div>
       </div>
 
@@ -65,13 +65,13 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         className="rounded-full px-10 py-6 text-base shadow-lg bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 border-0"
       >
         <Sparkles className="h-5 w-5 mr-2" />
-        Start my journey
+        let's gooo
         <ArrowRight className="h-5 w-5 ml-2" />
       </Button>
 
       {/* Privacy note */}
       <p className="text-xs text-slate-500 mt-8 text-center max-w-xs">
-        Your conversations are private. This space is yours. 🔒
+        ur convos stay private btw. this space is just for you 🔒
       </p>
     </div>
   );
