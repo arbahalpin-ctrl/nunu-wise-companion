@@ -67,6 +67,18 @@ const getTipForAge = (ageMonths: number): string => {
   return randomTip;
 };
 
+const getMoodResponse = (mood: string): string => {
+  const responses: Record<string, string> = {
+    good: "That's lovely to hear. Even good days deserve acknowledgment. 💛",
+    okay: "Okay is okay. Not every day needs to be amazing.",
+    tired: "Tiredness is so real in this season. You're running on fumes and still showing up.",
+    anxious: "Anxiety can feel so heavy. Want to talk through what's on your mind?",
+    sad: "Sadness is allowed here. You don't have to push through alone.",
+    overwhelmed: "When everything feels like too much, let's just focus on right now. One breath.",
+  };
+  return responses[mood] || "Thanks for sharing how you're feeling.";
+};
+
 const Home = ({ onTabChange }: HomeProps) => {
   const [babyAgeMonths, setBabyAgeMonths] = useState<number | null>(() => {
     const saved = localStorage.getItem(BABY_AGE_KEY);
@@ -80,6 +92,16 @@ const Home = ({ onTabChange }: HomeProps) => {
   });
   const [timeSinceNap, setTimeSinceNap] = useState<string>('');
   const [dailyTip, setDailyTip] = useState<string>('');
+  const [selectedMood, setSelectedMood] = useState<string | null>(null);
+
+  const moods = [
+    { id: 'good', emoji: '😊', label: 'Good', color: 'bg-emerald-100 border-emerald-200' },
+    { id: 'okay', emoji: '😐', label: 'Okay', color: 'bg-amber-100 border-amber-200' },
+    { id: 'tired', emoji: '😴', label: 'Tired', color: 'bg-blue-100 border-blue-200' },
+    { id: 'anxious', emoji: '😰', label: 'Anxious', color: 'bg-purple-100 border-purple-200' },
+    { id: 'sad', emoji: '😢', label: 'Sad', color: 'bg-indigo-100 border-indigo-200' },
+    { id: 'overwhelmed', emoji: '😩', label: 'Overwhelmed', color: 'bg-rose-100 border-rose-200' },
+  ];
 
   // Update tip when age changes
   useEffect(() => {
@@ -141,18 +163,57 @@ const Home = ({ onTabChange }: HomeProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white flex flex-col pb-24">
       {/* Header */}
-      <div className="flex flex-col items-center pt-8 pb-4 px-6">
-        <div className="w-20 h-20 bg-white rounded-full p-2 shadow-md border-2 border-white mb-4">
+      <div className="flex flex-col items-center pt-6 pb-3 px-6">
+        <div className="w-16 h-16 bg-white rounded-full p-2 shadow-md border-2 border-white mb-3">
           <img 
             src={koalaHero} 
             alt="Nunu" 
             className="w-full h-full object-contain rounded-full"
           />
         </div>
-        <h1 className="text-xl font-bold text-slate-800">Hey, you 💛</h1>
+        <h1 className="text-lg font-bold text-slate-800">Hey, you 💛</h1>
+        <p className="text-sm text-slate-500">How are you feeling?</p>
       </div>
 
       <div className="flex-1 px-6 space-y-4">
+        {/* Mood Check-in */}
+        <Card className="border-none shadow-sm bg-white/80">
+          <CardContent className="p-4">
+            {!selectedMood ? (
+              <div className="grid grid-cols-6 gap-2">
+                {moods.map((mood) => (
+                  <button
+                    key={mood.id}
+                    onClick={() => setSelectedMood(mood.id)}
+                    className={`
+                      p-2 rounded-xl border transition-all duration-200
+                      hover:scale-105 active:scale-95
+                      ${mood.color}
+                    `}
+                  >
+                    <div className="text-xl">{mood.emoji}</div>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-2">
+                <div className="text-2xl mb-2">
+                  {moods.find(m => m.id === selectedMood)?.emoji}
+                </div>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  {getMoodResponse(selectedMood)}
+                </p>
+                <button 
+                  onClick={() => setSelectedMood(null)}
+                  className="text-xs text-slate-400 mt-3 hover:text-slate-600"
+                >
+                  Check in again
+                </button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Baby Age & Wake Window Card */}
         <Card className="border-none shadow-md bg-white">
           <CardContent className="p-4">
@@ -239,18 +300,18 @@ const Home = ({ onTabChange }: HomeProps) => {
             onClick={() => onTabChange?.('chat')}
             className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-shadow text-left"
           >
-            <Moon className="h-8 w-8 text-indigo-400 mb-2" />
+            <Moon className="h-7 w-7 text-indigo-400 mb-2" />
             <p className="font-medium text-slate-800 text-sm">Sleep help</p>
-            <p className="text-xs text-slate-500 mt-1">Tips & troubleshooting</p>
+            <p className="text-xs text-slate-500 mt-0.5">Tips & troubleshooting</p>
           </button>
           
           <button
             onClick={() => onTabChange?.('chat')}
             className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-shadow text-left"
           >
-            <Heart className="h-8 w-8 text-rose-400 mb-2" />
+            <Heart className="h-7 w-7 text-rose-400 mb-2" />
             <p className="font-medium text-slate-800 text-sm">I need support</p>
-            <p className="text-xs text-slate-500 mt-1">Talk it through</p>
+            <p className="text-xs text-slate-500 mt-0.5">Talk it through</p>
           </button>
         </div>
 
