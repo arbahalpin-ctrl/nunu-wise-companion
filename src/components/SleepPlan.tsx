@@ -280,7 +280,7 @@ const SleepPlan = ({ assessment, onStartProgram, onEditAssessment }: SleepPlanPr
   const { schedule, recommendedNaps, idealBedtime } = generateSchedule();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white pb-32">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white pb-48">
       {/* Header */}
       <div className="p-6 text-center">
         <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -532,8 +532,8 @@ const SleepPlan = ({ assessment, onStartProgram, onEditAssessment }: SleepPlanPr
         </Card>
       </div>
 
-      {/* Start Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4">
+      {/* Start Button - positioned above main nav */}
+      <div className="fixed bottom-20 left-0 right-0 bg-white border-t border-slate-200 p-4 shadow-lg">
         <div className="max-w-md mx-auto">
           <Button
             onClick={onStartProgram}
