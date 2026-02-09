@@ -13,24 +13,24 @@ const Home = ({ onTabChange }: HomeProps) => {
   const [showMoodResponse, setShowMoodResponse] = useState(false);
 
   const moods = [
-    { id: 'great', emoji: '🔥', label: 'Great!', color: 'bg-orange-100 border-orange-300 hover:bg-orange-200' },
+    { id: 'great', emoji: '🔥', label: 'On fire!', color: 'bg-orange-100 border-orange-300 hover:bg-orange-200' },
     { id: 'good', emoji: '😊', label: 'Good', color: 'bg-amber-100 border-amber-300 hover:bg-amber-200' },
     { id: 'okay', emoji: '😐', label: 'Okay', color: 'bg-yellow-100 border-yellow-300 hover:bg-yellow-200' },
     { id: 'tired', emoji: '😴', label: 'Tired', color: 'bg-teal-100 border-teal-300 hover:bg-teal-200' },
-    { id: 'struggling', emoji: '😰', label: 'Struggling', color: 'bg-purple-100 border-purple-300 hover:bg-purple-200' },
-    { id: 'overwhelmed', emoji: '😩', label: 'Need help', color: 'bg-rose-100 border-rose-300 hover:bg-rose-200' },
+    { id: 'lost', emoji: '😶‍🌫️', label: 'Lost myself', color: 'bg-purple-100 border-purple-300 hover:bg-purple-200' },
+    { id: 'overwhelmed', emoji: '😩', label: 'Overwhelmed', color: 'bg-rose-100 border-rose-300 hover:bg-rose-200' },
   ];
 
   const getMoodResponse = (mood: string) => {
     const responses: Record<string, string> = {
-      great: "Yes! Love that energy! 🔥 Keep riding that wave — you're crushing it!",
-      good: "That's what I like to hear! Good days are built one moment at a time. Keep going! 💪",
-      okay: "Okay is a perfectly valid place to be. Small steps still move you forward! 🚀",
-      tired: "Rest is productive too! You're recharging for your next win. Take what you need. ⚡",
-      struggling: "Tough days don't last, but tough mums do. You've got more strength than you know. 💜",
-      overwhelmed: "Hey — breathe. You're not alone in this. Let's tackle one thing at a time together. 🤝",
+      great: "Yes! That spark is SHINING today! 🔥 This is what the journey looks like — keep building on this energy!",
+      good: "Good is beautiful! Every good day is another step back to yourself. You're on your way! 💖",
+      okay: "Okay is part of the journey too. You're still moving forward, even when it doesn't feel like it. ✨",
+      tired: "Rest is part of reclaiming yourself. You can't pour from an empty cup — refill yours today. ⚡",
+      lost: "Feeling lost is actually the first step to finding yourself again. You're not gone — you're transforming. The old you is still there, waiting. 💜",
+      overwhelmed: "When it's all too much, remember: you're not losing yourself, you're becoming someone even stronger. Let's take this one breath at a time. 🤝",
     };
-    return responses[mood] || "Thanks for checking in! Every moment of awareness is progress. ✨";
+    return responses[mood] || "Thanks for checking in! Every moment of awareness brings you closer to yourself. ✨";
   };
 
   const handleMoodSelect = (moodId: string) => {
@@ -50,7 +50,7 @@ const Home = ({ onTabChange }: HomeProps) => {
         {/* Koala with glow effect */}
         <div className="mb-6 relative">
           <div className="absolute inset-0 bg-orange-300/30 rounded-full blur-2xl scale-110"></div>
-          <div className="relative w-36 h-36 bg-white rounded-full p-3 shadow-lg border-4 border-orange-200">
+          <div className="relative w-32 h-32 bg-white rounded-full p-3 shadow-lg border-4 border-orange-200">
             <img 
               src={koalaHero} 
               alt="Nunu" 
@@ -59,13 +59,13 @@ const Home = ({ onTabChange }: HomeProps) => {
           </div>
         </div>
 
-        {/* Greeting - Uplifting */}
-        <div className="text-center mb-8">
+        {/* Greeting - Journey focused */}
+        <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-slate-800 mb-2">
-            You've got this! 🌟
+            Welcome back ✨
           </h1>
-          <p className="text-slate-600">
-            How are you feeling today?
+          <p className="text-slate-600 text-sm">
+            How are you feeling on your journey today?
           </p>
         </div>
 
@@ -108,14 +108,14 @@ const Home = ({ onTabChange }: HomeProps) => {
           </Card>
         )}
 
-        {/* Primary CTA - Vibrant */}
+        {/* Primary CTA */}
         <Button 
           onClick={handleTalkToNunu}
           size="lg"
           className="rounded-full px-8 py-6 text-base shadow-lg bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white border-0"
         >
           <Sparkles className="h-5 w-5 mr-2" />
-          Let's Chat!
+          Chat with Nunu
         </Button>
 
         {/* Quick Access */}
@@ -136,15 +136,15 @@ const Home = ({ onTabChange }: HomeProps) => {
             <div className="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center mb-2 hover:bg-rose-200 transition-colors">
               <Heart className="h-5 w-5 text-rose-500" />
             </div>
-            <span className="text-xs font-medium">Self-care</span>
+            <span className="text-xs font-medium">Find myself</span>
           </button>
         </div>
       </div>
 
-      {/* Bottom - Motivating */}
+      {/* Bottom - Journey reminder */}
       <div className="px-6 pb-24 text-center">
         <p className="text-sm text-orange-600 font-semibold">
-          Every step forward counts. Keep going! 💪
+          Your spark is still there. Let's find it together. 💖
         </p>
       </div>
     </div>

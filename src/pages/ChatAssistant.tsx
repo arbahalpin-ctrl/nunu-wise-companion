@@ -23,7 +23,7 @@ const STORAGE_KEY = 'nunu-conversations';
 const getInitialMessage = (): Message => ({
   id: '1',
   role: 'assistant',
-  content: "Hey superstar! 🌟 I'm Nunu — your personal cheerleader and expert wingwoman for all things motherhood. Sleep struggles, feeding wins, or just need someone in your corner? I've got you. What's on your mind?",
+  content: "Hey you! ✨ I'm Nunu — here to help you get your spark back. Motherhood is a wild ride, but you haven't lost yourself — you're just transforming. Whether it's sleep, sanity, or just needing someone in your corner, I've got you. What's going on today?",
   timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 });
 

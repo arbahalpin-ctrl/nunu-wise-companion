@@ -23,52 +23,55 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         </div>
       </div>
 
-      {/* Welcome - Uplifting */}
-      <div className="text-center max-w-xs mb-12">
-        <h1 className="text-3xl font-bold text-slate-800 mb-4">
-          Hey superstar! 🌟
+      {/* Welcome - Journey focused */}
+      <div className="text-center max-w-xs mb-10">
+        <h1 className="text-3xl font-bold text-slate-800 mb-3">
+          Get your spark back ✨
         </h1>
-        <p className="text-slate-600 leading-relaxed">
-          I'm Nunu — your personal hype-woman, sleep expert, and pocket cheerleader. Ready to tackle motherhood together? Let's go!
+        <p className="text-slate-600 leading-relaxed mb-4">
+          Motherhood changed you — but you're still in there. I'm Nunu, and I'm here to help you rediscover yourself while crushing this whole mum thing.
+        </p>
+        <p className="text-orange-600 font-semibold text-sm">
+          This is your journey back to you. 💖
         </p>
       </div>
 
-      {/* What I help with */}
-      <div className="flex gap-8 mb-12">
+      {/* The journey pillars */}
+      <div className="flex gap-6 mb-12">
         <div className="flex flex-col items-center">
           <div className="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center mb-2">
-            <span className="text-2xl">💪</span>
+            <span className="text-2xl">😴</span>
           </div>
-          <span className="text-xs font-medium text-slate-600">Sleep wins</span>
+          <span className="text-xs font-medium text-slate-600">Rest</span>
         </div>
         <div className="flex flex-col items-center">
           <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center mb-2">
-            <span className="text-2xl">✨</span>
+            <span className="text-2xl">💪</span>
           </div>
-          <span className="text-xs font-medium text-slate-600">Pep talks</span>
+          <span className="text-xs font-medium text-slate-600">Strength</span>
         </div>
         <div className="flex flex-col items-center">
           <div className="w-14 h-14 rounded-full bg-rose-100 flex items-center justify-center mb-2">
-            <span className="text-2xl">🔥</span>
+            <span className="text-2xl">✨</span>
           </div>
-          <span className="text-xs font-medium text-slate-600">Real advice</span>
+          <span className="text-xs font-medium text-slate-600">You</span>
         </div>
       </div>
 
-      {/* CTA - Vibrant */}
+      {/* CTA */}
       <Button 
         onClick={onComplete}
         size="lg"
         className="rounded-full px-10 py-6 text-base shadow-lg bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 border-0"
       >
         <Sparkles className="h-5 w-5 mr-2" />
-        Let's do this!
+        Start my journey
         <ArrowRight className="h-5 w-5 ml-2" />
       </Button>
 
       {/* Privacy note */}
       <p className="text-xs text-slate-500 mt-8 text-center max-w-xs">
-        Your conversations are private. I'm here for you, not your data. 🔒
+        Your conversations are private. This space is yours. 🔒
       </p>
     </div>
   );
