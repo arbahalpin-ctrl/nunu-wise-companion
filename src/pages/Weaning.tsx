@@ -9,6 +9,40 @@ const BABY_AGE_KEY = 'nunu-baby-age-months';
 
 type AgeGroup = '6' | '7-8' | '9-12' | '12+';
 
+// Available cutting guide SVGs
+const CUTTING_GUIDES: Record<string, string[]> = {
+  'banana': ['6', '9-12'],
+  'avocado': ['6'],
+  'broccoli': ['6'],
+  'grapes': ['6'],
+};
+
+// Cutting Guide Component
+const CuttingGuide = ({ foodId, age }: { foodId: string; age: AgeGroup }) => {
+  const ageKey = age === '12+' ? '12plus' : age;
+  const hasGuide = CUTTING_GUIDES[foodId]?.includes(age);
+  
+  if (!hasGuide) {
+    return (
+      <div className="mt-4 p-4 border-2 border-dashed border-slate-200 rounded-xl text-center bg-slate-50">
+        <p className="text-slate-400 text-sm">
+          Visual guide coming soon
+        </p>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="mt-4 bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <img 
+        src={`/food-guides/${foodId}-${ageKey}.svg`}
+        alt={`How to cut ${foodId} for ${age} month old`}
+        className="w-full h-48 object-contain p-4"
+      />
+    </div>
+  );
+};
+
 const Weaning = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFood, setSelectedFood] = useState<Food | null>(null);
@@ -166,12 +200,8 @@ const Weaning = () => {
             </CardContent>
           </Card>
 
-          {/* Visual Guide Placeholder */}
-          <div className="mt-4 p-4 border-2 border-dashed border-slate-200 rounded-xl text-center">
-            <p className="text-slate-400 text-sm">
-              📸 Visual cutting guide coming soon
-            </p>
-          </div>
+          {/* Visual Cutting Guide */}
+          <CuttingGuide foodId={selectedFood.id} age={selectedAge} />
 
           {/* Tips */}
           <div className="mt-6">

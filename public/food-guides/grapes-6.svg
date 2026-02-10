@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <circle cx="100" cy="100" r="90" fill="#f8f9fa" stroke="#e9ecef" stroke-width="2"/>
+  <!-- Grapes quartered lengthways - IMPORTANT safety -->
+  <g transform="translate(35, 50)">
+    <!-- First grape quartered -->
+    <path d="M20,0 L40,20 L20,40 L0,20 Z" fill="#9775fa" transform="translate(0,0)"/>
+    <line x1="20" y1="0" x2="20" y2="40" stroke="#f8f9fa" stroke-width="3"/>
+    <line x1="0" y1="20" x2="40" y2="20" stroke="#f8f9fa" stroke-width="3"/>
+    
+    <!-- Second grape quartered -->
+    <path d="M20,0 L40,20 L20,40 L0,20 Z" fill="#9775fa" transform="translate(50,0)"/>
+    <line x1="70" y1="0" x2="70" y2="40" stroke="#f8f9fa" stroke-width="3"/>
+    <line x1="50" y1="20" x2="90" y2="20" stroke="#f8f9fa" stroke-width="3"/>
+    
+    <!-- Third grape quartered -->
+    <path d="M20,0 L40,20 L20,40 L0,20 Z" fill="#9775fa" transform="translate(100,0)"/>
+    <line x1="120" y1="0" x2="120" y2="40" stroke="#f8f9fa" stroke-width="3"/>
+    <line x1="100" y1="20" x2="140" y2="20" stroke="#f8f9fa" stroke-width="3"/>
+  </g>
+  <g transform="translate(55, 105)">
+    <path d="M20,0 L40,20 L20,40 L0,20 Z" fill="#9775fa"/>
+    <line x1="20" y1="0" x2="20" y2="40" stroke="#f8f9fa" stroke-width="3"/>
+    <line x1="0" y1="20" x2="40" y2="20" stroke="#f8f9fa" stroke-width="3"/>
+    
+    <path d="M20,0 L40,20 L20,40 L0,20 Z" fill="#9775fa" transform="translate(50,0)"/>
+    <line x1="70" y1="0" x2="70" y2="40" stroke="#f8f9fa" stroke-width="3"/>
+    <line x1="50" y1="20" x2="90" y2="20" stroke="#f8f9fa" stroke-width="3"/>
+  </g>
+  <text x="100" y="180" text-anchor="middle" font-family="system-ui" font-size="10" fill="#e03131" font-weight="bold">⚠️ Always quarter lengthways</text>
+</svg>

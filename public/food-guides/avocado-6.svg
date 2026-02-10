@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <circle cx="100" cy="100" r="90" fill="#f8f9fa" stroke="#e9ecef" stroke-width="2"/>
+  <!-- Avocado spears for 6mo -->
+  <g transform="translate(40, 55)">
+    <rect x="0" y="0" width="100" height="22" rx="5" fill="#a9e34b"/>
+    <rect x="0" y="0" width="100" height="7" rx="3" fill="#82c91e" opacity="0.5"/>
+  </g>
+  <g transform="translate(50, 85)">
+    <rect x="0" y="0" width="90" height="22" rx="5" fill="#a9e34b"/>
+    <rect x="0" y="0" width="90" height="7" rx="3" fill="#82c91e" opacity="0.5"/>
+  </g>
+  <g transform="translate(45, 115)">
+    <rect x="0" y="0" width="95" height="22" rx="5" fill="#a9e34b"/>
+    <rect x="0" y="0" width="95" height="7" rx="3" fill="#82c91e" opacity="0.5"/>
+  </g>
+  <text x="100" y="185" text-anchor="middle" font-family="system-ui" font-size="11" fill="#868e96">Long slices with skin for grip</text>
+</svg>
