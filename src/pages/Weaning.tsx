@@ -14,7 +14,7 @@ const FOODS_WITH_GUIDES = [
   'banana', 'avocado', 'broccoli', 'grapes', 'carrot',
   'strawberry', 'blueberry', 'sweet-potato', 'apple',
   'egg', 'chicken', 'peas', 'tomato', 'cheese',
-  'peanut-butter', 'salmon', 'mango', 'pasta', 'bread'
+  'peanut-butter', 'salmon', 'mango', 'pasta', 'bread', 'yogurt'
 ];
 
 // Cutting Guide Component - shows single infographic per food
