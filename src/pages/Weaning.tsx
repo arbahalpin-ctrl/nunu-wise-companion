@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Search, X, AlertTriangle, ChevronLeft, Star, Clock, Bookmark, BookmarkCheck, Info } from 'lucide-react';
+import { Search, X, AlertTriangle, ChevronLeft, Star, Clock, Bookmark, BookmarkCheck, Info, ChefHat, Snowflake, Users } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { foods, Food } from '@/data/foods';
+import { recipes, Recipe, getRecipeCategories } from '@/data/recipes';
 
 const SAVED_FOODS_KEY = 'nunu-saved-foods';
+const SAVED_RECIPES_KEY = 'nunu-saved-recipes';
 const BABY_AGE_KEY = 'nunu-baby-age-months';
 
 type AgeGroup = '6' | '7-8' | '9-12' | '12+';
@@ -43,19 +45,26 @@ const CuttingGuide = ({ foodId }: { foodId: string }) => {
 };
 
 const Weaning = () => {
+  const [activeTab, setActiveTab] = useState<'foods' | 'recipes'>('foods');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFood, setSelectedFood] = useState<Food | null>(null);
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [selectedAge, setSelectedAge] = useState<AgeGroup>('6');
   const [savedFoods, setSavedFoods] = useState<string[]>([]);
+  const [savedRecipes, setSavedRecipes] = useState<string[]>([]);
   const [babyAge, setBabyAge] = useState<number>(6);
   const [showSearch, setShowSearch] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [recipeCategory, setRecipeCategory] = useState<string>('all');
 
   // Load saved data
   useEffect(() => {
     try {
       const saved = localStorage.getItem(SAVED_FOODS_KEY);
       if (saved) setSavedFoods(JSON.parse(saved));
+      
+      const savedRec = localStorage.getItem(SAVED_RECIPES_KEY);
+      if (savedRec) setSavedRecipes(JSON.parse(savedRec));
       
       const age = localStorage.getItem(BABY_AGE_KEY);
       if (age) {
@@ -76,6 +85,28 @@ const Weaning = () => {
   useEffect(() => {
     localStorage.setItem(SAVED_FOODS_KEY, JSON.stringify(savedFoods));
   }, [savedFoods]);
+
+  useEffect(() => {
+    localStorage.setItem(SAVED_RECIPES_KEY, JSON.stringify(savedRecipes));
+  }, [savedRecipes]);
+
+  const toggleSavedRecipe = (recipeId: string) => {
+    setSavedRecipes(prev => 
+      prev.includes(recipeId) 
+        ? prev.filter(id => id !== recipeId)
+        : [...prev, recipeId]
+    );
+  };
+
+  // Filter recipes
+  const filteredRecipes = recipes.filter(recipe => {
+    const matchesSearch = recipe.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          recipe.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = recipeCategory === 'all' || recipe.category === recipeCategory;
+    const minAge = parseInt(recipe.ageRange);
+    const matchesAge = babyAge >= minAge;
+    return matchesSearch && matchesCategory && matchesAge;
+  });
 
   const toggleSaved = (foodId: string) => {
     setSavedFoods(prev => 
@@ -257,6 +288,167 @@ const Weaning = () => {
     );
   }
 
+  // Recipe Detail View
+  if (selectedRecipe) {
+    const isSaved = savedRecipes.includes(selectedRecipe.id);
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white pb-24">
+        {/* Header */}
+        <div className="sticky top-0 bg-white/90 backdrop-blur-sm z-10 px-4 py-3 flex items-center justify-between border-b">
+          <button 
+            onClick={() => setSelectedRecipe(null)}
+            className="flex items-center text-slate-600"
+          >
+            <ChevronLeft className="h-5 w-5" />
+            <span>Back</span>
+          </button>
+          <button
+            onClick={() => toggleSavedRecipe(selectedRecipe.id)}
+            className="p-2"
+          >
+            {isSaved ? (
+              <BookmarkCheck className="h-6 w-6 text-orange-500 fill-orange-500" />
+            ) : (
+              <Bookmark className="h-6 w-6 text-slate-400" />
+            )}
+          </button>
+        </div>
+
+        {/* Recipe Image */}
+        <div className="relative h-56 w-full overflow-hidden">
+          <img 
+            src={selectedRecipe.image} 
+            alt={selectedRecipe.name}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800';
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute bottom-4 left-4 right-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full capitalize">
+                {selectedRecipe.category}
+              </span>
+              <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
+                {selectedRecipe.ageRange} months
+              </span>
+              {selectedRecipe.freezable && (
+                <span className="bg-blue-500/80 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                  <Snowflake className="h-3 w-3" />
+                  Freezable
+                </span>
+              )}
+            </div>
+            <h1 className="text-2xl font-bold text-white">{selectedRecipe.name}</h1>
+          </div>
+        </div>
+
+        {/* Quick Info */}
+        <div className="flex justify-around py-4 bg-white border-b">
+          <div className="text-center">
+            <Clock className="h-5 w-5 mx-auto text-orange-500 mb-1" />
+            <p className="text-xs text-slate-500">Prep</p>
+            <p className="font-semibold text-slate-800">{selectedRecipe.prepTime} min</p>
+          </div>
+          <div className="text-center">
+            <ChefHat className="h-5 w-5 mx-auto text-orange-500 mb-1" />
+            <p className="text-xs text-slate-500">Cook</p>
+            <p className="font-semibold text-slate-800">{selectedRecipe.cookTime} min</p>
+          </div>
+          <div className="text-center">
+            <Users className="h-5 w-5 mx-auto text-orange-500 mb-1" />
+            <p className="text-xs text-slate-500">Servings</p>
+            <p className="font-semibold text-slate-800">{selectedRecipe.servings}</p>
+          </div>
+        </div>
+
+        <div className="px-4 py-6 space-y-6">
+          {/* Allergens Warning */}
+          {selectedRecipe.allergens && selectedRecipe.allergens.length > 0 && (
+            <Card className="border-none shadow-sm bg-amber-50">
+              <CardContent className="p-3">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-amber-600" />
+                  <p className="text-sm text-amber-800">
+                    <span className="font-medium">Contains: </span>
+                    {selectedRecipe.allergens.join(', ')}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Nutrition Highlights */}
+          {selectedRecipe.nutritionHighlights && (
+            <div className="flex flex-wrap gap-2">
+              {selectedRecipe.nutritionHighlights.map((nutrient, i) => (
+                <span key={i} className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">
+                  ✓ {nutrient}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Ingredients */}
+          <div>
+            <h3 className="font-semibold text-slate-800 mb-3 text-lg">Ingredients</h3>
+            <Card className="border-none shadow-sm">
+              <CardContent className="p-4">
+                <ul className="space-y-2">
+                  {selectedRecipe.ingredients.map((ingredient, i) => (
+                    <li key={i} className="flex items-start gap-3 text-slate-700">
+                      <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0" />
+                      {ingredient}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Instructions */}
+          <div>
+            <h3 className="font-semibold text-slate-800 mb-3 text-lg">Instructions</h3>
+            <div className="space-y-3">
+              {selectedRecipe.instructions.map((step, i) => (
+                <Card key={i} className="border-none shadow-sm">
+                  <CardContent className="p-4">
+                    <div className="flex gap-3">
+                      <div className="w-7 h-7 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-white text-sm font-bold">{i + 1}</span>
+                      </div>
+                      <p className="text-slate-700 pt-0.5">{step}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Tips */}
+          {selectedRecipe.tips && selectedRecipe.tips.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                <Star className="h-5 w-5 text-orange-500" />
+                Tips
+              </h3>
+              <ul className="space-y-2">
+                {selectedRecipe.tips.map((tip, i) => (
+                  <li key={i} className="flex items-start gap-2 text-slate-600">
+                    <span className="text-orange-400 mt-1">💡</span>
+                    {tip}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // Search Results View
   if (showSearch || searchQuery) {
     return (
@@ -335,159 +527,245 @@ const Weaning = () => {
     );
   }
 
-  // Main View - Featured Food + Search Button
+  // Main View with Tabs
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white pb-24">
       {/* Header */}
-      <div className="p-6 pb-4">
+      <div className="p-6 pb-2">
         <h1 className="text-2xl font-bold text-slate-800">Weaning Guide</h1>
-        <p className="text-slate-500 mt-1">Learn how to serve foods safely</p>
+        <p className="text-slate-500 mt-1">Foods, recipes & serving guides</p>
       </div>
 
-      <div className="px-6 space-y-4">
-        {/* Search Button */}
-        <button
-          onClick={() => setShowSearch(true)}
-          className="w-full flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm border border-slate-200"
-        >
-          <Search className="h-5 w-5 text-slate-400" />
-          <span className="text-slate-400">Search all {foods.length} foods...</span>
-        </button>
-
-        {/* Quick Categories */}
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-6 px-6">
-          {categories.slice(1).map((cat) => (
-            <button
-              key={cat}
-              onClick={() => { setSelectedCategory(cat); setShowSearch(true); }}
-              className="px-4 py-2 bg-white rounded-full text-sm whitespace-nowrap shadow-sm border border-slate-100"
-            >
-              {cat}
-            </button>
-          ))}
+      {/* Tab Navigation */}
+      <div className="px-6 mb-4">
+        <div className="flex bg-white rounded-xl p-1 shadow-sm">
+          <button
+            onClick={() => setActiveTab('foods')}
+            className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2 ${
+              activeTab === 'foods'
+                ? 'bg-amber-500 text-white shadow-md'
+                : 'text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            🥕 Foods
+          </button>
+          <button
+            onClick={() => setActiveTab('recipes')}
+            className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2 ${
+              activeTab === 'recipes'
+                ? 'bg-orange-500 text-white shadow-md'
+                : 'text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <ChefHat className="h-4 w-4" />
+            Recipes
+            <span className="bg-orange-200 text-orange-700 text-xs px-1.5 py-0.5 rounded-full">{recipes.length}</span>
+          </button>
         </div>
+      </div>
 
-        {/* Featured Food */}
-        {featuredFood && (
-          <div>
-            <h2 className="text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2">
-              <Star className="h-5 w-5 text-amber-500" />
-              {savedFoods.length > 0 ? 'Your Saved Foods' : "Today's Featured Food"}
-            </h2>
-            
-            <button
-              onClick={() => setSelectedFood(featuredFood)}
-              className="w-full bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow text-left"
-            >
-              <div className="relative h-48 overflow-hidden">
-                <img 
-                  src={featuredFood.image} 
-                  alt={featuredFood.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800';
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4">
-                  <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
-                    {featuredFood.category}
-                  </span>
-                  <h3 className="text-2xl font-bold text-white mt-2">{featuredFood.name}</h3>
-                </div>
-                {featuredFood.allergen && (
-                  <div className="absolute top-4 right-4 bg-amber-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                    <AlertTriangle className="h-3 w-3" />
-                    Allergen
-                  </div>
-                )}
-              </div>
-              <div className="p-4">
-                <p className="text-slate-600 text-sm line-clamp-2">
-                  {featuredFood.serving['6']}
-                </p>
-                <p className="text-amber-600 text-sm font-medium mt-2">
-                  Tap to see full serving guide →
-                </p>
-              </div>
-            </button>
+      {/* FOODS TAB */}
+      {activeTab === 'foods' && (
+        <div className="px-6 space-y-4">
+          {/* Search Button */}
+          <button
+            onClick={() => setShowSearch(true)}
+            className="w-full flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm border border-slate-200"
+          >
+            <Search className="h-5 w-5 text-slate-400" />
+            <span className="text-slate-400">Search all {foods.length} foods...</span>
+          </button>
+
+          {/* Quick Categories */}
+          <div className="flex gap-2 overflow-x-auto pb-2 -mx-6 px-6">
+            {categories.slice(1).map((cat) => (
+              <button
+                key={cat}
+                onClick={() => { setSelectedCategory(cat); setShowSearch(true); }}
+                className="px-4 py-2 bg-white rounded-full text-sm whitespace-nowrap shadow-sm border border-slate-100"
+              >
+                {cat}
+              </button>
+            ))}
           </div>
-        )}
 
-        {/* Saved Foods List */}
-        {savedFoods.length > 1 && (
-          <div className="grid grid-cols-3 gap-2">
-            {savedFoods.slice(1, 7).map(foodId => {
-              const food = foods.find(f => f.id === foodId);
-              if (!food) return null;
-              return (
-                <button
-                  key={food.id}
-                  onClick={() => setSelectedFood(food)}
-                  className="bg-white rounded-xl overflow-hidden shadow-sm"
+          {/* Featured Food */}
+          {featuredFood && (
+            <div>
+              <h2 className="text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                <Star className="h-5 w-5 text-amber-500" />
+                {savedFoods.length > 0 ? 'Your Saved Foods' : "Today's Featured Food"}
+              </h2>
+              
+              <button
+                onClick={() => setSelectedFood(featuredFood)}
+                className="w-full bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow text-left"
+              >
+                <div className="relative h-40 overflow-hidden">
+                  <img 
+                    src={featuredFood.image} 
+                    alt={featuredFood.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
+                      {featuredFood.category}
+                    </span>
+                    <h3 className="text-xl font-bold text-white mt-2">{featuredFood.name}</h3>
+                  </div>
+                </div>
+              </button>
+            </div>
+          )}
+
+          {/* Quick Info Cards */}
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <Card className="border-none shadow-sm bg-rose-50">
+              <CardContent className="p-3">
+                <AlertTriangle className="h-5 w-5 text-rose-500 mb-1" />
+                <h3 className="font-semibold text-rose-800 text-xs">Choking Hazards</h3>
+                <p className="text-rose-600 text-xs mt-1">
+                  Quarter grapes & cherry tomatoes
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-none shadow-sm bg-blue-50">
+              <CardContent className="p-3">
+                <Info className="h-5 w-5 text-blue-500 mb-1" />
+                <h3 className="font-semibold text-blue-800 text-xs">Allergens</h3>
+                <p className="text-blue-600 text-xs mt-1">
+                  Introduce early (~6mo)
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* RECIPES TAB */}
+      {activeTab === 'recipes' && (
+        <div className="px-6 space-y-4">
+          {/* Age Filter */}
+          <Card className="border-none shadow-sm bg-orange-50">
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-orange-700">Showing recipes for</p>
+                  <p className="text-lg font-bold text-orange-600">{babyAge}+ months</p>
+                </div>
+                <select
+                  value={babyAge}
+                  onChange={(e) => {
+                    const age = parseInt(e.target.value);
+                    setBabyAge(age);
+                    localStorage.setItem(BABY_AGE_KEY, age.toString());
+                  }}
+                  className="bg-white border border-orange-200 rounded-lg px-3 py-2 text-orange-700 text-sm"
                 >
-                  <div className="h-16 overflow-hidden">
+                  {[...Array(19)].map((_, i) => (
+                    <option key={i + 6} value={i + 6}>{i + 6} months</option>
+                  ))}
+                </select>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recipe Category Filters */}
+          <div className="flex gap-2 overflow-x-auto pb-2 -mx-6 px-6">
+            <button
+              onClick={() => setRecipeCategory('all')}
+              className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
+                recipeCategory === 'all'
+                  ? 'bg-orange-500 text-white'
+                  : 'bg-white text-slate-600 shadow-sm'
+              }`}
+            >
+              All ({filteredRecipes.length})
+            </button>
+            {getRecipeCategories().map((cat) => (
+              <button
+                key={cat.name}
+                onClick={() => setRecipeCategory(cat.name)}
+                className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors flex items-center gap-1 ${
+                  recipeCategory === cat.name
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-white text-slate-600 shadow-sm'
+                }`}
+              >
+                {cat.emoji} {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          {/* Recipe Grid */}
+          <div className="space-y-3">
+            {filteredRecipes.length === 0 ? (
+              <Card className="border-none shadow-sm">
+                <CardContent className="p-6 text-center">
+                  <p className="text-slate-500">No recipes available for {babyAge} months yet.</p>
+                  <p className="text-slate-400 text-sm mt-1">Try selecting an older age range.</p>
+                </CardContent>
+              </Card>
+            ) : (
+              filteredRecipes.map((recipe) => (
+                <button
+                  key={recipe.id}
+                  onClick={() => setSelectedRecipe(recipe)}
+                  className="w-full bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow text-left flex"
+                >
+                  <div className="w-28 h-28 flex-shrink-0 overflow-hidden">
                     <img 
-                      src={food.image} 
-                      alt={food.name}
+                      src={recipe.image} 
+                      alt={recipe.name}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800';
+                      }}
                     />
                   </div>
-                  <p className="p-2 text-xs text-slate-700 truncate">{food.name}</p>
+                  <div className="flex-1 p-3 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-lg">{recipe.emoji}</span>
+                        <h3 className="font-medium text-slate-800 text-sm line-clamp-1">{recipe.name}</h3>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                        <span className="bg-slate-100 px-2 py-0.5 rounded capitalize">{recipe.category}</span>
+                        <span>{recipe.ageRange}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 mt-2 text-xs text-slate-400">
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {recipe.prepTime + recipe.cookTime} min
+                      </span>
+                      {recipe.freezable && (
+                        <span className="flex items-center gap-1 text-blue-500">
+                          <Snowflake className="h-3 w-3" />
+                          Freezable
+                        </span>
+                      )}
+                      {savedRecipes.includes(recipe.id) && (
+                        <BookmarkCheck className="h-4 w-4 text-orange-500 fill-orange-500" />
+                      )}
+                    </div>
+                  </div>
                 </button>
-              );
-            })}
+              ))
+            )}
           </div>
-        )}
 
-        {/* Quick Info Cards */}
-        <div className="grid grid-cols-2 gap-3 pt-4">
-          <Card className="border-none shadow-sm bg-rose-50">
-            <CardContent className="p-4">
-              <AlertTriangle className="h-6 w-6 text-rose-500 mb-2" />
-              <h3 className="font-semibold text-rose-800 text-sm">Choking Hazards</h3>
-              <p className="text-rose-600 text-xs mt-1">
-                Always quarter grapes, cherry tomatoes & blueberries lengthways
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card className="border-none shadow-sm bg-blue-50">
-            <CardContent className="p-4">
-              <Info className="h-6 w-6 text-blue-500 mb-2" />
-              <h3 className="font-semibold text-blue-800 text-sm">Allergens</h3>
-              <p className="text-blue-600 text-xs mt-1">
-                Introduce top allergens early (around 6mo) to reduce allergy risk
-              </p>
-            </CardContent>
-          </Card>
+          {/* Recipe Count */}
+          <p className="text-center text-xs text-slate-400 pt-2">
+            {filteredRecipes.length} recipe{filteredRecipes.length !== 1 ? 's' : ''} available for {babyAge}+ months
+          </p>
         </div>
-
-        {/* Age Reminder */}
-        <Card className="border-none shadow-sm bg-amber-50">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-amber-800">Baby's age</p>
-                <p className="text-2xl font-bold text-amber-600">{babyAge} months</p>
-              </div>
-              <select
-                value={babyAge}
-                onChange={(e) => {
-                  const age = parseInt(e.target.value);
-                  setBabyAge(age);
-                  localStorage.setItem(BABY_AGE_KEY, age.toString());
-                }}
-                className="bg-white border border-amber-200 rounded-lg px-3 py-2 text-amber-700"
-              >
-                {[...Array(19)].map((_, i) => (
-                  <option key={i + 6} value={i + 6}>{i + 6} months</option>
-                ))}
-              </select>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      )}
     </div>
   );
 };
