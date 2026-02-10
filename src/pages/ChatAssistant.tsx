@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Clock, Trash2, Plus, MessageSquare, X, Bookmark, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { getSleepContext } from '@/utils/chatIntegration';
+import { getSleepContext, clearUnread } from '@/utils/chatIntegration';
 
 interface Message {
   id: string;
@@ -95,6 +95,11 @@ const ChatAssistant = () => {
       console.error('Failed to save conversations:', e);
     }
   }, [conversations]);
+
+  // Clear unread count when chat is opened
+  useEffect(() => {
+    clearUnread();
+  }, []);
 
   useEffect(() => {
     scrollToBottom();

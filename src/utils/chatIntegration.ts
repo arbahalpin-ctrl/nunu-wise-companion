@@ -3,6 +3,7 @@
 const CONVERSATIONS_KEY = 'nunu-conversations';
 const ASSESSMENT_KEY = 'nunu-sleep-assessment';
 const PROGRAM_KEY = 'nunu-sleep-program';
+const UNREAD_KEY = 'nunu-chat-unread';
 
 interface Message {
   id: string;
@@ -18,6 +19,43 @@ interface Conversation {
   createdAt: number;
   updatedAt: number;
 }
+
+/**
+ * Get unread message count
+ */
+export const getUnreadCount = (): number => {
+  try {
+    return parseInt(localStorage.getItem(UNREAD_KEY) || '0', 10);
+  } catch {
+    return 0;
+  }
+};
+
+/**
+ * Increment unread count (called when Nunu sends unprompted message)
+ */
+export const incrementUnread = (): void => {
+  try {
+    const current = getUnreadCount();
+    localStorage.setItem(UNREAD_KEY, String(current + 1));
+    // Dispatch event so Navigation can update
+    window.dispatchEvent(new Event('nunu-unread-update'));
+  } catch (e) {
+    console.error('Failed to increment unread:', e);
+  }
+};
+
+/**
+ * Clear unread count (called when user opens chat)
+ */
+export const clearUnread = (): void => {
+  try {
+    localStorage.setItem(UNREAD_KEY, '0');
+    window.dispatchEvent(new Event('nunu-unread-update'));
+  } catch (e) {
+    console.error('Failed to clear unread:', e);
+  }
+};
 
 const METHOD_NAMES: Record<string, string> = {
   fading: 'Gentle Fading',
@@ -155,6 +193,9 @@ const injectAssistantMessage = (content: string, titleSuffix?: string): void => 
     }
 
     localStorage.setItem(CONVERSATIONS_KEY, JSON.stringify(conversations));
+    
+    // Increment unread count for unprompted messages
+    incrementUnread();
   } catch (e) {
     console.error('Failed to inject message:', e);
   }
