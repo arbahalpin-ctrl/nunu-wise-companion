@@ -336,7 +336,7 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
   
   // Send morning follow-up message (once per day)
   useEffect(() => {
-    if (shouldPromptCheckIn && !morningMessageSent) {
+    if (shouldPromptCheckIn && !morningMessageSent && programData && assessment) {
       // Check if it's actually morning (6am - 11am)
       const hour = new Date().getHours();
       if (hour >= 6 && hour < 12) {
@@ -344,7 +344,7 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
         setMorningMessageSent(true);
       }
     }
-  }, [shouldPromptCheckIn, morningMessageSent, assessment.babyName, programData.currentNight]);
+  }, [shouldPromptCheckIn, morningMessageSent, assessment, programData]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white pb-24">
