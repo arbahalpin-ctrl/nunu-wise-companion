@@ -9,18 +9,12 @@ const BABY_AGE_KEY = 'nunu-baby-age-months';
 
 type AgeGroup = '6' | '7-8' | '9-12' | '12+';
 
-// Available cutting guide SVGs
-const CUTTING_GUIDES: Record<string, string[]> = {
-  'banana': ['6', '9-12'],
-  'avocado': ['6'],
-  'broccoli': ['6'],
-  'grapes': ['6'],
-};
+// Foods with cutting guide infographics
+const FOODS_WITH_GUIDES = ['banana', 'avocado', 'broccoli', 'grapes', 'carrot'];
 
-// Cutting Guide Component
-const CuttingGuide = ({ foodId, age }: { foodId: string; age: AgeGroup }) => {
-  const ageKey = age === '12+' ? '12plus' : age;
-  const hasGuide = CUTTING_GUIDES[foodId]?.includes(age);
+// Cutting Guide Component - shows single infographic per food
+const CuttingGuide = ({ foodId }: { foodId: string }) => {
+  const hasGuide = FOODS_WITH_GUIDES.includes(foodId);
   
   if (!hasGuide) {
     return (
@@ -33,11 +27,11 @@ const CuttingGuide = ({ foodId, age }: { foodId: string; age: AgeGroup }) => {
   }
   
   return (
-    <div className="mt-4 bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+    <div className="mt-4 bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden">
       <img 
-        src={`/food-guides/${foodId}-${ageKey}.svg`}
-        alt={`How to cut ${foodId} for ${age} month old`}
-        className="w-full h-48 object-contain p-4"
+        src={`/food-guides/${foodId}.svg`}
+        alt={`How to cut ${foodId} for babies`}
+        className="w-full object-contain"
       />
     </div>
   );
@@ -201,7 +195,7 @@ const Weaning = () => {
           </Card>
 
           {/* Visual Cutting Guide */}
-          <CuttingGuide foodId={selectedFood.id} age={selectedAge} />
+          <CuttingGuide foodId={selectedFood.id} />
 
           {/* Tips */}
           <div className="mt-6">
