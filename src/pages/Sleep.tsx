@@ -1,11 +1,50 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, Component } from 'react';
 import SleepAssessment, { SleepAssessmentData } from '@/components/SleepAssessment';
 import SleepPlan from '@/components/SleepPlan';
 import SleepProgram from '@/components/SleepProgram';
 import { injectSleepProgramStartMessage } from '@/utils/chatIntegration';
+import { Button } from '@/components/ui/button';
 
 const ASSESSMENT_STORAGE_KEY = 'nunu-sleep-assessment';
 const PROGRAM_STORAGE_KEY = 'nunu-sleep-program';
+
+// Error boundary wrapper
+class SleepErrorBoundary extends Component<
+  { children: React.ReactNode; onReset: () => void },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode; onReset: () => void }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white flex items-center justify-center p-6">
+          <div className="text-center">
+            <p className="text-lg font-medium text-slate-800 mb-2">Something went wrong</p>
+            <p className="text-sm text-slate-500 mb-4">Let's reset and start fresh</p>
+            <Button
+              onClick={() => {
+                this.props.onReset();
+                this.setState({ hasError: false });
+              }}
+              className="bg-indigo-600 hover:bg-indigo-700"
+            >
+              Reset Sleep Data
+            </Button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 interface SleepProps {
   onTabChange?: (tab: string) => void;
@@ -101,51 +140,59 @@ const Sleep = ({ onTabChange }: SleepProps) => {
   };
 
   // Render based on current stage
-  if (stage === 'assessment') {
+  const renderContent = () => {
+    if (stage === 'assessment') {
+      return (
+        <SleepAssessment 
+          onComplete={handleAssessmentComplete}
+          onSkip={() => {
+            // If they have an existing assessment, go back to their plan/program
+            if (assessment) {
+              const savedProgram = localStorage.getItem(PROGRAM_STORAGE_KEY);
+              if (savedProgram) {
+                setStage('program');
+              } else {
+                setStage('plan');
+              }
+            }
+          }}
+        />
+      );
+    }
+
+    if (stage === 'plan' && assessment) {
+      return (
+        <SleepPlan 
+          assessment={assessment}
+          onStartProgram={handleStartProgram}
+          onEditAssessment={handleEditAssessment}
+          onOpenChat={handleOpenChat}
+        />
+      );
+    }
+
+    if (stage === 'program' && assessment) {
+      return (
+        <SleepProgram 
+          assessment={assessment}
+          onOpenChat={handleOpenChat}
+          onResetProgram={handleResetProgram}
+        />
+      );
+    }
+
+    // Fallback - shouldn't normally reach here
     return (
       <SleepAssessment 
         onComplete={handleAssessmentComplete}
-        onSkip={() => {
-          // If they have an existing assessment, go back to their plan/program
-          if (assessment) {
-            const savedProgram = localStorage.getItem(PROGRAM_STORAGE_KEY);
-            if (savedProgram) {
-              setStage('program');
-            } else {
-              setStage('plan');
-            }
-          }
-        }}
       />
     );
-  }
+  };
 
-  if (stage === 'plan' && assessment) {
-    return (
-      <SleepPlan 
-        assessment={assessment}
-        onStartProgram={handleStartProgram}
-        onEditAssessment={handleEditAssessment}
-        onOpenChat={handleOpenChat}
-      />
-    );
-  }
-
-  if (stage === 'program' && assessment) {
-    return (
-      <SleepProgram 
-        assessment={assessment}
-        onOpenChat={handleOpenChat}
-        onResetProgram={handleResetProgram}
-      />
-    );
-  }
-
-  // Fallback - shouldn't normally reach here
   return (
-    <SleepAssessment 
-      onComplete={handleAssessmentComplete}
-    />
+    <SleepErrorBoundary onReset={handleResetProgram}>
+      {renderContent()}
+    </SleepErrorBoundary>
   );
 };
 
