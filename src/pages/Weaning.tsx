@@ -315,33 +315,27 @@ const Weaning = () => {
           </button>
         </div>
 
-        {/* Recipe Image */}
-        <div className="relative h-56 w-full overflow-hidden">
-          <img 
-            src={selectedRecipe.image} 
-            alt={selectedRecipe.name}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800';
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          <div className="absolute bottom-4 left-4 right-4">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full capitalize">
-                {selectedRecipe.category}
-              </span>
-              <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
-                {selectedRecipe.ageRange} months
-              </span>
-              {selectedRecipe.freezable && (
-                <span className="bg-blue-500/80 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                  <Snowflake className="h-3 w-3" />
-                  Freezable
+        {/* Recipe Header */}
+        <div className="bg-gradient-to-br from-orange-500 to-amber-500 p-6 pt-4">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-5xl">{selectedRecipe.emoji}</span>
+            <div>
+              <h1 className="text-2xl font-bold text-white">{selectedRecipe.name}</h1>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full capitalize">
+                  {selectedRecipe.category}
                 </span>
-              )}
+                <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
+                  {selectedRecipe.ageRange} months
+                </span>
+                {selectedRecipe.freezable && (
+                  <span className="bg-blue-500/80 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                    <Snowflake className="h-3 w-3" />
+                    Freezable
+                  </span>
+                )}
+              </div>
             </div>
-            <h1 className="text-2xl font-bold text-white">{selectedRecipe.name}</h1>
           </div>
         </div>
 
@@ -716,43 +710,31 @@ const Weaning = () => {
                 <button
                   key={recipe.id}
                   onClick={() => setSelectedRecipe(recipe)}
-                  className="w-full bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow text-left flex"
+                  className="w-full bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow text-left p-4"
                 >
-                  <div className="w-28 h-28 flex-shrink-0 overflow-hidden">
-                    <img 
-                      src={recipe.image} 
-                      alt={recipe.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800';
-                      }}
-                    />
-                  </div>
-                  <div className="flex-1 p-3 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-lg">{recipe.emoji}</span>
-                        <h3 className="font-medium text-slate-800 text-sm line-clamp-1">{recipe.name}</h3>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <div className="flex items-start gap-3">
+                    <span className="text-3xl">{recipe.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-slate-800 text-sm line-clamp-1">{recipe.name}</h3>
+                      <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
                         <span className="bg-slate-100 px-2 py-0.5 rounded capitalize">{recipe.category}</span>
                         <span>{recipe.ageRange}</span>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-slate-400">
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {recipe.prepTime + recipe.cookTime} min
-                      </span>
-                      {recipe.freezable && (
-                        <span className="flex items-center gap-1 text-blue-500">
-                          <Snowflake className="h-3 w-3" />
-                          Freezable
+                      <div className="flex items-center gap-3 mt-2 text-xs text-slate-400">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {recipe.prepTime + recipe.cookTime} min
                         </span>
-                      )}
-                      {savedRecipes.includes(recipe.id) && (
-                        <BookmarkCheck className="h-4 w-4 text-orange-500 fill-orange-500" />
-                      )}
+                        {recipe.freezable && (
+                          <span className="flex items-center gap-1 text-blue-500">
+                            <Snowflake className="h-3 w-3" />
+                            Freezable
+                          </span>
+                        )}
+                        {savedRecipes.includes(recipe.id) && (
+                          <BookmarkCheck className="h-4 w-4 text-orange-500 fill-orange-500" />
+                        )}
+                      </div>
                     </div>
                   </div>
                 </button>
