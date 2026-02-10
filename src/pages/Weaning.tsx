@@ -1,1032 +1,464 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
-import { Search, ChevronRight, X, Clock, AlertTriangle, Check, Baby, Filter, Star, Flame, Bookmark, Trash2, MessageSquare, Send, Bot } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, X, AlertTriangle, ChevronLeft, Star, Clock, Bookmark, BookmarkCheck, Info } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { foods, Food } from '@/data/foods';
 
-const SAVED_RECIPES_KEY = 'nunu-saved-recipes';
-const WEANING_CHAT_KEY = 'nunu-weaning-chat';
+const SAVED_FOODS_KEY = 'nunu-saved-foods';
+const BABY_AGE_KEY = 'nunu-baby-age-months';
 
-interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: string;
-}
-
-interface SavedRecipe {
-  id: string;
-  content: string;
-  savedAt: number;
-  conversationTitle: string;
-}
-
-interface Recipe {
-  id: string;
-  name: string;
-  emoji: string;
-  image?: string;
-  ageFrom: number;
-  prepTime: string;
-  cookTime?: string;
-  servings?: string;
-  category: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'dessert';
-  tags: string[];
-  ingredients: string[];
-  instructions: string[];
-  tips?: string;
-  nutrition?: string;
-  freezable?: boolean;
-  popular?: boolean;
-}
-
-// Extensive recipe database
-const recipes: Recipe[] = [
-  // BREAKFAST
-  {
-    id: 'banana-pancakes', name: 'Banana Pancakes', emoji: '🥞',
-    ageFrom: 6, prepTime: '5 mins', cookTime: '10 mins', category: 'breakfast',
-    tags: ['egg-free option', 'freezable', 'quick'], popular: true, freezable: true,
-    ingredients: ['1 ripe banana', '1 egg', '2 tbsp oats (optional)', 'Pinch of cinnamon'],
-    instructions: ['Mash banana until smooth', 'Beat in egg', 'Add oats if using', 'Cook small spoonfuls 2-3 mins each side'],
-    tips: 'No added sugar needed! Freeze extras between parchment.'
-  },
-  {
-    id: 'egg-muffins', name: 'Veggie Egg Muffins', emoji: '🧁',
-    ageFrom: 6, prepTime: '10 mins', cookTime: '15 mins', servings: '12 mini muffins', category: 'breakfast',
-    tags: ['meal prep', 'freezable', 'protein'], popular: true, freezable: true,
-    ingredients: ['4 eggs', '2 tbsp milk', 'Handful spinach, chopped', '2 tbsp cheese', '1/4 red pepper, diced'],
-    instructions: ['Preheat oven 180°C', 'Whisk eggs and milk', 'Stir in veggies and cheese', 'Pour into greased mini muffin tin', 'Bake 12-15 mins'],
-    tips: 'Freeze for up to 3 months. Reheat from frozen 30 secs.'
-  },
-  {
-    id: 'overnight-oats', name: 'Baby Overnight Oats', emoji: '🥣',
-    ageFrom: 6, prepTime: '5 mins', category: 'breakfast',
-    tags: ['no-cook', 'meal prep', 'dairy'],
-    ingredients: ['3 tbsp oats', '4 tbsp milk/formula', '1 tbsp yogurt', 'Mashed fruit of choice'],
-    instructions: ['Mix oats, milk, yogurt in jar', 'Add mashed fruit', 'Refrigerate overnight', 'Serve cold or warm slightly'],
-    tips: 'Prep 3-4 days worth at once!'
-  },
-  {
-    id: 'french-toast', name: 'Baby French Toast Sticks', emoji: '🍞',
-    ageFrom: 7, prepTime: '5 mins', cookTime: '10 mins', category: 'breakfast',
-    tags: ['finger food', 'egg'], freezable: true,
-    ingredients: ['1 egg', '2 tbsp milk', 'Pinch cinnamon', '1 slice bread'],
-    instructions: ['Whisk egg, milk, cinnamon', 'Cut bread into strips', 'Dip in egg mixture', 'Pan fry until golden, 2-3 mins each side'],
-    tips: 'Use whole grain bread for extra fiber.'
-  },
-  {
-    id: 'chia-pudding', name: 'Chia Pudding', emoji: '🫐',
-    ageFrom: 8, prepTime: '5 mins', category: 'breakfast',
-    tags: ['no-cook', 'dairy-free option', 'omega-3'],
-    ingredients: ['2 tbsp chia seeds', '1/2 cup milk', 'Mashed banana or berries'],
-    instructions: ['Mix chia seeds and milk', 'Stir well to prevent clumps', 'Refrigerate 4 hours or overnight', 'Top with fruit before serving'],
-    tips: 'Texture may need getting used to - blend if baby prefers smooth.'
-  },
-  // LUNCH
-  {
-    id: 'avo-toast', name: 'Loaded Avo Toast', emoji: '🥑',
-    ageFrom: 6, prepTime: '5 mins', category: 'lunch',
-    tags: ['quick', 'finger food', 'healthy fats'], popular: true,
-    ingredients: ['1 slice bread', '1/4 avocado', 'Toppings: egg, cheese, hemp seeds'],
-    instructions: ['Toast bread lightly', 'Mash and spread avocado', 'Add toppings of choice', 'Cut into finger strips'],
-    tips: 'Sprinkle hemp seeds for extra omega-3 and grip.'
-  },
-  {
-    id: 'quesadilla', name: 'Baby Quesadilla', emoji: '🧀',
-    ageFrom: 7, prepTime: '5 mins', cookTime: '5 mins', category: 'lunch',
-    tags: ['quick', 'cheese', 'customizable'], popular: true,
-    ingredients: ['1 tortilla', 'Grated cheese', 'Optional: beans, avocado, chicken'],
-    instructions: ['Sprinkle cheese on half tortilla', 'Add any fillings', 'Fold in half', 'Pan fry 2 mins each side until golden', 'Cool and cut into strips'],
-    tips: 'Great way to use up leftovers!'
-  },
-  {
-    id: 'pasta-pesto', name: 'Pesto Pasta', emoji: '🍝',
-    ageFrom: 6, prepTime: '5 mins', cookTime: '15 mins', category: 'lunch',
-    tags: ['quick', 'batch cook', 'freezable'], freezable: true,
-    ingredients: ['Pasta shapes', '2 tbsp pesto (low salt)', 'Grated cheese', 'Optional: peas, chicken'],
-    instructions: ['Cook pasta very soft', 'Drain and toss with pesto', 'Add cheese and any extras', 'Serve warm or cold'],
-    tips: 'Make your own pesto to control salt. Basil + olive oil + parmesan.'
-  },
-  {
-    id: 'veggie-fingers', name: 'Veggie Fritters', emoji: '🥕',
-    ageFrom: 6, prepTime: '10 mins', cookTime: '20 mins', category: 'lunch',
-    tags: ['hidden veg', 'freezable', 'batch cook'], popular: true, freezable: true,
-    ingredients: ['1 courgette, grated', '1 carrot, grated', '1 egg', '3 tbsp flour', 'Optional: cheese'],
-    instructions: ['Grate veg, squeeze out water', 'Mix with egg, flour, cheese', 'Form into finger shapes', 'Bake 180°C 20 mins, flip halfway'],
-    tips: 'Squeeze veg really well or they will be soggy!'
-  },
-  {
-    id: 'mini-meatballs', name: 'Mini Meatballs', emoji: '🧆',
-    ageFrom: 6, prepTime: '15 mins', cookTime: '15 mins', servings: '20 meatballs', category: 'lunch',
-    tags: ['protein', 'iron', 'freezable', 'batch cook'], popular: true, freezable: true,
-    ingredients: ['250g beef or lamb mince', '1 grated courgette', '1 egg', '2 tbsp breadcrumbs', 'Herbs'],
-    instructions: ['Mix all ingredients', 'Roll into small balls', 'Bake 180°C 15 mins', 'Ensure cooked through'],
-    tips: 'Freeze raw or cooked. Great iron source!'
-  },
-  {
-    id: 'hummus-wrap', name: 'Hummus Veggie Wrap', emoji: '🌯',
-    ageFrom: 8, prepTime: '5 mins', category: 'lunch',
-    tags: ['no-cook', 'quick', 'plant protein'],
-    ingredients: ['1 tortilla', '2 tbsp hummus', 'Cucumber strips', 'Grated carrot', 'Avocado'],
-    instructions: ['Spread hummus on tortilla', 'Add veggies in a line', 'Roll up tightly', 'Cut into pinwheels or strips'],
-    tips: 'Make your own hummus for lower salt.'
-  },
-  {
-    id: 'salmon-cakes', name: 'Salmon Fish Cakes', emoji: '🐟',
-    ageFrom: 7, prepTime: '15 mins', cookTime: '10 mins', category: 'lunch',
-    tags: ['omega-3', 'protein', 'freezable'], freezable: true,
-    ingredients: ['1 tin salmon, drained', '1 small potato, mashed', '1 egg', 'Fresh dill or parsley'],
-    instructions: ['Flake salmon, remove any bones', 'Mix with mashed potato, egg, herbs', 'Form into small patties', 'Pan fry 4-5 mins each side'],
-    tips: 'Check thoroughly for bones! Tinned salmon is fine.'
-  },
-  // DINNER
-  {
-    id: 'hidden-veg-sauce', name: 'Hidden Veggie Pasta Sauce', emoji: '🍅',
-    ageFrom: 6, prepTime: '10 mins', cookTime: '25 mins', category: 'dinner',
-    tags: ['hidden veg', 'batch cook', 'freezable'], popular: true, freezable: true,
-    ingredients: ['1 tin tomatoes', '1 carrot', '1 courgette', '1 red pepper', 'Garlic, olive oil, basil'],
-    instructions: ['Sauté garlic 1 min', 'Add grated/diced veg, cook 5 mins', 'Add tomatoes and basil', 'Simmer 15 mins', 'Blend smooth'],
-    tips: 'Make big batch and freeze in portions.'
-  },
-  {
-    id: 'chicken-strips', name: 'Tender Chicken Strips', emoji: '🍗',
-    ageFrom: 6, prepTime: '10 mins', cookTime: '25 mins', category: 'dinner',
-    tags: ['protein', 'finger food', 'freezable'], freezable: true,
-    ingredients: ['1 chicken breast', 'Olive oil', 'Pinch herbs', '2 tbsp breadcrumbs (optional)'],
-    instructions: ['Cut chicken into strips', 'Coat in oil and herbs', 'Bake 190°C 20-25 mins', 'Ensure cooked through, shred for young babies'],
-    tips: 'Don\'t overcook or it gets dry. Poach in stock for extra moisture.'
-  },
-  {
-    id: 'lentil-dal', name: 'Baby Dal', emoji: '🍛',
-    ageFrom: 6, prepTime: '5 mins', cookTime: '25 mins', category: 'dinner',
-    tags: ['plant protein', 'iron', 'freezable', 'vegan'], freezable: true,
-    ingredients: ['1 cup red lentils', '2 cups water/stock', '1 tsp mild curry spices', 'Coconut milk splash'],
-    instructions: ['Rinse lentils', 'Simmer with water and spices 20-25 mins', 'Stir in coconut milk', 'Mash slightly or blend', 'Serve with rice'],
-    tips: 'Babies can have spices! Start mild and increase.'
-  },
-  {
-    id: 'shepherds-pie', name: 'Mini Shepherd\'s Pie', emoji: '🥧',
-    ageFrom: 7, prepTime: '15 mins', cookTime: '30 mins', category: 'dinner',
-    tags: ['comfort food', 'iron', 'freezable', 'one-pot'], freezable: true,
-    ingredients: ['200g lamb mince', '1 carrot, diced', 'Peas', 'Gravy/stock', 'Mashed potato topping'],
-    instructions: ['Brown mince, add veg', 'Add stock, simmer 15 mins', 'Transfer to dish, top with mash', 'Bake 180°C 15 mins until golden'],
-    tips: 'Make in muffin tin for individual portions.'
-  },
-  {
-    id: 'risotto', name: 'Baby Risotto', emoji: '🍚',
-    ageFrom: 7, prepTime: '5 mins', cookTime: '25 mins', category: 'dinner',
-    tags: ['one-pot', 'comfort food', 'customizable'],
-    ingredients: ['1/2 cup risotto rice', '1.5 cups low salt stock', 'Butter', 'Parmesan', 'Peas or veg'],
-    instructions: ['Toast rice in butter 1 min', 'Add stock gradually, stirring', 'Cook until creamy, ~20 mins', 'Stir in cheese and veg'],
-    tips: 'Naturally soft and easy to eat. Add any veg!'
-  },
-  {
-    id: 'fish-pie', name: 'Easy Fish Pie', emoji: '🐠',
-    ageFrom: 7, prepTime: '15 mins', cookTime: '25 mins', category: 'dinner',
-    tags: ['omega-3', 'comfort food', 'freezable'], freezable: true,
-    ingredients: ['White fish fillet', 'Salmon fillet', 'Peas', 'White sauce', 'Mashed potato'],
-    instructions: ['Poach fish in milk 8 mins', 'Flake fish, check for bones', 'Mix with peas and white sauce', 'Top with mash', 'Bake 180°C 15 mins'],
-    tips: 'Use any fish. Batch cook and freeze portions.'
-  },
-  {
-    id: 'mild-curry', name: 'Baby-Friendly Curry', emoji: '🍛',
-    ageFrom: 8, prepTime: '10 mins', cookTime: '25 mins', category: 'dinner',
-    tags: ['one-pot', 'spices', 'family meal'],
-    ingredients: ['Chicken or chickpeas', 'Coconut milk', 'Tomatoes', 'Mild curry powder', 'Veg of choice'],
-    instructions: ['Cook protein/chickpeas', 'Add veg, cook 5 mins', 'Add coconut milk, tomatoes, spices', 'Simmer 15 mins', 'Serve with rice'],
-    tips: 'Babies can handle spices! Just avoid chili heat.'
-  },
-  // SNACKS
-  {
-    id: 'energy-balls', name: 'No-Bake Energy Balls', emoji: '⚡',
-    ageFrom: 8, prepTime: '10 mins', category: 'snack',
-    tags: ['no-cook', 'healthy', 'nut-free option'], popular: true,
-    ingredients: ['1 cup oats', '1/2 cup nut/seed butter', '2 tbsp honey', 'Optional: coconut, choc chips'],
-    instructions: ['Mix all ingredients', 'Roll into small balls', 'Refrigerate 30 mins', 'Store in fridge up to 1 week'],
-    tips: 'Use sunflower seed butter for nut-free.'
-  },
-  {
-    id: 'fruit-lollies', name: 'Fruit Yogurt Lollies', emoji: '🍦',
-    ageFrom: 6, prepTime: '5 mins', category: 'snack',
-    tags: ['frozen', 'teething', 'no sugar'],
-    ingredients: ['1/2 cup yogurt', '1/2 cup fruit puree or mashed fruit'],
-    instructions: ['Mix yogurt and fruit', 'Pour into lolly moulds', 'Freeze 4+ hours', 'Run under warm water to release'],
-    tips: 'Great for teething! Use breast milk for younger babies.'
-  },
-  {
-    id: 'cheese-crackers', name: 'Homemade Cheese Crackers', emoji: '🧀',
-    ageFrom: 8, prepTime: '10 mins', cookTime: '12 mins', category: 'snack',
-    tags: ['baked', 'finger food'],
-    ingredients: ['100g cheese, grated', '100g flour', '50g butter', 'Water to bind'],
-    instructions: ['Mix cheese, flour, butter', 'Add water to form dough', 'Roll thin, cut shapes', 'Bake 180°C 10-12 mins'],
-    tips: 'Much lower salt than shop crackers!'
-  },
-  {
-    id: 'banana-bread', name: 'Healthy Banana Bread', emoji: '🍌',
-    ageFrom: 6, prepTime: '10 mins', cookTime: '45 mins', category: 'snack',
-    tags: ['baked', 'no added sugar', 'freezable'], freezable: true,
-    ingredients: ['3 ripe bananas', '2 eggs', '2 cups oats (blended to flour)', '1 tsp baking powder', 'Cinnamon'],
-    instructions: ['Blend oats to flour', 'Mash bananas, mix in eggs', 'Add oat flour, baking powder, cinnamon', 'Bake 180°C 40-45 mins'],
-    tips: 'Slice and freeze for quick breakfasts!'
-  },
-  {
-    id: 'sweet-potato-toast', name: 'Sweet Potato Toast', emoji: '🍠',
-    ageFrom: 6, prepTime: '2 mins', cookTime: '10 mins', category: 'snack',
-    tags: ['grain-free', 'quick'],
-    ingredients: ['1 sweet potato', 'Toppings: nut butter, avocado, banana'],
-    instructions: ['Slice sweet potato lengthways, 1cm thick', 'Toast in toaster 2-3 cycles until soft', 'Top with favourite toppings'],
-    tips: 'Great bread alternative! Keeps for a few days.'
-  },
-  // DESSERT
-  {
-    id: 'baked-apple', name: 'Baked Cinnamon Apple', emoji: '🍎',
-    ageFrom: 6, prepTime: '5 mins', cookTime: '25 mins', category: 'dessert',
-    tags: ['no sugar', 'simple', 'warm'],
-    ingredients: ['1 apple', 'Butter', 'Cinnamon', 'Optional: oat crumble topping'],
-    instructions: ['Core apple, score skin', 'Fill with butter and cinnamon', 'Bake 180°C 25 mins until soft', 'Cool slightly before serving'],
-    tips: 'Naturally sweet dessert. Serve with yogurt.'
-  },
-  {
-    id: 'rice-pudding', name: 'Creamy Rice Pudding', emoji: '🍚',
-    ageFrom: 6, prepTime: '5 mins', cookTime: '30 mins', category: 'dessert',
-    tags: ['comfort food', 'dairy'],
-    ingredients: ['1/2 cup pudding rice', '2 cups milk', 'Vanilla', 'Cinnamon'],
-    instructions: ['Combine rice and milk in pan', 'Simmer 25-30 mins, stirring often', 'Add vanilla and cinnamon', 'Serve warm or cold'],
-    tips: 'Top with fruit puree for natural sweetness.'
-  }
-];
-
-const categoryEmojis: Record<string, string> = {
-  breakfast: '🍳', lunch: '🥪', dinner: '🍽️', snack: '🍪', dessert: '🍨'
-};
-
-const getInitialChatMessage = (): ChatMessage => ({
-  id: '1',
-  role: 'assistant',
-  content: "Hey! I'm here to help with weaning recipes. Tell me what ingredients you have, your baby's age, or any dietary needs — and I'll suggest something!",
-  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-});
+type AgeGroup = '6' | '7-8' | '9-12' | '12+';
 
 const Weaning = () => {
-  const [selectedFood, setSelectedFood] = useState<Food | null>(null);
-  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
-  const [selectedSavedRecipe, setSelectedSavedRecipe] = useState<SavedRecipe | null>(null);
-  const [activeTab, setActiveTab] = useState<'recipes' | 'foods' | 'saved' | 'chat'>('foods');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedMealType, setSelectedMealType] = useState<string>('all');
-  const [babyAge, setBabyAge] = useState<string>('6');
-  const [showFilters, setShowFilters] = useState(false);
-  const [savedRecipes, setSavedRecipes] = useState<SavedRecipe[]>([]);
-  
-  // Chat state
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(() => {
-    try {
-      const saved = localStorage.getItem(WEANING_CHAT_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch (e) {}
-    return [getInitialChatMessage()];
-  });
-  const [newMessage, setNewMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [savedMessageIds, setSavedMessageIds] = useState<Set<string>>(() => {
-    try {
-      const saved = localStorage.getItem(SAVED_RECIPES_KEY);
-      if (saved) {
-        const recipes: SavedRecipe[] = JSON.parse(saved);
-        return new Set(recipes.map(r => r.id));
-      }
-    } catch (e) {}
-    return new Set();
-  });
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [selectedFood, setSelectedFood] = useState<Food | null>(null);
+  const [selectedAge, setSelectedAge] = useState<AgeGroup>('6');
+  const [savedFoods, setSavedFoods] = useState<string[]>([]);
+  const [babyAge, setBabyAge] = useState<number>(6);
+  const [showSearch, setShowSearch] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
-  // Load saved recipes from localStorage
+  // Load saved data
   useEffect(() => {
-    const loadSavedRecipes = () => {
-      try {
-        const saved = localStorage.getItem(SAVED_RECIPES_KEY);
-        if (saved) {
-          setSavedRecipes(JSON.parse(saved));
-        }
-      } catch (e) {
-        console.error('Failed to load saved recipes:', e);
+    try {
+      const saved = localStorage.getItem(SAVED_FOODS_KEY);
+      if (saved) setSavedFoods(JSON.parse(saved));
+      
+      const age = localStorage.getItem(BABY_AGE_KEY);
+      if (age) {
+        const ageNum = parseInt(age);
+        setBabyAge(ageNum);
+        // Set default age group based on baby's age
+        if (ageNum < 7) setSelectedAge('6');
+        else if (ageNum < 9) setSelectedAge('7-8');
+        else if (ageNum < 12) setSelectedAge('9-12');
+        else setSelectedAge('12+');
       }
-    };
-    loadSavedRecipes();
-    // Listen for storage changes (in case saved from chat)
-    window.addEventListener('storage', loadSavedRecipes);
-    return () => window.removeEventListener('storage', loadSavedRecipes);
+    } catch (e) {
+      console.error('Failed to load saved data:', e);
+    }
   }, []);
 
-  const deleteSavedRecipe = (id: string) => {
-    try {
-      const updated = savedRecipes.filter(r => r.id !== id);
-      localStorage.setItem(SAVED_RECIPES_KEY, JSON.stringify(updated));
-      setSavedRecipes(updated);
-      setSelectedSavedRecipe(null);
-    } catch (e) {
-      console.error('Failed to delete recipe:', e);
-    }
-  };
-
-  // Save chat messages to localStorage
+  // Save favorites
   useEffect(() => {
-    try {
-      localStorage.setItem(WEANING_CHAT_KEY, JSON.stringify(chatMessages));
-    } catch (e) {
-      console.error('Failed to save chat:', e);
+    localStorage.setItem(SAVED_FOODS_KEY, JSON.stringify(savedFoods));
+  }, [savedFoods]);
+
+  const toggleSaved = (foodId: string) => {
+    setSavedFoods(prev => 
+      prev.includes(foodId) 
+        ? prev.filter(id => id !== foodId)
+        : [...prev, foodId]
+    );
+  };
+
+  const categories = ['All', ...new Set(foods.map(f => f.category))];
+
+  const filteredFoods = foods.filter(food => {
+    const matchesSearch = food.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          food.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || food.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  // Get featured food (rotates daily, or first saved, or random popular)
+  const getFeaturedFood = () => {
+    if (savedFoods.length > 0) {
+      return foods.find(f => f.id === savedFoods[0]);
     }
-  }, [chatMessages]);
+    const dayOfYear = Math.floor((new Date().getTime() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    return foods[dayOfYear % foods.length];
+  };
 
-  // Scroll to bottom when messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages]);
+  const featuredFood = getFeaturedFood();
 
-  const sendChatMessage = async () => {
-    if (!newMessage.trim() || isTyping) return;
+  // Food Detail View
+  if (selectedFood) {
+    const isSaved = savedFoods.includes(selectedFood.id);
     
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: newMessage.trim(),
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-    
-    const updatedMessages = [...chatMessages, userMessage];
-    setChatMessages(updatedMessages);
-    setNewMessage('');
-    setIsTyping(true);
-    
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [
-            { role: 'system', content: 'You are Nunu, a baby weaning and recipe expert. Focus on age-appropriate recipes, ingredients, and feeding tips. Give practical, easy recipes with clear ingredients and steps. Keep responses concise but helpful.' },
-            ...updatedMessages.map(m => ({ role: m.role, content: m.content }))
-          ]
-        }),
-      });
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white pb-24">
+        {/* Header */}
+        <div className="sticky top-0 bg-white/90 backdrop-blur-sm z-10 px-4 py-3 flex items-center justify-between border-b">
+          <button 
+            onClick={() => setSelectedFood(null)}
+            className="flex items-center text-slate-600"
+          >
+            <ChevronLeft className="h-5 w-5" />
+            <span>Back</span>
+          </button>
+          <button
+            onClick={() => toggleSaved(selectedFood.id)}
+            className="p-2"
+          >
+            {isSaved ? (
+              <BookmarkCheck className="h-6 w-6 text-amber-500 fill-amber-500" />
+            ) : (
+              <Bookmark className="h-6 w-6 text-slate-400" />
+            )}
+          </button>
+        </div>
 
-      const data = await response.json();
-      
-      if (!response.ok) throw new Error(data.error || 'Failed to get response');
-      
-      const aiMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: data.message,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      
-      setChatMessages([...updatedMessages, aiMessage]);
-    } catch (error) {
-      console.error('Chat error:', error);
-      const errorMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: "I'm having trouble connecting. Try again in a moment? 💛",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      setChatMessages([...updatedMessages, errorMessage]);
-    } finally {
-      setIsTyping(false);
-    }
-  };
+        {/* Food Image */}
+        <div className="relative h-64 w-full overflow-hidden">
+          <img 
+            src={selectedFood.image} 
+            alt={selectedFood.name}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800';
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+          <div className="absolute bottom-4 left-4 right-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
+                {selectedFood.category}
+              </span>
+              {selectedFood.allergen && (
+                <span className="bg-amber-500/80 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" />
+                  Allergen
+                </span>
+              )}
+            </div>
+            <h1 className="text-3xl font-bold text-white">{selectedFood.name}</h1>
+          </div>
+        </div>
 
-  const saveRecipeFromChat = (message: ChatMessage) => {
-    try {
-      const saved = localStorage.getItem(SAVED_RECIPES_KEY);
-      const recipes: SavedRecipe[] = saved ? JSON.parse(saved) : [];
-      
-      if (recipes.some(r => r.id === message.id)) return;
-      
-      const newRecipe: SavedRecipe = {
-        id: message.id,
-        content: message.content,
-        savedAt: Date.now(),
-        conversationTitle: 'Recipe Chat'
-      };
-      
-      const updated = [newRecipe, ...recipes];
-      localStorage.setItem(SAVED_RECIPES_KEY, JSON.stringify(updated));
-      setSavedRecipes(updated);
-      setSavedMessageIds(prev => new Set([...prev, message.id]));
-    } catch (e) {
-      console.error('Failed to save recipe:', e);
-    }
-  };
+        {/* Age Tabs */}
+        <div className="px-4 py-4 border-b bg-white sticky top-14 z-10">
+          <p className="text-sm text-slate-500 mb-2">How to serve at each age:</p>
+          <div className="flex gap-2">
+            {(['6', '7-8', '9-12', '12+'] as AgeGroup[]).map((age) => (
+              <button
+                key={age}
+                onClick={() => setSelectedAge(age)}
+                className={`flex-1 py-3 px-2 rounded-xl text-sm font-medium transition-all ${
+                  selectedAge === age
+                    ? 'bg-amber-500 text-white shadow-md'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {age === '12+' ? '12+ mo' : `${age} mo`}
+              </button>
+            ))}
+          </div>
+        </div>
 
-  const clearChat = () => {
-    setChatMessages([getInitialChatMessage()]);
-  };
+        {/* Serving Guide */}
+        <div className="px-4 py-6">
+          <Card className="border-none shadow-md bg-amber-50">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-3">
+                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-2xl">{selectedFood.emoji}</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-slate-800 mb-2">
+                    At {selectedAge === '12+' ? '12+ months' : `${selectedAge} months`}
+                  </h3>
+                  <p className="text-slate-700 leading-relaxed">
+                    {selectedFood.serving[selectedAge]}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-  // Filter recipes
-  const filteredRecipes = useMemo(() => {
-    return recipes.filter(recipe => {
-      const matchesSearch = recipe.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        recipe.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        recipe.ingredients.some(ing => ing.toLowerCase().includes(searchQuery.toLowerCase()));
-      const matchesMealType = selectedMealType === 'all' || recipe.category === selectedMealType;
-      const matchesAge = recipe.ageFrom <= parseInt(babyAge);
-      return matchesSearch && matchesMealType && matchesAge;
-    });
-  }, [searchQuery, selectedMealType, babyAge]);
+          {/* Visual Guide Placeholder */}
+          <div className="mt-4 p-4 border-2 border-dashed border-slate-200 rounded-xl text-center">
+            <p className="text-slate-400 text-sm">
+              📸 Visual cutting guide coming soon
+            </p>
+          </div>
 
-  // Filter foods
-  const filteredFoods = useMemo(() => {
-    return foods.filter(food => {
-      const matchesSearch = food.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategory === 'all' || food.category.toLowerCase() === selectedCategory.toLowerCase();
-      return matchesSearch && matchesCategory;
-    });
-  }, [searchQuery, selectedCategory]);
+          {/* Tips */}
+          <div className="mt-6">
+            <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
+              <Star className="h-5 w-5 text-amber-500" />
+              Tips
+            </h3>
+            <ul className="space-y-2">
+              {selectedFood.tips.map((tip, i) => (
+                <li key={i} className="flex items-start gap-2 text-slate-600">
+                  <span className="text-amber-400 mt-1">•</span>
+                  {tip}
+                </li>
+              ))}
+            </ul>
+          </div>
 
-  const foodCategories = ['all', ...new Set(foods.map(f => f.category))];
-  const mealTypes = ['all', 'breakfast', 'lunch', 'dinner', 'snack', 'dessert'];
+          {/* Warnings */}
+          {selectedFood.warnings && selectedFood.warnings.length > 0 && (
+            <Card className="mt-6 border-none shadow-md bg-rose-50">
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-rose-800 mb-2 flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5" />
+                  Important
+                </h3>
+                <ul className="space-y-2">
+                  {selectedFood.warnings.map((warning, i) => (
+                    <li key={i} className="text-rose-700 text-sm">
+                      {warning}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          )}
 
-  const getServingForAge = (food: Food): string => {
-    if (parseInt(babyAge) <= 6) return food.serving['6'];
-    if (parseInt(babyAge) <= 8) return food.serving['7-8'];
-    if (parseInt(babyAge) <= 12) return food.serving['9-12'];
-    return food.serving['12+'];
-  };
-
-  return (
-    <div className="pb-24 min-h-screen bg-gradient-to-b from-sky-50 to-white">
-      {/* Header */}
-      <div className="p-6 pb-3">
-        <h1 className="text-2xl font-bold text-slate-800">Weaning Guide</h1>
-        <p className="text-slate-500 mt-1">Foods, recipes & serving guides</p>
+          {/* Allergen Notice */}
+          {selectedFood.allergen && (
+            <Card className="mt-6 border-none shadow-md bg-blue-50">
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
+                  <Info className="h-5 w-5" />
+                  Allergen Information
+                </h3>
+                <p className="text-blue-700 text-sm">
+                  This is a common allergen. Introduce early (around 6 months) and continue serving 
+                  regularly. Watch for reactions and consult your doctor if you have concerns.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
+    );
+  }
 
-      {/* Search Bar - hide on chat/saved tabs */}
-      {(activeTab === 'recipes' || activeTab === 'foods') && (
-        <div className="px-6 mb-3">
+  // Search Results View
+  if (showSearch || searchQuery) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white pb-24">
+        {/* Search Header */}
+        <div className="sticky top-0 bg-white z-10 px-4 py-3 border-b shadow-sm">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
             <input
               type="text"
-              placeholder="Search foods or recipes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 focus:outline-none focus:border-slate-400"
+              placeholder="Search foods..."
+              className="w-full pl-10 pr-10 py-3 bg-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500"
+              autoFocus
             />
-          </div>
-        </div>
-      )}
-
-      {/* Age & Filter Row - hide on chat/saved tabs */}
-      {(activeTab === 'recipes' || activeTab === 'foods') && (
-        <div className="px-6 mb-3 flex gap-2">
-          <select 
-            value={babyAge}
-            onChange={(e) => setBabyAge(e.target.value)}
-            className="flex-1 p-3 bg-white border border-slate-200 rounded-xl text-slate-700 text-sm"
-          >
-            <option value="6">6 months</option>
-            <option value="7">7-8 months</option>
-            <option value="9">9-12 months</option>
-            <option value="13">12+ months</option>
-          </select>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`px-4 py-3 rounded-xl border flex items-center gap-2 text-sm ${
-              showFilters ? 'bg-slate-800 text-white border-slate-800' : 'bg-white border-slate-200 text-slate-600'
-            }`}
-          >
-            <Filter className="h-4 w-4" />
-            Filters
-          </button>
-        </div>
-      )}
-
-      {/* Expandable Filters */}
-      {showFilters && (activeTab === 'recipes' || activeTab === 'foods') && (
-        <div className="px-6 mb-3 space-y-2">
-          {activeTab === 'recipes' && (
-            <div className="flex gap-2 overflow-x-auto pb-1">
-              {mealTypes.map(type => (
-                <button
-                  key={type}
-                  onClick={() => setSelectedMealType(type)}
-                  className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
-                    selectedMealType === type 
-                      ? 'bg-slate-800 text-white' 
-                      : 'bg-white text-slate-600 border border-slate-200'
-                  }`}
-                >
-                  {type === 'all' ? 'All' : `${categoryEmojis[type]} ${type.charAt(0).toUpperCase() + type.slice(1)}`}
-                </button>
-              ))}
-            </div>
-          )}
-          {activeTab === 'foods' && (
-            <div className="flex gap-2 overflow-x-auto pb-1">
-              {foodCategories.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
-                    selectedCategory === cat 
-                      ? 'bg-slate-800 text-white' 
-                      : 'bg-white text-slate-600 border border-slate-200'
-                  }`}
-                >
-                  {cat === 'all' ? 'All Foods' : cat}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Tabs */}
-      <div className="px-6 mb-4">
-        <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
-          <button
-            onClick={() => setActiveTab('foods')}
-            className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === 'foods' ? 'bg-white shadow text-slate-800' : 'text-slate-500'
-            }`}
-          >
-            Foods
-          </button>
-          <button
-            onClick={() => setActiveTab('recipes')}
-            className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === 'recipes' ? 'bg-white shadow text-slate-800' : 'text-slate-500'
-            }`}
-          >
-            Recipes
-          </button>
-          <button
-            onClick={() => setActiveTab('chat')}
-            className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${
-              activeTab === 'chat' ? 'bg-white shadow text-slate-800' : 'text-slate-500'
-            }`}
-          >
-            <MessageSquare className="h-3.5 w-3.5" />
-            Ask
-          </button>
-          <button
-            onClick={() => setActiveTab('saved')}
-            className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${
-              activeTab === 'saved' ? 'bg-white shadow text-slate-800' : 'text-slate-500'
-            }`}
-          >
-            <Bookmark className="h-3.5 w-3.5" />
-            {savedRecipes.length > 0 && savedRecipes.length}
-          </button>
-        </div>
-      </div>
-
-      {/* Chat Tab */}
-      {activeTab === 'chat' && (
-        <div className="flex flex-col h-[calc(100vh-280px)]">
-          {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-2 space-y-3">
-            {chatMessages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex gap-2 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            {(searchQuery || showSearch) && (
+              <button
+                onClick={() => { setSearchQuery(''); setShowSearch(false); }}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2"
               >
-                {message.role === 'assistant' && (
-                  <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Bot className="h-4 w-4 text-white" />
-                  </div>
-                )}
-                
-                <div className={`
-                  max-w-[80%] rounded-2xl p-3
-                  ${message.role === 'user' 
-                    ? 'bg-slate-800 text-white' 
-                    : 'bg-white shadow-sm border border-slate-100'
-                  }
-                `}>
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                  <div className={`
-                    flex items-center justify-between mt-2
-                    ${message.role === 'user' ? 'text-slate-300' : 'text-slate-400'}
-                  `}>
-                    <span className="text-xs flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {message.timestamp}
-                    </span>
-                    {message.role === 'assistant' && message.id !== '1' && (
-                      <button
-                        onClick={() => saveRecipeFromChat(message)}
-                        className={`p-1.5 rounded-full transition-colors ${
-                          savedMessageIds.has(message.id)
-                            ? 'text-emerald-500 bg-emerald-50'
-                            : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
-                        }`}
-                        title={savedMessageIds.has(message.id) ? 'Saved!' : 'Save recipe'}
-                      >
-                        {savedMessageIds.has(message.id) ? (
-                          <Check className="h-3.5 w-3.5" />
-                        ) : (
-                          <Bookmark className="h-3.5 w-3.5" />
-                        )}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {isTyping && (
-              <div className="flex gap-2 justify-start">
-                <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot className="h-4 w-4 text-white" />
-                </div>
-                <div className="bg-white shadow-sm border border-slate-100 rounded-2xl p-3">
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-slate-300 rounded-full animate-pulse" />
-                    <div className="w-2 h-2 bg-slate-300 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
-                    <div className="w-2 h-2 bg-slate-300 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
-                  </div>
-                </div>
-              </div>
+                <X className="h-5 w-5 text-slate-400" />
+              </button>
             )}
-            
-            <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Prompts */}
-          {chatMessages.length <= 1 && (
-            <div className="px-4 py-2 border-t border-slate-100">
-              <div className="flex flex-wrap gap-2">
-                {['What can I make with banana?', 'Iron-rich recipes', 'Easy finger foods', 'Breakfast ideas'].map((prompt, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setNewMessage(prompt)}
-                    className="px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-full text-slate-600 hover:bg-slate-50"
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Chat Input */}
-          <div className="p-4 border-t border-slate-100 bg-white">
-            <div className="flex gap-2">
-              <Input
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Ask about recipes..."
-                className="rounded-full bg-slate-50 border-slate-200"
-                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendChatMessage())}
-                disabled={isTyping}
-              />
-              <Button 
-                onClick={sendChatMessage}
-                disabled={!newMessage.trim() || isTyping}
-                className="rounded-full w-12 h-10 p-0 bg-slate-800 hover:bg-slate-700"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Popular Section (Recipes only) */}
-      {activeTab === 'recipes' && !searchQuery && selectedMealType === 'all' && (
-        <div className="px-6 mb-4">
-          <h3 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
-            <Flame className="h-4 w-4 text-orange-500" /> Popular Recipes
-          </h3>
-          <div className="flex gap-3 overflow-x-auto pb-2">
-            {recipes.filter(r => r.popular && r.ageFrom <= parseInt(babyAge)).slice(0, 5).map(recipe => (
+          {/* Category Filter */}
+          <div className="flex gap-2 mt-3 overflow-x-auto pb-2 -mx-4 px-4">
+            {categories.map((cat) => (
               <button
-                key={recipe.id}
-                onClick={() => setSelectedRecipe(recipe)}
-                className="flex-shrink-0 w-32 bg-white rounded-xl p-3 shadow-sm border border-slate-100 text-center"
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
+                  selectedCategory === cat
+                    ? 'bg-amber-500 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
               >
-                <div className="text-3xl mb-1">{recipe.emoji}</div>
-                <p className="text-xs font-medium text-slate-700 truncate">{recipe.name}</p>
-                <p className="text-xs text-slate-400">{recipe.prepTime}</p>
+                {cat}
               </button>
             ))}
           </div>
         </div>
-      )}
 
-      {activeTab === 'recipes' && (
-        <div className="px-6 space-y-2">
-          {filteredRecipes.length === 0 ? (
-            <div className="text-center py-8 text-slate-500">
-              <p>No recipes found matching your filters</p>
-            </div>
-          ) : (
-            filteredRecipes.map(recipe => (
-              <button
-                key={recipe.id}
-                onClick={() => setSelectedRecipe(recipe)}
-                className="w-full bg-white rounded-xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-shadow text-left flex items-center gap-4"
-              >
-                <div className="text-4xl">{recipe.emoji}</div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium text-slate-800">{recipe.name}</p>
-                    {recipe.freezable && <span className="text-xs text-blue-500">❄️</span>}
-                  </div>
-                  <div className="flex items-center gap-3 mt-1 flex-wrap">
-                    <span className="text-xs text-slate-500 flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {recipe.prepTime}
-                    </span>
-                    <span className="text-xs text-slate-500 flex items-center gap-1">
-                      <Baby className="h-3 w-3" />
-                      {recipe.ageFrom}m+
-                    </span>
-                    <span className="text-xs px-2 py-0.5 bg-slate-100 rounded-full text-slate-500">
-                      {recipe.category}
-                    </span>
-                  </div>
-                </div>
-                <ChevronRight className="h-5 w-5 text-slate-400" />
-              </button>
-            ))
-          )}
-        </div>
-      )}
-
-      {activeTab === 'foods' && (
-        <div className="px-6 grid grid-cols-3 gap-3">
-          {filteredFoods.length === 0 ? (
-            <div className="col-span-3 text-center py-8 text-slate-500">
-              <p>No foods found matching your search</p>
-            </div>
-          ) : (
-            filteredFoods.map(food => (
+        {/* Results */}
+        <div className="px-4 py-4">
+          <p className="text-sm text-slate-500 mb-3">
+            {filteredFoods.length} food{filteredFoods.length !== 1 ? 's' : ''} found
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            {filteredFoods.map((food) => (
               <button
                 key={food.id}
                 onClick={() => setSelectedFood(food)}
-                className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-shadow text-center"
+                className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow text-left"
               >
-                <div className="text-3xl mb-2">{food.emoji}</div>
-                <p className="text-sm font-medium text-slate-700">{food.name}</p>
-                {food.allergen && (
-                  <span className="text-xs text-amber-600 mt-1 block">⚠️</span>
-                )}
+                <div className="h-24 overflow-hidden">
+                  <img 
+                    src={food.image} 
+                    alt={food.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800';
+                    }}
+                  />
+                </div>
+                <div className="p-3">
+                  <p className="font-medium text-slate-800 truncate">{food.name}</p>
+                  <p className="text-xs text-slate-400">{food.category}</p>
+                </div>
               </button>
-            ))
-          )}
+            ))}
+          </div>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {activeTab === 'saved' && (
-        <div className="px-6">
-          {savedRecipes.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Bookmark className="h-8 w-8 text-slate-400" />
+  // Main View - Featured Food + Search Button
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white pb-24">
+      {/* Header */}
+      <div className="p-6 pb-4">
+        <h1 className="text-2xl font-bold text-slate-800">Weaning Guide</h1>
+        <p className="text-slate-500 mt-1">Learn how to serve foods safely</p>
+      </div>
+
+      <div className="px-6 space-y-4">
+        {/* Search Button */}
+        <button
+          onClick={() => setShowSearch(true)}
+          className="w-full flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm border border-slate-200"
+        >
+          <Search className="h-5 w-5 text-slate-400" />
+          <span className="text-slate-400">Search all {foods.length} foods...</span>
+        </button>
+
+        {/* Quick Categories */}
+        <div className="flex gap-2 overflow-x-auto pb-2 -mx-6 px-6">
+          {categories.slice(1).map((cat) => (
+            <button
+              key={cat}
+              onClick={() => { setSelectedCategory(cat); setShowSearch(true); }}
+              className="px-4 py-2 bg-white rounded-full text-sm whitespace-nowrap shadow-sm border border-slate-100"
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Featured Food */}
+        {featuredFood && (
+          <div>
+            <h2 className="text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2">
+              <Star className="h-5 w-5 text-amber-500" />
+              {savedFoods.length > 0 ? 'Your Saved Foods' : "Today's Featured Food"}
+            </h2>
+            
+            <button
+              onClick={() => setSelectedFood(featuredFood)}
+              className="w-full bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow text-left"
+            >
+              <div className="relative h-48 overflow-hidden">
+                <img 
+                  src={featuredFood.image} 
+                  alt={featuredFood.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800';
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
+                    {featuredFood.category}
+                  </span>
+                  <h3 className="text-2xl font-bold text-white mt-2">{featuredFood.name}</h3>
+                </div>
+                {featuredFood.allergen && (
+                  <div className="absolute top-4 right-4 bg-amber-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                    <AlertTriangle className="h-3 w-3" />
+                    Allergen
+                  </div>
+                )}
               </div>
-              <h3 className="font-medium text-slate-700 mb-2">No saved recipes yet</h3>
-              <p className="text-sm text-slate-500 max-w-xs mx-auto">
-                Chat with Nunu about recipes and tap the bookmark icon to save your favourites here
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {savedRecipes.map(recipe => (
+              <div className="p-4">
+                <p className="text-slate-600 text-sm line-clamp-2">
+                  {featuredFood.serving['6']}
+                </p>
+                <p className="text-amber-600 text-sm font-medium mt-2">
+                  Tap to see full serving guide →
+                </p>
+              </div>
+            </button>
+          </div>
+        )}
+
+        {/* Saved Foods List */}
+        {savedFoods.length > 1 && (
+          <div className="grid grid-cols-3 gap-2">
+            {savedFoods.slice(1, 7).map(foodId => {
+              const food = foods.find(f => f.id === foodId);
+              if (!food) return null;
+              return (
                 <button
-                  key={recipe.id}
-                  onClick={() => setSelectedSavedRecipe(recipe)}
-                  className="w-full bg-white rounded-xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-shadow text-left"
+                  key={food.id}
+                  onClick={() => setSelectedFood(food)}
+                  className="bg-white rounded-xl overflow-hidden shadow-sm"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <MessageSquare className="h-5 w-5 text-slate-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-slate-700 line-clamp-2">{recipe.content.slice(0, 100)}...</p>
-                      <div className="flex items-center gap-2 mt-2 text-xs text-slate-400">
-                        <span>From: {recipe.conversationTitle}</span>
-                        <span>•</span>
-                        <span>{new Date(recipe.savedAt).toLocaleDateString()}</span>
-                      </div>
-                    </div>
-                    <ChevronRight className="h-5 w-5 text-slate-400 flex-shrink-0" />
+                  <div className="h-16 overflow-hidden">
+                    <img 
+                      src={food.image} 
+                      alt={food.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
+                  <p className="p-2 text-xs text-slate-700 truncate">{food.name}</p>
                 </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Food Detail Modal */}
-      {selectedFood && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-          <div className="bg-white w-full max-w-lg max-h-[85vh] rounded-t-2xl sm:rounded-2xl overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b">
-              <div className="flex items-center gap-3">
-                <span className="text-3xl">{selectedFood.emoji}</span>
-                <div>
-                  <h2 className="font-semibold text-slate-800">{selectedFood.name}</h2>
-                  {selectedFood.allergen && (
-                    <span className="text-xs text-amber-600">⚠️ Common allergen</span>
-                  )}
-                </div>
-              </div>
-              <button onClick={() => setSelectedFood(null)} className="p-2 hover:bg-slate-100 rounded-full">
-                <X className="h-5 w-5 text-slate-500" />
-              </button>
-            </div>
-            
-            <div className="p-5 overflow-y-auto max-h-[65vh] space-y-5">
-              <div className="bg-sky-50 rounded-xl p-4">
-                <p className="text-xs text-sky-600 font-medium mb-1">
-                  Serving at {babyAge === '6' ? '6 months' : babyAge === '7' ? '7-8 months' : babyAge === '9' ? '9-12 months' : '12+ months'}:
-                </p>
-                <p className="text-slate-700">{getServingForAge(selectedFood)}</p>
-              </div>
-
-              <div>
-                <h3 className="font-medium text-slate-800 mb-3">By age:</h3>
-                <div className="space-y-2">
-                  {Object.entries(selectedFood.serving).map(([age, serving]) => (
-                    <div key={age} className="flex gap-3 text-sm">
-                      <span className="font-medium text-slate-500 w-16 flex-shrink-0">
-                        {age === '6' ? '6m' : age === '7-8' ? '7-8m' : age === '9-12' ? '9-12m' : '12m+'}
-                      </span>
-                      <span className="text-slate-600">{serving}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="font-medium text-slate-800 mb-2">Tips:</h3>
-                <ul className="space-y-2">
-                  {selectedFood.tips.map((tip, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
-                      <Check className="h-4 w-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                      {tip}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {selectedFood.warnings && (
-                <div className="bg-amber-50 rounded-xl p-4">
-                  <h3 className="font-medium text-amber-800 mb-2 flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4" />
-                    Important:
-                  </h3>
-                  <ul className="space-y-1">
-                    {selectedFood.warnings.map((warning, i) => (
-                      <li key={i} className="text-sm text-amber-700">• {warning}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
+              );
+            })}
           </div>
+        )}
+
+        {/* Quick Info Cards */}
+        <div className="grid grid-cols-2 gap-3 pt-4">
+          <Card className="border-none shadow-sm bg-rose-50">
+            <CardContent className="p-4">
+              <AlertTriangle className="h-6 w-6 text-rose-500 mb-2" />
+              <h3 className="font-semibold text-rose-800 text-sm">Choking Hazards</h3>
+              <p className="text-rose-600 text-xs mt-1">
+                Always quarter grapes, cherry tomatoes & blueberries lengthways
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-none shadow-sm bg-blue-50">
+            <CardContent className="p-4">
+              <Info className="h-6 w-6 text-blue-500 mb-2" />
+              <h3 className="font-semibold text-blue-800 text-sm">Allergens</h3>
+              <p className="text-blue-600 text-xs mt-1">
+                Introduce top allergens early (around 6mo) to reduce allergy risk
+              </p>
+            </CardContent>
+          </Card>
         </div>
-      )}
 
-      {/* Recipe Detail Modal */}
-      {selectedRecipe && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-          <div className="bg-white w-full max-w-lg max-h-[90vh] rounded-t-2xl sm:rounded-2xl overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b">
-              <div className="flex items-center gap-3">
-                <span className="text-3xl">{selectedRecipe.emoji}</span>
-                <div>
-                  <h2 className="font-semibold text-slate-800">{selectedRecipe.name}</h2>
-                  <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {selectedRecipe.prepTime}
-                    </span>
-                    {selectedRecipe.cookTime && (
-                      <span>+ {selectedRecipe.cookTime} cook</span>
-                    )}
-                    <span className="flex items-center gap-1">
-                      <Baby className="h-3 w-3" />
-                      {selectedRecipe.ageFrom}m+
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <button onClick={() => setSelectedRecipe(null)} className="p-2 hover:bg-slate-100 rounded-full">
-                <X className="h-5 w-5 text-slate-500" />
-              </button>
-            </div>
-            
-            <div className="p-5 overflow-y-auto max-h-[70vh] space-y-5">
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2">
-                {selectedRecipe.tags.map((tag, i) => (
-                  <span key={i} className="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded-full">
-                    {tag}
-                  </span>
-                ))}
-                {selectedRecipe.freezable && (
-                  <span className="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded-full">
-                    ❄️ Freezable
-                  </span>
-                )}
-              </div>
-
-              {/* Ingredients */}
+        {/* Age Reminder */}
+        <Card className="border-none shadow-sm bg-amber-50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium text-slate-800 mb-2">Ingredients:</h3>
-                <ul className="space-y-1.5">
-                  {selectedRecipe.ingredients.map((ing, i) => (
-                    <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
-                      <span className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 flex-shrink-0" />
-                      {ing}
-                    </li>
-                  ))}
-                </ul>
+                <p className="text-sm text-amber-800">Baby's age</p>
+                <p className="text-2xl font-bold text-amber-600">{babyAge} months</p>
               </div>
-
-              {/* Instructions */}
-              <div>
-                <h3 className="font-medium text-slate-800 mb-2">Method:</h3>
-                <ol className="space-y-3">
-                  {selectedRecipe.instructions.map((step, i) => (
-                    <li key={i} className="text-sm text-slate-600 flex gap-3">
-                      <span className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-medium text-slate-500 flex-shrink-0">
-                        {i + 1}
-                      </span>
-                      <span className="pt-0.5">{step}</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-
-              {/* Tips */}
-              {selectedRecipe.tips && (
-                <div className="bg-emerald-50 rounded-xl p-4">
-                  <p className="text-sm text-emerald-700">
-                    <span className="font-medium">💡 Tip:</span> {selectedRecipe.tips}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Saved Recipe Detail Modal */}
-      {selectedSavedRecipe && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-          <div className="bg-white w-full max-w-lg max-h-[90vh] rounded-t-2xl sm:rounded-2xl overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center">
-                  <MessageSquare className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <h2 className="font-semibold text-slate-800">Saved from Chat</h2>
-                  <p className="text-xs text-slate-500">{selectedSavedRecipe.conversationTitle}</p>
-                </div>
-              </div>
-              <button onClick={() => setSelectedSavedRecipe(null)} className="p-2 hover:bg-slate-100 rounded-full">
-                <X className="h-5 w-5 text-slate-500" />
-              </button>
-            </div>
-            
-            <div className="p-5 overflow-y-auto max-h-[65vh]">
-              <div className="bg-slate-50 rounded-xl p-4">
-                <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
-                  {selectedSavedRecipe.content}
-                </p>
-              </div>
-              
-              <div className="mt-4 flex items-center justify-between text-xs text-slate-400">
-                <span>Saved {new Date(selectedSavedRecipe.savedAt).toLocaleDateString()}</span>
-              </div>
-            </div>
-
-            <div className="p-4 border-t">
-              <button
-                onClick={() => deleteSavedRecipe(selectedSavedRecipe.id)}
-                className="w-full py-3 text-red-500 text-sm font-medium flex items-center justify-center gap-2 hover:bg-red-50 rounded-xl transition-colors"
+              <select
+                value={babyAge}
+                onChange={(e) => {
+                  const age = parseInt(e.target.value);
+                  setBabyAge(age);
+                  localStorage.setItem(BABY_AGE_KEY, age.toString());
+                }}
+                className="bg-white border border-amber-200 rounded-lg px-3 py-2 text-amber-700"
               >
-                <Trash2 className="h-4 w-4" />
-                Delete from saved
-              </button>
+                {[...Array(19)].map((_, i) => (
+                  <option key={i + 6} value={i + 6}>{i + 6} months</option>
+                ))}
+              </select>
             </div>
-          </div>
-        </div>
-      )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
