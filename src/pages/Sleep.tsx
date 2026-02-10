@@ -55,6 +55,7 @@ type SleepStage = 'assessment' | 'plan' | 'program';
 const Sleep = ({ onTabChange }: SleepProps) => {
   const [stage, setStage] = useState<SleepStage>('assessment');
   const [assessment, setAssessment] = useState<SleepAssessmentData | null>(null);
+  const [loadError, setLoadError] = useState(false);
 
   // Load saved state on mount
   useEffect(() => {
@@ -63,6 +64,12 @@ const Sleep = ({ onTabChange }: SleepProps) => {
       const savedAssessment = localStorage.getItem(ASSESSMENT_STORAGE_KEY);
       if (savedAssessment) {
         const parsedAssessment = JSON.parse(savedAssessment);
+        
+        // Validate the data has required fields
+        if (!parsedAssessment.babyName || typeof parsedAssessment.babyAgeMonths !== 'number') {
+          throw new Error('Invalid assessment data');
+        }
+        
         setAssessment(parsedAssessment);
         
         // Check if program has been started
@@ -81,8 +88,13 @@ const Sleep = ({ onTabChange }: SleepProps) => {
         setStage('assessment');
       }
     } catch (e) {
-      console.error('Failed to load sleep state:', e);
+      console.error('Failed to load sleep state, resetting:', e);
+      // Clear corrupted data
+      localStorage.removeItem(ASSESSMENT_STORAGE_KEY);
+      localStorage.removeItem(PROGRAM_STORAGE_KEY);
+      setAssessment(null);
       setStage('assessment');
+      setLoadError(true);
     }
   }, []);
 
