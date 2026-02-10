@@ -45,6 +45,7 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
   const [timerRunning, setTimerRunning] = useState(false);
   const [elapsedMinutes, setElapsedMinutes] = useState(0);
   const [pendingCheckIn, setPendingCheckIn] = useState<'20min' | '60min' | null>(null);
+  const [morningMessageSent, setMorningMessageSent] = useState(false);
   const [checkInLog, setCheckInLog] = useState<NightLog>({
     date: new Date().toISOString().split('T')[0],
     bedtimeMinutesToSleep: 30,
@@ -334,7 +335,6 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
   const shouldPromptCheckIn = !hasLoggedToday && programData.currentNight > 1;
   
   // Send morning follow-up message (once per day)
-  const [morningMessageSent, setMorningMessageSent] = useState(false);
   useEffect(() => {
     if (shouldPromptCheckIn && !morningMessageSent) {
       // Check if it's actually morning (6am - 11am)
