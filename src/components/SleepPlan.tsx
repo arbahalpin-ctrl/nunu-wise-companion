@@ -8,6 +8,7 @@ interface SleepPlanProps {
   assessment: SleepAssessmentData;
   onStartProgram: () => void;
   onEditAssessment: () => void;
+  onOpenChat?: () => void;
 }
 
 interface RecommendedMethod {
@@ -21,10 +22,11 @@ interface RecommendedMethod {
   checkInIntervals?: number[];
 }
 
-const SleepPlan = ({ assessment, onStartProgram, onEditAssessment }: SleepPlanProps) => {
+const SleepPlan = ({ assessment, onStartProgram, onEditAssessment, onOpenChat }: SleepPlanProps) => {
   const [showFullPlan, setShowFullPlan] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
   const [committed, setCommitted] = useState(false);
+  const [showNunuPrompt, setShowNunuPrompt] = useState(true);
 
   // Generate recommended method based on assessment
   const getRecommendedMethod = (): RecommendedMethod => {
@@ -555,6 +557,41 @@ const SleepPlan = ({ assessment, onStartProgram, onEditAssessment }: SleepPlanPr
           </Button>
         </div>
       </div>
+
+      {/* Floating Nunu "Here to help" prompt */}
+      {showNunuPrompt && onOpenChat && (
+        <div className="fixed bottom-44 right-4 z-50 animate-in slide-in-from-right duration-500">
+          <div className="relative">
+            {/* Speech bubble */}
+            <button
+              onClick={() => {
+                onOpenChat();
+                setShowNunuPrompt(false);
+              }}
+              className="bg-white rounded-2xl shadow-lg border border-slate-200 p-3 pr-4 flex items-center gap-3 hover:shadow-xl transition-shadow"
+            >
+              {/* Nunu face */}
+              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                <img src="/nunu-logo.svg" alt="Nunu" className="w-10 h-10" />
+              </div>
+              {/* Message */}
+              <div className="text-left">
+                <p className="text-sm font-medium text-slate-800">Here to help 💜</p>
+                <p className="text-xs text-slate-500">Tap to chat with me</p>
+              </div>
+            </button>
+            {/* Close button */}
+            <button
+              onClick={() => setShowNunuPrompt(false)}
+              className="absolute -top-2 -right-2 w-6 h-6 bg-slate-200 hover:bg-slate-300 rounded-full flex items-center justify-center text-slate-500 text-xs"
+            >
+              ✕
+            </button>
+            {/* Speech bubble tail */}
+            <div className="absolute -bottom-2 right-8 w-4 h-4 bg-white border-r border-b border-slate-200 transform rotate-45" />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

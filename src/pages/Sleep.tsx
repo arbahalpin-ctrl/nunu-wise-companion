@@ -126,6 +126,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
         assessment={assessment}
         onStartProgram={handleStartProgram}
         onEditAssessment={handleEditAssessment}
+        onOpenChat={handleOpenChat}
       />
     );
   }
