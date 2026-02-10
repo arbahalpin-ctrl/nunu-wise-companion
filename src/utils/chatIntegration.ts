@@ -100,9 +100,9 @@ export const injectTimedCheckIn = (
   const messages: Record<string, string> = {
     '20min': `Just checking in. 💜
 
-Night one can be the toughest. If ${babyName}'s needs are met and you're sticking to your intervals, you're on track.
+First nights can feel intense. If ${babyName}'s needs are met and you're sticking to your intervals, you're on track.
 
-**Do you want help with what to do next?**`,
+**Want help staying on track with your intervals?**`,
     '60min': `Still here with you. 💜
 
 How are you holding up? Want to talk through whether to continue tonight or pause?

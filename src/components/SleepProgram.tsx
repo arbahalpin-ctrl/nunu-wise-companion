@@ -27,6 +27,7 @@ interface ProgramData {
   checkInIntervals: number[];
   bedtimeStartedAt?: string; // ISO timestamp for when tonight's bedtime started
   checkInsDismissed?: string[]; // Track which check-ins have been dismissed tonight
+  quietMode?: boolean; // If true, disable timed check-in nudges
 }
 
 interface SleepProgramProps {
@@ -115,12 +116,14 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
       const mins = Math.floor((now - started) / 60000);
       setElapsedMinutes(mins);
       
-      // Check if we should show a check-in prompt
-      const dismissed = programData.checkInsDismissed || [];
-      if (mins >= 20 && mins < 60 && !dismissed.includes('20min') && pendingCheckIn !== '20min') {
-        setPendingCheckIn('20min');
-      } else if (mins >= 60 && !dismissed.includes('60min') && pendingCheckIn !== '60min') {
-        setPendingCheckIn('60min');
+      // Check if we should show a check-in prompt (unless quiet mode)
+      if (!programData.quietMode) {
+        const dismissed = programData.checkInsDismissed || [];
+        if (mins >= 15 && mins < 60 && !dismissed.includes('20min') && pendingCheckIn !== '20min') {
+          setPendingCheckIn('20min'); // First check-in at 15min
+        } else if (mins >= 60 && !dismissed.includes('60min') && pendingCheckIn !== '60min') {
+          setPendingCheckIn('60min');
+        }
       }
     };
     
@@ -538,7 +541,7 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
         {programData.bedtimeStartedAt && !showMorningCheckIn && (
           <Card className="border-none shadow-md bg-indigo-50 border-2 border-indigo-200">
             <CardContent className="p-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center">
                     <Moon className="h-5 w-5 text-white" />
@@ -553,6 +556,27 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
                   className="text-sm text-indigo-500 hover:text-indigo-700"
                 >
                   End session
+                </button>
+              </div>
+              {/* Quiet Mode Toggle */}
+              <div className="flex items-center justify-between pt-3 border-t border-indigo-200">
+                <div>
+                  <p className="text-sm font-medium text-indigo-900">
+                    {programData.quietMode ? 'Quiet mode' : 'Check-ins on'}
+                  </p>
+                  <p className="text-xs text-indigo-600">
+                    {programData.quietMode ? 'Chat available if you need me' : 'I\'ll check in at key moments'}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setProgramData({ ...programData, quietMode: !programData.quietMode })}
+                  className={`relative w-12 h-6 rounded-full transition-colors ${
+                    programData.quietMode ? 'bg-slate-300' : 'bg-indigo-600'
+                  }`}
+                >
+                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                    programData.quietMode ? 'left-1' : 'left-7'
+                  }`} />
                 </button>
               </div>
             </CardContent>
@@ -571,8 +595,8 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
                   <p className="font-semibold text-purple-900 mb-1">Checking in 💜</p>
                   <p className="text-sm text-purple-700 mb-4">
                     {pendingCheckIn === '20min' 
-                      ? `Night one can be the toughest. If ${assessment.babyName}'s needs are met and you're sticking to your intervals, you're on track.`
-                      : `Still here with you. How are you holding up? Want to talk through whether to continue tonight or pause?`
+                      ? `First nights can feel intense. If ${assessment.babyName}'s needs are met and you're sticking to your intervals, you're on track.`
+                      : `Still here with you. How are you holding up? Want to talk through whether to continue or pause?`
                     }
                   </p>
                   <div className="flex gap-2">
