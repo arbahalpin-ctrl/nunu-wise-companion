@@ -320,6 +320,25 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
     return null;
   };
 
+  // Send morning follow-up message (once per day)
+  // Note: Must be before any conditional returns to follow React hooks rules
+  useEffect(() => {
+    if (!programData || !assessment) return;
+    
+    const todayDate = new Date().toISOString().split('T')[0];
+    const hasLoggedToday = programData.nightLogs.some(log => log.date === todayDate);
+    const shouldPromptCheckIn = !hasLoggedToday && programData.currentNight > 1;
+    
+    if (shouldPromptCheckIn && !morningMessageSent) {
+      // Check if it's actually morning (6am - 11am)
+      const hour = new Date().getHours();
+      if (hour >= 6 && hour < 12) {
+        injectMorningFollowUp(assessment.babyName, programData.currentNight - 1);
+        setMorningMessageSent(true);
+      }
+    }
+  }, [programData, assessment, morningMessageSent]);
+
   if (!programData) return null;
 
   const guidance = getCurrentNightGuidance();
@@ -333,18 +352,6 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
     ? programData.nightLogs[programData.nightLogs.length - 1].date 
     : null;
   const shouldPromptCheckIn = !hasLoggedToday && programData.currentNight > 1;
-  
-  // Send morning follow-up message (once per day)
-  useEffect(() => {
-    if (shouldPromptCheckIn && !morningMessageSent && programData && assessment) {
-      // Check if it's actually morning (6am - 11am)
-      const hour = new Date().getHours();
-      if (hour >= 6 && hour < 12) {
-        injectMorningFollowUp(assessment.babyName, programData.currentNight - 1);
-        setMorningMessageSent(true);
-      }
-    }
-  }, [shouldPromptCheckIn, morningMessageSent, assessment, programData]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white pb-24">
