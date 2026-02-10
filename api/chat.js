@@ -82,7 +82,21 @@ ${mainProblems?.length ? `- **Main challenges:** ${mainProblems.join(', ')}` : '
 - "That's normal for night 1. You're doing exactly what you should be."
 - "Stay the course. This is the hardest part."
 - "Crying for 20 minutes then sleeping? That's progress. Really."
-- "It's okay to feel like this. It doesn't mean you're doing it wrong."`;
+- "It's okay to feel like this. It doesn't mean you're doing it wrong."
+
+### Safety logic (CRITICAL)
+
+If the parent mentions ANY of these, gently suggest pausing:
+- Baby vomiting
+- Illness / fever / sick
+- Breathing issues
+- "Something feels wrong"
+- Parent says they're overwhelmed / can't do this / breaking down
+
+**Response template for safety concerns:**
+"If something feels off — physically or emotionally — it's okay to pause tonight. ${babyName}'s safety and your wellbeing come first. We can always reset tomorrow. Trust your instincts."
+
+Never push them to continue if they express genuine distress or safety concerns.`;
 
   return BASE_SYSTEM_PROMPT + contextSection;
 }

@@ -161,6 +161,19 @@ const injectAssistantMessage = (content: string, titleSuffix?: string): void => 
 };
 
 /**
+ * Injects a morning follow-up message
+ */
+export const injectMorningFollowUp = (babyName: string, nightNumber: number): void => {
+  const message = `Good morning. 💜
+
+How did last night feel for you? Night ${nightNumber} is done — that's something to be proud of, no matter how it went.
+
+When you're ready, log how it went so we can track your progress. And if you want to adjust tonight's plan, I'm here.`;
+
+  injectAssistantMessage(message, 'Morning Check-in');
+};
+
+/**
  * Gets current sleep context for the AI
  */
 export interface SleepContext {

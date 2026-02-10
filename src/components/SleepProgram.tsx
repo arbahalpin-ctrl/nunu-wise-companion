@@ -3,7 +3,7 @@ import { Moon, Sun, Clock, CheckCircle2, TrendingDown, MessageCircle, ChevronRig
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { SleepAssessmentData } from './SleepAssessment';
-import { injectTimedCheckIn } from '@/utils/chatIntegration';
+import { injectTimedCheckIn, injectMorningFollowUp } from '@/utils/chatIntegration';
 
 const PROGRAM_STORAGE_KEY = 'nunu-sleep-program';
 
@@ -332,6 +332,19 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
     ? programData.nightLogs[programData.nightLogs.length - 1].date 
     : null;
   const shouldPromptCheckIn = !hasLoggedToday && programData.currentNight > 1;
+  
+  // Send morning follow-up message (once per day)
+  const [morningMessageSent, setMorningMessageSent] = useState(false);
+  useEffect(() => {
+    if (shouldPromptCheckIn && !morningMessageSent) {
+      // Check if it's actually morning (6am - 11am)
+      const hour = new Date().getHours();
+      if (hour >= 6 && hour < 12) {
+        injectMorningFollowUp(assessment.babyName, programData.currentNight - 1);
+        setMorningMessageSent(true);
+      }
+    }
+  }, [shouldPromptCheckIn, morningMessageSent, assessment.babyName, programData.currentNight]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white pb-24">
