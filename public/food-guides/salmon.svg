@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="white"/>
+  <text x="200" y="35" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" font-weight="bold" fill="#1e293b">How to Serve Salmon</text>
+  
+  <rect x="60" y="48" width="280" height="25" rx="5" fill="#dbeafe"/>
+  <text x="200" y="66" text-anchor="middle" font-family="system-ui" font-size="10" fill="#1e40af">🐟 Fish allergen - introduce early! Excellent omega-3 source</text>
+  
+  <!-- 6-8 months -->
+  <text x="80" y="100" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#475569">6-8 months</text>
+  <text x="80" y="115" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">(large strip to</text>
+  <text x="80" y="127" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">suck or flaked)</text>
+  <g transform="translate(35, 135)">
+    <path d="M0,35 Q10,0 45,0 Q80,0 90,35 Q80,50 45,50 Q10,50 0,35" fill="#fb923c"/>
+    <path d="M10,30 Q18,10 45,10 Q72,10 80,30" fill="#fdba74" opacity="0.5"/>
+    <line x1="20" y1="20" x2="20" y2="40" stroke="#fed7aa" stroke-width="1"/>
+    <line x1="45" y1="15" x2="45" y2="45" stroke="#fed7aa" stroke-width="1"/>
+    <line x1="70" y1="20" x2="70" y2="40" stroke="#fed7aa" stroke-width="1"/>
+  </g>
+  
+  <path d="M 130 165 Q 165 135 200 165" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- 9-12 months -->
+  <text x="200" y="100" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#475569">9-12 months</text>
+  <text x="200" y="115" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">(flaked pieces,</text>
+  <text x="200" y="127" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">check for bones!)</text>
+  <g transform="translate(155, 135)">
+    <ellipse cx="20" cy="12" rx="18" ry="10" fill="#fb923c"/>
+    <ellipse cx="55" cy="15" rx="20" ry="11" fill="#fdba74"/>
+    <ellipse cx="85" cy="12" rx="16" ry="9" fill="#fb923c"/>
+    <ellipse cx="25" cy="40" rx="17" ry="10" fill="#fdba74"/>
+    <ellipse cx="60" cy="42" rx="19" ry="11" fill="#fb923c"/>
+    <ellipse cx="90" cy="38" rx="15" ry="9" fill="#fdba74"/>
+  </g>
+  
+  <path d="M 255 165 Q 290 135 320 165" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- 12+ months -->
+  <text x="320" y="100" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#475569">12+ months</text>
+  <text x="320" y="115" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">(any prep,</text>
+  <text x="320" y="127" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">still check bones)</text>
+  <g transform="translate(275, 130)">
+    <rect x="0" y="10" width="90" height="55" rx="8" fill="#fb923c"/>
+    <line x1="10" y1="25" x2="10" y2="55" stroke="#fed7aa" stroke-width="1"/>
+    <line x1="30" y1="20" x2="30" y2="58" stroke="#fed7aa" stroke-width="1"/>
+    <line x1="50" y1="22" x2="50" y2="56" stroke="#fed7aa" stroke-width="1"/>
+    <line x1="70" y1="25" x2="70" y2="55" stroke="#fed7aa" stroke-width="1"/>
+  </g>
+  
+  <rect x="30" y="220" width="340" height="65" rx="8" fill="#fef3c7"/>
+  <text x="200" y="242" text-anchor="middle" font-family="system-ui" font-size="11" fill="#92400e" font-weight="600">⚠️ ALWAYS check thoroughly for bones!</text>
+  <text x="200" y="260" text-anchor="middle" font-family="system-ui" font-size="10" fill="#92400e">Wild-caught preferred. Baked or poached is best.</text>
+  <text x="200" y="275" text-anchor="middle" font-family="system-ui" font-size="10" fill="#92400e">Tinned salmon (bones are soft and edible) is a great option!</text>
+  
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#475569"/></marker></defs>
+</svg>

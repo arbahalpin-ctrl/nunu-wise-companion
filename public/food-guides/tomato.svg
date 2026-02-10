@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 320">
+  <rect width="400" height="320" fill="white"/>
+  <text x="200" y="35" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" font-weight="bold" fill="#1e293b">How to Cut Tomatoes</text>
+  
+  <rect x="40" y="50" width="320" height="35" rx="6" fill="#fef2f2"/>
+  <text x="200" y="72" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#dc2626">⚠️ Cherry tomatoes: ALWAYS quarter like grapes!</text>
+  
+  <!-- Large tomato -->
+  <text x="100" y="110" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#475569">Large tomato</text>
+  <text x="100" y="125" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">(wedges, seeds</text>
+  <text x="100" y="137" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">scooped out)</text>
+  <g transform="translate(55, 145)">
+    <path d="M0,35 L25,0 L45,0 L90,35 Q85,55 45,55 Q5,55 0,35" fill="#ef4444"/>
+    <ellipse cx="45" cy="5" rx="15" ry="6" fill="#22c55e"/>
+  </g>
+  
+  <!-- Cherry tomatoes -->
+  <text x="300" y="110" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#475569">Cherry tomatoes</text>
+  <text x="300" y="125" text-anchor="middle" font-family="system-ui" font-size="10" fill="#16a34a">(quartered</text>
+  <text x="300" y="137" text-anchor="middle" font-family="system-ui" font-size="10" fill="#16a34a">lengthways!)</text>
+  <g transform="translate(260, 145)">
+    <path d="M15,0 L30,15 L15,30 L0,15 Z" fill="#ef4444"/>
+    <path d="M40,5 L55,20 L40,35 L25,20 Z" fill="#f87171"/>
+    <path d="M65,0 L80,15 L65,30 L50,15 Z" fill="#ef4444"/>
+    <path d="M25,38 L40,53 L25,68 L10,53 Z" fill="#f87171"/>
+    <path d="M55,40 L70,55 L55,70 L40,55 Z" fill="#ef4444"/>
+  </g>
+  <circle cx="300" cy="180" r="45" stroke="#16a34a" stroke-width="3" fill="none" stroke-dasharray="5,3"/>
+  
+  <rect x="30" y="240" width="340" height="65" rx="8" fill="#fef3c7"/>
+  <text x="200" y="262" text-anchor="middle" font-family="system-ui" font-size="11" fill="#92400e" font-weight="600">Same rules as grapes for cherry tomatoes!</text>
+  <text x="200" y="280" text-anchor="middle" font-family="system-ui" font-size="10" fill="#92400e">Round shape = choking hazard. May cause acidic rash around mouth (not allergy)</text>
+  <text x="200" y="296" text-anchor="middle" font-family="system-ui" font-size="10" fill="#92400e">Cooked tomatoes in sauces are fine from 6mo</text>
+  
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#475569"/></marker></defs>
+</svg>

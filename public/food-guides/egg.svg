@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="white"/>
+  <text x="200" y="35" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" font-weight="bold" fill="#1e293b">How to Serve Eggs</text>
+  
+  <rect x="80" y="48" width="240" height="25" rx="5" fill="#dbeafe"/>
+  <text x="200" y="66" text-anchor="middle" font-family="system-ui" font-size="10" fill="#1e40af">🥚 Top allergen - introduce early around 6 months!</text>
+  
+  <!-- 6 months - scrambled -->
+  <text x="80" y="100" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#475569">6 months</text>
+  <text x="80" y="115" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">(scrambled or</text>
+  <text x="80" y="127" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">mashed hard-boiled)</text>
+  <g transform="translate(40, 135)">
+    <ellipse cx="40" cy="30" rx="38" ry="25" fill="#fef08a"/>
+    <ellipse cx="30" cy="25" rx="12" ry="8" fill="#fde047"/>
+    <ellipse cx="50" cy="35" rx="10" ry="7" fill="#fde047"/>
+    <ellipse cx="35" cy="40" rx="8" ry="5" fill="#fde047"/>
+  </g>
+  
+  <path d="M 125 165 Q 160 140 195 165" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- 7-9 months - strips -->
+  <text x="200" y="100" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#475569">7-9 months</text>
+  <text x="200" y="115" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">(omelette strips</text>
+  <text x="200" y="127" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">or egg fingers)</text>
+  <g transform="translate(160, 135)">
+    <rect x="0" y="0" width="22" height="60" rx="4" fill="#fef08a"/>
+    <rect x="28" y="5" width="22" height="55" rx="4" fill="#fef08a"/>
+    <rect x="56" y="2" width="22" height="58" rx="4" fill="#fef08a"/>
+  </g>
+  
+  <path d="M 250 165 Q 285 140 315 165" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- 9+ months -->
+  <text x="320" y="100" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#475569">9+ months</text>
+  <text x="320" y="115" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">(quartered boiled</text>
+  <text x="320" y="127" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">or any style)</text>
+  <g transform="translate(285, 130)">
+    <ellipse cx="35" cy="35" rx="32" ry="38" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+    <circle cx="35" cy="38" r="15" fill="#fde047"/>
+    <line x1="35" y1="0" x2="35" y2="73" stroke="#e2e8f0" stroke-width="2"/>
+    <line x1="3" y1="38" x2="67" y2="38" stroke="#e2e8f0" stroke-width="2"/>
+  </g>
+  
+  <rect x="50" y="230" width="300" height="55" rx="8" fill="#ecfdf5"/>
+  <text x="200" y="252" text-anchor="middle" font-family="system-ui" font-size="11" fill="#065f46" font-weight="600">💡 Always well-cooked for babies</text>
+  <text x="200" y="270" text-anchor="middle" font-family="system-ui" font-size="10" fill="#065f46">Include both yolk AND white for allergen exposure</text>
+  
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#475569"/></marker></defs>
+</svg>

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 320">
+  <rect width="400" height="320" fill="white"/>
+  <text x="200" y="35" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" font-weight="bold" fill="#1e293b">How to Cut Apple</text>
+  
+  <rect x="40" y="50" width="320" height="35" rx="6" fill="#fef2f2"/>
+  <text x="200" y="72" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#dc2626">⚠️ Raw apple chunks are a choking hazard - COOK or GRATE!</text>
+  
+  <!-- 6-8 months -->
+  <text x="80" y="115" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#475569">6-8 months</text>
+  <text x="80" y="130" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">(steamed soft</text>
+  <text x="80" y="142" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">or grated raw)</text>
+  <g transform="translate(35, 150)">
+    <path d="M0,50 Q5,0 45,0 Q85,0 90,50 Q85,80 45,80 Q5,80 0,50" fill="#ef4444"/>
+    <ellipse cx="45" cy="5" rx="8" ry="5" fill="#84cc16"/>
+    <rect x="42" y="0" width="6" height="12" rx="2" fill="#854d0e"/>
+    <text x="45" y="50" text-anchor="middle" font-size="10" fill="white">SOFT</text>
+  </g>
+  
+  <path d="M 135 195 Q 170 165 200 195" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- 9-12 months -->
+  <text x="200" y="115" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#475569">9-12 months</text>
+  <text x="200" y="130" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">(very thin raw</text>
+  <text x="200" y="142" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">slices or cooked)</text>
+  <g transform="translate(160, 155)">
+    <path d="M0,40 Q2,0 20,0 Q38,0 40,40 Q38,55 20,55 Q2,55 0,40" fill="#ef4444"/>
+    <path d="M15,40 Q17,5 30,5 Q43,5 45,40 Q43,52 30,52 Q17,52 15,40" fill="#ef4444" transform="translate(30,0)"/>
+    <path d="M30,40 Q32,5 45,5 Q58,5 60,40 Q58,52 45,52 Q32,52 30,40" fill="#ef4444" transform="translate(25,0)"/>
+    <text x="45" y="75" text-anchor="middle" font-size="9" fill="#64748b">paper thin!</text>
+  </g>
+  
+  <path d="M 260 195 Q 295 165 325 195" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  
+  <!-- 12+ months -->
+  <text x="320" y="115" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#475569">12+ months</text>
+  <text x="320" y="130" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">(thin slices,</text>
+  <text x="320" y="142" text-anchor="middle" font-family="system-ui" font-size="10" fill="#64748b">still careful!)</text>
+  <g transform="translate(280, 150)">
+    <path d="M0,55 Q5,5 40,5 Q75,5 80,55 Q75,85 40,85 Q5,85 0,55" fill="#ef4444"/>
+    <line x1="20" y1="10" x2="20" y2="80" stroke="white" stroke-width="2"/>
+    <line x1="40" y1="8" x2="40" y2="82" stroke="white" stroke-width="2"/>
+    <line x1="60" y1="10" x2="60" y2="80" stroke="white" stroke-width="2"/>
+  </g>
+  
+  <rect x="30" y="255" width="340" height="50" rx="8" fill="#fef3c7"/>
+  <text x="200" y="277" text-anchor="middle" font-family="system-ui" font-size="11" fill="#92400e">Raw apple chunks not safe until 4+ years</text>
+  <text x="200" y="293" text-anchor="middle" font-family="system-ui" font-size="10" fill="#92400e">Always cook until soft OR grate finely for raw</text>
+  
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#475569"/></marker></defs>
+</svg>

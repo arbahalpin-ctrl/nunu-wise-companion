@@ -10,7 +10,12 @@ const BABY_AGE_KEY = 'nunu-baby-age-months';
 type AgeGroup = '6' | '7-8' | '9-12' | '12+';
 
 // Foods with cutting guide infographics
-const FOODS_WITH_GUIDES = ['banana', 'avocado', 'broccoli', 'grapes', 'carrot'];
+const FOODS_WITH_GUIDES = [
+  'banana', 'avocado', 'broccoli', 'grapes', 'carrot',
+  'strawberry', 'blueberry', 'sweet-potato', 'apple',
+  'egg', 'chicken', 'peas', 'tomato', 'cheese',
+  'peanut-butter', 'salmon', 'mango', 'pasta', 'bread'
+];
 
 // Cutting Guide Component - shows single infographic per food
 const CuttingGuide = ({ foodId }: { foodId: string }) => {
