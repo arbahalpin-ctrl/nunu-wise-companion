@@ -36,16 +36,13 @@ export const injectSleepProgramStartMessage = (
 ): void => {
   const methodName = METHOD_NAMES[methodId] || methodId;
   
-  const supportMessage = `I see you've started the **${methodName}** with ${babyName} — that's a big step, and I'm really proud of you for committing to better sleep for your family. 💜
+  const supportMessage = `I can see you've chosen the **${methodName}** for tonight. I'm here with you while you do this. 💜
 
-Tonight might feel hard. That's normal. But remember:
-- **You're not alone** — I'm here whenever you need to talk
-- **Consistency is key** — even when it's tough, stick with it
-- **This works** — most families see real improvement by night 3-5
+If things feel hard, confusing, or emotional at any point — message me and I'll guide you through it in real time.
 
-If you're struggling, have questions, or just need someone to tell you you're doing great at 2am — I'm here. Just come back to chat.
+**You're not doing this alone.**
 
-**You've got this. ${babyName} is lucky to have a parent who cares this much.** ✨`;
+The first night can feel intense. That doesn't mean it's going wrong. If you need reassurance or want to sense-check anything, just type here.`;
 
   try {
     const saved = localStorage.getItem(CONVERSATIONS_KEY);
@@ -89,6 +86,77 @@ If you're struggling, have questions, or just need someone to tell you you're do
     localStorage.setItem(CONVERSATIONS_KEY, JSON.stringify(conversations));
   } catch (e) {
     console.error('Failed to inject sleep program message:', e);
+  }
+};
+
+/**
+ * Injects a timed check-in message during sleep training
+ */
+export const injectTimedCheckIn = (
+  checkInType: '20min' | '60min' | 'custom',
+  babyName: string,
+  customMessage?: string
+): void => {
+  const messages: Record<string, string> = {
+    '20min': `Just checking in. 💜
+
+Night one can be the toughest. If ${babyName}'s needs are met and you're sticking to your intervals, you're on track.
+
+**Do you want help with what to do next?**`,
+    '60min': `Still here with you. 💜
+
+How are you holding up? Want to talk through whether to continue tonight or pause?
+
+There's no wrong answer — I'm just here to support whatever you decide.`,
+    'custom': customMessage || ''
+  };
+
+  const message = messages[checkInType];
+  if (!message) return;
+
+  injectAssistantMessage(message, 'Sleep Check-in');
+};
+
+/**
+ * Helper to inject any assistant message into chat
+ */
+const injectAssistantMessage = (content: string, titleSuffix?: string): void => {
+  try {
+    const saved = localStorage.getItem(CONVERSATIONS_KEY);
+    let conversations: Conversation[] = saved ? JSON.parse(saved) : [];
+    
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      role: 'assistant',
+      content,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    if (conversations.length === 0) {
+      const newConvo: Conversation = {
+        id: Date.now().toString(),
+        title: titleSuffix || 'Chat with Nunu',
+        messages: [
+          {
+            id: '1',
+            role: 'assistant',
+            content: "Hey. I'm Nunu — here to help with sleep, feeding, or just to listen when things feel hard. What's on your mind?",
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          },
+          newMessage
+        ],
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      };
+      conversations = [newConvo];
+    } else {
+      conversations[0].messages.push(newMessage);
+      conversations[0].updatedAt = Date.now();
+    }
+
+    localStorage.setItem(CONVERSATIONS_KEY, JSON.stringify(conversations));
+  } catch (e) {
+    console.error('Failed to inject message:', e);
   }
 };
 

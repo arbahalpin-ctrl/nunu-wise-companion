@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Moon, Sun, Clock, CheckCircle2, TrendingDown, MessageCircle, ChevronRight, Sparkles, AlertCircle, Trophy, Play, Pause, RotateCcw } from 'lucide-react';
+import { Moon, Sun, Clock, CheckCircle2, TrendingDown, MessageCircle, ChevronRight, Sparkles, AlertCircle, Trophy, Play, Pause, RotateCcw, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { SleepAssessmentData } from './SleepAssessment';
+import { injectTimedCheckIn } from '@/utils/chatIntegration';
 
 const PROGRAM_STORAGE_KEY = 'nunu-sleep-program';
 
@@ -24,6 +25,8 @@ interface ProgramData {
   currentNight: number;
   isActive: boolean;
   checkInIntervals: number[];
+  bedtimeStartedAt?: string; // ISO timestamp for when tonight's bedtime started
+  checkInsDismissed?: string[]; // Track which check-ins have been dismissed tonight
 }
 
 interface SleepProgramProps {
@@ -39,6 +42,8 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
   const [currentCheckIn, setCurrentCheckIn] = useState(0);
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false);
+  const [elapsedMinutes, setElapsedMinutes] = useState(0);
+  const [pendingCheckIn, setPendingCheckIn] = useState<'20min' | '60min' | null>(null);
   const [checkInLog, setCheckInLog] = useState<NightLog>({
     date: new Date().toISOString().split('T')[0],
     bedtimeMinutesToSleep: 30,
@@ -96,6 +101,34 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
       if (interval) clearInterval(interval);
     };
   }, [timerRunning, timerSeconds]);
+
+  // Track elapsed time since bedtime started & show check-in prompts
+  useEffect(() => {
+    if (!programData?.bedtimeStartedAt) {
+      setElapsedMinutes(0);
+      return;
+    }
+    
+    const updateElapsed = () => {
+      const started = new Date(programData.bedtimeStartedAt!).getTime();
+      const now = Date.now();
+      const mins = Math.floor((now - started) / 60000);
+      setElapsedMinutes(mins);
+      
+      // Check if we should show a check-in prompt
+      const dismissed = programData.checkInsDismissed || [];
+      if (mins >= 20 && mins < 60 && !dismissed.includes('20min') && pendingCheckIn !== '20min') {
+        setPendingCheckIn('20min');
+      } else if (mins >= 60 && !dismissed.includes('60min') && pendingCheckIn !== '60min') {
+        setPendingCheckIn('60min');
+      }
+    };
+    
+    updateElapsed();
+    const interval = setInterval(updateElapsed, 30000); // Check every 30 seconds
+    
+    return () => clearInterval(interval);
+  }, [programData?.bedtimeStartedAt, programData?.checkInsDismissed, pendingCheckIn]);
 
   const getMethodId = () => {
     const { cryingTolerance, babyAgeMonths } = assessment;
@@ -194,6 +227,8 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
       ...programData,
       nightLogs: updatedLogs,
       currentNight: programData.currentNight + 1,
+      bedtimeStartedAt: undefined, // Reset for next night
+      checkInsDismissed: [], // Reset check-ins for next night
     };
     
     setProgramData(updatedProgram);
@@ -209,6 +244,45 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
       morningWakeTime: '06:30',
       parentMood: 3,
     });
+  };
+
+  const startBedtime = () => {
+    if (!programData) return;
+    setProgramData({
+      ...programData,
+      bedtimeStartedAt: new Date().toISOString(),
+      checkInsDismissed: [],
+    });
+    setShowTimer(true);
+  };
+
+  const handleCheckInResponse = (checkInType: '20min' | '60min', wantToChat: boolean) => {
+    if (!programData) return;
+    
+    // Dismiss this check-in
+    const dismissed = [...(programData.checkInsDismissed || []), checkInType];
+    setProgramData({
+      ...programData,
+      checkInsDismissed: dismissed,
+    });
+    setPendingCheckIn(null);
+    
+    if (wantToChat) {
+      // Inject the supportive message into chat and navigate
+      injectTimedCheckIn(checkInType, assessment.babyName);
+      onOpenChat();
+    }
+  };
+
+  const endBedtimeSession = () => {
+    if (!programData) return;
+    setProgramData({
+      ...programData,
+      bedtimeStartedAt: undefined,
+    });
+    setShowTimer(false);
+    setTimerRunning(false);
+    setTimerSeconds(0);
   };
 
   const getProgressMessage = () => {
@@ -439,6 +513,104 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
           </Card>
         )}
 
+        {/* Start Bedtime Button */}
+        {!programData.bedtimeStartedAt && !showMorningCheckIn && (
+          <Card className="border-none shadow-md bg-gradient-to-r from-indigo-600 to-purple-600">
+            <CardContent className="p-5">
+              <div className="text-center text-white">
+                <Moon className="h-10 w-10 mx-auto mb-3 opacity-90" />
+                <h3 className="font-bold text-lg mb-2">Ready to start bedtime?</h3>
+                <p className="text-indigo-100 text-sm mb-4">
+                  Tap when you put {assessment.babyName} down. I'll be here to support you.
+                </p>
+                <Button
+                  onClick={startBedtime}
+                  className="bg-white text-indigo-600 hover:bg-indigo-50 font-semibold px-8"
+                >
+                  Start Tonight's Bedtime
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Active Bedtime Status */}
+        {programData.bedtimeStartedAt && !showMorningCheckIn && (
+          <Card className="border-none shadow-md bg-indigo-50 border-2 border-indigo-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center">
+                    <Moon className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-indigo-900">Bedtime in progress</p>
+                    <p className="text-sm text-indigo-600">{elapsedMinutes} minutes elapsed</p>
+                  </div>
+                </div>
+                <button
+                  onClick={endBedtimeSession}
+                  className="text-sm text-indigo-500 hover:text-indigo-700"
+                >
+                  End session
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Timed Check-in Prompt */}
+        {pendingCheckIn && (
+          <Card className="border-none shadow-lg bg-purple-50 border-2 border-purple-300 animate-pulse">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Heart className="h-6 w-6 text-purple-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-purple-900 mb-1">Checking in 💜</p>
+                  <p className="text-sm text-purple-700 mb-4">
+                    {pendingCheckIn === '20min' 
+                      ? `Night one can be the toughest. If ${assessment.babyName}'s needs are met and you're sticking to your intervals, you're on track.`
+                      : `Still here with you. How are you holding up? Want to talk through whether to continue tonight or pause?`
+                    }
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => handleCheckInResponse(pendingCheckIn, true)}
+                      className="bg-purple-600 hover:bg-purple-700"
+                    >
+                      <MessageCircle className="h-4 w-4 mr-1" />
+                      Talk to Nunu
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleCheckInResponse(pendingCheckIn, false)}
+                      className="border-purple-300 text-purple-700"
+                    >
+                      I'm okay
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Quick Chat Button - Always visible during active bedtime */}
+        {programData.bedtimeStartedAt && !showMorningCheckIn && !pendingCheckIn && (
+          <Button 
+            variant="outline" 
+            className="w-full border-purple-300 text-purple-700 hover:bg-purple-50"
+            onClick={onOpenChat}
+          >
+            <Heart className="h-4 w-4 mr-2" />
+            Need support? Talk to Nunu
+          </Button>
+        )}
+
         {/* Tonight's Guidance */}
         {guidance && !showMorningCheckIn && (
           <Card className="border-none shadow-md bg-slate-800 text-white">
@@ -604,15 +776,17 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
           </Card>
         )}
 
-        {/* Chat Button */}
-        <Button 
-          variant="outline" 
-          className="w-full"
-          onClick={onOpenChat}
-        >
-          <MessageCircle className="h-4 w-4 mr-2" />
-          Chat with Nunu for support
-        </Button>
+        {/* Chat Button - show when bedtime not active */}
+        {!programData.bedtimeStartedAt && (
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={onOpenChat}
+          >
+            <MessageCircle className="h-4 w-4 mr-2" />
+            Chat with Nunu for support
+          </Button>
+        )}
 
         {/* Reset Program */}
         <button
