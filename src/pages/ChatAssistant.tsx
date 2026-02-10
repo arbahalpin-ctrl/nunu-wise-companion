@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Clock, Trash2, Plus, MessageSquare, X, Bookmark, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { getSleepContext } from '@/utils/chatIntegration';
 
 interface Message {
   id: string;
@@ -165,10 +166,13 @@ const ChatAssistant = () => {
         content: msg.content
       }));
 
+      // Get current sleep context to pass to the AI
+      const sleepContext = getSleepContext();
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: conversationHistory }),
+        body: JSON.stringify({ messages: conversationHistory, sleepContext }),
       });
 
       const data = await response.json();

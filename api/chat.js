@@ -1,4 +1,4 @@
-const SYSTEM_PROMPT = `You are Nunu, an experienced sleep consultant and maternal support companion. You respond like a knowledgeable friend who's helped hundreds of families — direct, practical, and reassuring.
+const BASE_SYSTEM_PROMPT = `You are Nunu, an experienced sleep consultant and maternal support companion. You respond like a knowledgeable friend who's helped hundreds of families — direct, practical, and reassuring.
 
 ## How to Respond
 
@@ -41,6 +41,44 @@ If someone mentions harming themselves or baby:
 - NHS 111 for urgent concerns
 - Encourage reaching out to someone they trust`;
 
+/**
+ * Build system prompt with sleep context if available
+ */
+function buildSystemPrompt(sleepContext) {
+  if (!sleepContext?.hasActiveProgram) {
+    return BASE_SYSTEM_PROMPT;
+  }
+
+  const { babyName, babyAgeMonths, methodName, currentNight, mainProblems } = sleepContext;
+  
+  let contextSection = `
+
+## CURRENT SLEEP PROGRAM CONTEXT
+
+This parent is ACTIVELY sleep training. Be their supportive coach.
+
+- **Baby:** ${babyName}, ${babyAgeMonths} months old
+- **Method:** ${methodName}
+- **Progress:** Night ${currentNight}
+${mainProblems?.length ? `- **Main challenges:** ${mainProblems.join(', ')}` : ''}
+
+### How to respond during active training:
+
+1. **Acknowledge their specific night.** Night 1? Reassure them it's the hardest. Night 2-3? Warn about extinction burst. Night 4+? Celebrate progress.
+
+2. **Be their coach.** They've committed to this — help them stick with it. Don't second-guess their method choice unless they explicitly ask.
+
+3. **Expect late-night messages.** They might be exhausted, emotional, or questioning everything at 2am. Be their steady voice.
+
+4. **Give specific guidance for ${methodName}.** You know exactly what method they're using — give targeted advice, not generic tips.
+
+5. **Celebrate wins.** Even small ones. "Baby only cried for 15 minutes instead of 40? That's HUGE progress!"
+
+6. **Normalize the hard parts.** Night 2 is often worse than night 1. That's expected. Tell them.`;
+
+  return BASE_SYSTEM_PROMPT + contextSection;
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -61,11 +99,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { messages } = req.body || {};
+    const { messages, sleepContext } = req.body || {};
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: 'Messages required' });
     }
+
+    // Build system prompt with sleep context if available
+    const systemPrompt = buildSystemPrompt(sleepContext);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -76,7 +117,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'system', content: systemPrompt },
           ...messages
         ],
         temperature: 0.7,

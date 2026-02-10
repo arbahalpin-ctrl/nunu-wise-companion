@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import SleepAssessment, { SleepAssessmentData } from '@/components/SleepAssessment';
 import SleepPlan from '@/components/SleepPlan';
 import SleepProgram from '@/components/SleepProgram';
+import { injectSleepProgramStartMessage } from '@/utils/chatIntegration';
 
 const ASSESSMENT_STORAGE_KEY = 'nunu-sleep-assessment';
 const PROGRAM_STORAGE_KEY = 'nunu-sleep-program';
@@ -54,16 +55,23 @@ const Sleep = ({ onTabChange }: SleepProps) => {
 
   const handleStartProgram = () => {
     // Initialize the program in localStorage
+    const methodId = getMethodId();
     const intervals = assessment && assessment.cryingTolerance >= 4 ? [3, 5, 10, 10, 12, 15] : [];
     const newProgram = {
       startDate: new Date().toISOString().split('T')[0],
-      methodId: getMethodId(),
+      methodId,
       nightLogs: [],
       currentNight: 1,
       isActive: true,
       checkInIntervals: intervals,
     };
     localStorage.setItem(PROGRAM_STORAGE_KEY, JSON.stringify(newProgram));
+    
+    // Inject supportive message into chat
+    if (assessment) {
+      injectSleepProgramStartMessage(assessment.babyName, methodId);
+    }
+    
     setStage('program');
   };
 
