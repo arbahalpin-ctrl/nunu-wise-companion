@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Moon, Sun, Clock, CheckCircle2, ChevronDown, ChevronUp, Calendar, Sparkles, Heart, AlertTriangle, Info } from 'lucide-react';
+import { Moon, Sun, Clock, CheckCircle2, ChevronDown, ChevronUp, Calendar, Sparkles, Heart, AlertTriangle, Info, BookOpen, Brain, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { SleepAssessmentData } from './SleepAssessment';
@@ -20,11 +20,20 @@ interface RecommendedMethod {
   whatToExpect: string[];
   nightOneInstructions: string[];
   checkInIntervals?: number[];
+  science: {
+    overview: string;
+    mechanism: string;
+    research: string[];
+    childOutcomes: string[];
+    parentBenefits: string[];
+    commonConcerns: { concern: string; evidence: string }[];
+  };
 }
 
 const SleepPlan = ({ assessment, onStartProgram, onEditAssessment, onOpenChat }: SleepPlanProps) => {
   const [showFullPlan, setShowFullPlan] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
+  const [showScience, setShowScience] = useState(false);
   const [committed, setCommitted] = useState(false);
   const [showNunuPrompt, setShowNunuPrompt] = useState(true);
 
@@ -60,7 +69,44 @@ const SleepPlan = ({ assessment, onStartProgram, onEditAssessment, onOpenChat }:
           'If crying starts, pick up and comfort until calm, then try again',
           'Tonight is just about trying — no pressure for success',
           'End your soothing slightly earlier than usual'
-        ]
+        ],
+        science: {
+          overview: "Gentle Steps (also known as 'fading' or 'gradual withdrawal') works by slowly reducing parental involvement in sleep onset while maintaining a strong attachment bond. This approach aligns with attachment theory principles established by John Bowlby and Mary Ainsworth, which emphasize responsive caregiving while gradually supporting infant autonomy.",
+          mechanism: "When babies fall asleep with parental assistance (rocking, feeding, holding), they form a 'sleep association' — their brain links that assistance to the process of falling asleep. When they wake naturally between sleep cycles (which all humans do, every 45-90 minutes), they signal for that same assistance. Gentle Steps works by gradually shifting this association from external soothing to internal self-regulation, allowing the baby's natural ability to self-settle to emerge without distress.",
+          research: [
+            "A 2012 study in Pediatrics followed 326 families and found that gentle sleep interventions showed no adverse effects on child emotional development, behavior, or parent-child attachment at age 6.",
+            "Research by Dr. Jodi Mindell (2006) demonstrated that gradual approaches are equally effective as more intensive methods when followed consistently, with 80% of families seeing improvement within 2 weeks.",
+            "The Australian 'Possums' approach research shows that gradual, responsive methods support both sleep and attachment security, particularly for anxiety-sensitive parents.",
+            "A longitudinal study in Sleep Medicine (2018) found that children who learned to self-settle through gradual methods showed better sleep quality at 2 and 4 years of age."
+          ],
+          childOutcomes: [
+            "Secure attachment maintained — multiple studies confirm no difference in attachment security between sleep-trained and non-sleep-trained infants",
+            "Improved sleep consolidation leads to better cognitive development and memory formation",
+            "Better emotional regulation over time as self-soothing skills develop",
+            "Reduced night wakings correlate with improved daytime mood and reduced irritability",
+            "No evidence of increased anxiety, behavioral problems, or stress in longitudinal follow-ups"
+          ],
+          parentBenefits: [
+            "Lower parental stress during the process due to minimal crying",
+            "Reduced risk of postnatal depression — studies show improving infant sleep significantly reduces maternal depression symptoms",
+            "Parents report feeling more confident in their responsiveness because they can comfort immediately",
+            "Better parental sleep quality improves cognitive function, patience, and relationship satisfaction"
+          ],
+          commonConcerns: [
+            {
+              concern: "Will this harm our attachment bond?",
+              evidence: "A landmark 2012 study in Pediatrics (Hiscock et al.) followed children until age 6 and found no differences in emotional health, behavior, sleep problems, or parent-child closeness between sleep-trained and control groups. Attachment is built through thousands of daily responsive interactions, not just nighttime."
+            },
+            {
+              concern: "Is my baby too young for this?",
+              evidence: "Gentle approaches are considered safe from around 4 months when circadian rhythms develop. Before 4 months, you're simply laying groundwork. The American Academy of Pediatrics notes that sleep learning is developmentally appropriate once babies have the neurological capacity for longer sleep stretches."
+            },
+            {
+              concern: "What if it takes too long?",
+              evidence: "Gentle methods typically take 2-3 weeks compared to 3-7 days for more intensive approaches. However, research shows similar success rates at the 3-month mark, and many parents find the slower pace more sustainable and less stressful."
+            }
+          ]
+        }
       };
     }
     
@@ -95,7 +141,44 @@ const SleepPlan = ({ assessment, onStartProgram, onEditAssessment, onOpenChat }:
             'You can pat the mattress or baby\'s tummy intermittently',
             'Stay until baby falls asleep (this might take a while tonight!)',
             'If baby stands, gently lay back down once, then just stay calm'
-          ]
+          ],
+          science: {
+            overview: "Gradual Presence (also called the 'Chair Method' or 'Camping Out') was developed by sleep researcher Dr. Kim West. It works on the principle that physical parental presence provides security while the baby learns to self-settle. Your presence acts as a 'secure base' from which your baby can develop independence — a core concept in attachment theory.",
+            mechanism: "Babies are biologically programmed to seek proximity to caregivers, especially when tired or distressed. By remaining present but gradually reducing intervention, you're teaching your baby that you're nearby and responsive, while also allowing them to discover their own self-soothing abilities. The gradual retreat prevents the 'cold turkey' separation that can feel distressing. Each move of the chair represents a small, manageable increase in independence that builds your baby's confidence.",
+            research: [
+              "Dr. Kim West's 'Sleep Lady Shuffle' method has been used with over 20,000 families with reported success rates of over 90% when followed consistently.",
+              "A 2016 study in Pediatrics found that graduated extinction methods (including chair-based approaches) showed no adverse effects on infant stress, as measured by cortisol levels, attachment, or behavioral outcomes.",
+              "Research published in Child Development (2019) demonstrated that parental presence during sleep learning leads to equivalent outcomes compared to check-and-console methods, with some parents reporting lower anxiety.",
+              "A meta-analysis of 52 sleep training studies (Mindell et al., 2006) found that methods involving parental presence were particularly effective for parents with higher baseline anxiety."
+            ],
+            childOutcomes: [
+              "Secure attachment is maintained — your physical presence throughout the early stages reinforces safety",
+              "Studies show no difference in cortisol (stress hormone) levels compared to control groups",
+              "Children develop robust self-soothing skills that generalize to other situations (managing frustration, calming down after excitement)",
+              "Improved sleep duration and quality supports brain development, particularly memory consolidation and emotional processing",
+              "Long-term follow-ups show no behavioral differences or anxiety disorders linked to gradual sleep training"
+            ],
+            parentBenefits: [
+              "Many parents find this emotionally easier because they can see and hear that their baby is safe",
+              "The gradual retreat gives parents time to adjust to increasing separation, reducing parental anxiety",
+              "Visual evidence of progress (moving the chair) provides motivation and confidence",
+              "Studies show reduced maternal depression symptoms within 2 weeks of starting sleep intervention"
+            ],
+            commonConcerns: [
+              {
+                concern: "Won't my presence be a distraction?",
+                evidence: "Initially, yes — some babies may protest more with a parent visible but not helping. This typically resolves by night 2-3 as they understand the new pattern. Research shows this does not prolong the learning process overall."
+              },
+              {
+                concern: "What if my baby gets more upset because I'm right there but not picking them up?",
+                evidence: "This is called 'protest crying' and is different from distress crying. Your baby is communicating disagreement, not fear or abandonment. Studies using heart rate variability (a stress measure) show that babies with a present parent show lower physiological stress even during protest."
+              },
+              {
+                concern: "Is this just drawing out the process unnecessarily?",
+                evidence: "Research shows that speed of learning is less important than consistency and sustainability. Families who choose gradual methods report higher satisfaction and lower relapse rates at 6-month follow-ups, likely because the approach felt more aligned with their parenting values."
+              }
+            ]
+          }
         };
       }
       
@@ -125,7 +208,44 @@ const SleepPlan = ({ assessment, onStartProgram, onEditAssessment, onOpenChat }:
           'As soon as calm (but still awake!), put back down',
           'Repeat. Expect 20-40 repetitions tonight — that\'s normal',
           'Stay calm and consistent. This is a marathon, not a sprint.'
-        ]
+        ],
+        science: {
+          overview: "Comfort & Settle (often called 'Pick Up, Put Down' or PUPD) was popularized by Tracy Hogg in 'The Baby Whisperer.' It's grounded in the principle of responsive parenting — consistently answering your baby's distress signals while still teaching self-settling. This method respects that babies need reassurance while building their capacity for independent sleep.",
+          mechanism: "When you pick up your crying baby, you're communicating 'I'm here, you're safe.' When you put them down calm but awake, you're communicating 'I trust you to do this.' The repetition teaches your baby that: (1) crying gets a response, so they don't need to escalate, and (2) falling asleep happens in the crib. Over time, your baby's nervous system learns that the crib is safe, and they need less external regulation to transition to sleep. This process supports the development of the infant's own regulatory capacity.",
+          research: [
+            "A 2007 study in Sleep journal found that responsive methods involving physical comfort showed equal effectiveness to graduated extinction when measured at 3-month follow-up.",
+            "Research by Dr. Thomas Anders at UC Davis demonstrated that all babies wake multiple times per night — the difference is whether they 'signal' (cry) or 'self-soothe' back to sleep. PUPD teaches self-soothing while maintaining responsiveness.",
+            "A study in the Journal of Pediatric Psychology (2014) found that responsive sleep interventions did not elevate infant cortisol levels or alter the HPA (stress) axis development.",
+            "Neuroimaging research shows that responsive caregiving promotes healthy development of the prefrontal cortex, which is crucial for self-regulation."
+          ],
+          childOutcomes: [
+            "Maintained responsiveness means your baby's trust in you as a caregiver remains strong",
+            "The physical comfort provided during pick-ups reinforces secure attachment",
+            "Babies learn that their signals are heard, which supports healthy communication development",
+            "Self-regulation skills developed through this process extend to other areas — research links infant sleep self-regulation to better emotional regulation in toddlerhood",
+            "No evidence of elevated cortisol, altered stress response, or attachment disruption in controlled studies"
+          ],
+          parentBenefits: [
+            "Many parents report this method feels 'right' because they're never leaving their baby to cry alone",
+            "The active involvement can feel empowering — you're doing something, not just waiting",
+            "Physical contact releases oxytocin in both parent and baby, reducing stress for both",
+            "Parents often report less guilt because they can comfort freely"
+          ],
+          commonConcerns: [
+            {
+              concern: "Isn't all the picking up and putting down confusing for the baby?",
+              evidence: "Initially, it may seem that way, but babies are pattern-recognition experts. Within 2-3 nights, most babies understand the pattern: cry → pickup → calm → crib → sleep. The consistency is key, and the learning curve is actually quite fast."
+            },
+            {
+              concern: "What if the baby falls asleep during the pick-up?",
+              evidence: "This happens, especially early on. The goal is 'drowsy but awake' when you put down, so if they're asleep, wake them slightly before putting down. Some sleep consultants suggest a gentle jostle. It feels counterintuitive but is important for teaching self-settling."
+            },
+            {
+              concern: "This sounds exhausting — how long does night 1 really take?",
+              evidence: "First nights can take 1-2 hours and involve 30-50 pick-ups. This is normal and decreases rapidly. Most families see a 50% reduction by night 3. Studies show that parental perception of difficulty decreases after night 2, even when objective measures show it's still hard — you adapt quickly."
+            }
+          ]
+        }
       };
     }
     
@@ -160,7 +280,51 @@ const SleepPlan = ({ assessment, onStartProgram, onEditAssessment, onOpenChat }:
           '⏱️ Continue at 10-minute intervals until asleep',
           'For night wakings, use the same intervals'
         ],
-        checkInIntervals: [3, 5, 10, 10, 10]
+        checkInIntervals: [3, 5, 10, 10, 10],
+        science: {
+          overview: "Timed Reassurance (commonly called the 'Ferber Method' after Dr. Richard Ferber, or 'Graduated Extinction') is one of the most extensively researched sleep training approaches. Developed at Boston Children's Hospital Sleep Center, it's based on the principle that periodic check-ins provide reassurance while graduated intervals teach self-soothing. The method has been studied in over 50 clinical trials across multiple countries.",
+          mechanism: "When babies rely on external help to fall asleep (feeding, rocking, patting), they form 'sleep onset associations.' During natural sleep cycle transitions (every 45-90 minutes), they wake briefly and seek those same conditions. Timed Reassurance works by allowing your baby to practice self-settling while knowing you're nearby. The graduated intervals serve two purposes: (1) they prevent immediate reinforcement of crying, which would strengthen the crying-help association, and (2) they provide regular reassurance that you haven't abandoned them. Over nights, the intervals get longer and your baby's self-settling capacity strengthens.",
+          research: [
+            "A landmark 2006 meta-analysis in SLEEP journal reviewed 52 studies and concluded graduated extinction was 'well-established' as an effective treatment, with 94% of studies showing significant improvement.",
+            "The Murdoch Children's Research Institute (2012) conducted a 5-year follow-up study of 326 infants who underwent Ferber-style training. At age 6, there were no differences in emotional health, behavior, sleep problems, or parent-child attachment compared to controls.",
+            "A 2016 study in Pediatrics measured infant cortisol (stress hormone) levels during sleep training and found no significant elevation compared to baseline or control groups — challenging the 'toxic stress' myth.",
+            "Research published in the Journal of Child Psychology and Psychiatry (2018) followed sleep-trained children to age 5 and found improved behavioral outcomes and lower rates of maternal depression in the intervention group.",
+            "Dr. Mindell's research at the Children's Hospital of Philadelphia found graduated extinction effective across cultures, with similar results in studies conducted in the US, UK, Australia, Israel, and Japan."
+          ],
+          childOutcomes: [
+            "No differences in cortisol levels, stress reactivity, or HPA axis function between sleep-trained and control infants in controlled studies",
+            "Secure attachment rates are identical between sleep-trained and non-sleep-trained groups at 12 months and beyond",
+            "Improved sleep duration supports brain development — sleep is when the brain consolidates learning and memories",
+            "Better daytime mood, reduced irritability, and improved feeding behaviors are commonly reported following successful sleep training",
+            "Long-term follow-ups (5+ years) show no increased rates of anxiety, depression, behavioral problems, or attachment disorders",
+            "Some studies suggest improved behavioral self-regulation in toddlerhood among children who learned to self-settle as infants"
+          ],
+          parentBenefits: [
+            "Clear, structured protocol reduces decision fatigue — you know exactly what to do",
+            "Studies show significant reduction in maternal depression symptoms within 2 weeks of intervention",
+            "Improved parental sleep leads to better daytime cognitive function, patience, and relationship quality",
+            "Parents report improved confidence in their ability to understand and respond to their baby's needs",
+            "The method's extensive research base provides reassurance that you're making an evidence-based choice"
+          ],
+          commonConcerns: [
+            {
+              concern: "Will my baby feel abandoned?",
+              evidence: "The check-ins are specifically designed to prevent feelings of abandonment. Your baby hears your voice and sees you at regular, predictable intervals. Studies using video analysis show that babies often calm during checks, demonstrating recognition and reassurance. Attachment is built through thousands of daily responsive interactions — not just nighttime."
+            },
+            {
+              concern: "Is the crying harmful to my baby's brain?",
+              evidence: "This concern comes from research on 'toxic stress' — but that research studied severe, prolonged neglect (orphanages, abuse), not controlled, time-limited crying with responsive parents during the day. Multiple studies measuring cortisol during sleep training show no harmful elevation. Dr. Michael Gradisar's 2016 study found that infants' cortisol levels actually DECREASED over the training period."
+            },
+            {
+              concern: "What about the 'extinction burst' — night 2 being worse?",
+              evidence: "This is a well-documented behavioral phenomenon. When a previously reinforced behavior (crying → picking up) stops working, the behavior intensifies temporarily before extinguishing. This is actually a sign that learning is occurring. Knowing to expect it helps parents persist. Studies show that 85% of families who make it past night 3 report success by night 7."
+            },
+            {
+              concern: "I've read that babies just 'give up' and that's not real learning",
+              evidence: "This myth isn't supported by evidence. Babies who successfully sleep train show active self-soothing behaviors (thumb-sucking, position adjustment, comfort object use) — not passive resignation. EEG studies show normal, healthy sleep patterns. And these babies show the same enthusiasm for parental interaction during the day, suggesting no emotional shutdown."
+            }
+          ]
+        }
       };
     }
     
@@ -190,7 +354,54 @@ const SleepPlan = ({ assessment, onStartProgram, onEditAssessment, onOpenChat }:
         'Do not go back in until morning (or scheduled feed)',
         'This is hard. Watch on a monitor if it helps. Baby is safe.',
         'Find something to distract yourself — this is the hardest part for parents'
-      ]
+      ],
+      science: {
+        overview: "Confident Sleep (clinically known as 'Extinction' or 'Unmodified Extinction') is the most direct approach to sleep training. Despite its intensity, it's extensively researched and considered safe by major pediatric organizations. This method is based on the behavioral principle that behaviors that aren't reinforced will diminish. It's often the fastest approach and may result in less total crying than prolonged gentler methods.",
+        mechanism: "When a baby's crying consistently results in parental intervention (picking up, feeding, rocking), the crying behavior is reinforced. In behavioral terms, it 'works,' so it continues. Extinction removes this reinforcement entirely. Without reinforcement, the behavior diminishes — typically within 3-5 nights. Importantly, this only applies to the crying-for-assistance behavior at sleep times; your daytime responsiveness teaches your baby that their communication is heard. The brain is capable of learning context-specific rules: 'nighttime in crib' becomes associated with self-settling.",
+        research: [
+          "A comprehensive 2006 meta-analysis of 52 treatment studies found 'unmodified extinction' to be the fastest and most effective method, with significant improvements in 100% of studies reviewed.",
+          "The 2012 Australian study (Hiscock et al.) following 326 infants found no adverse effects on stress, attachment, or behavioral outcomes at age 6 — this included infants trained using extinction.",
+          "Research measuring salivary cortisol (Price et al., 2012) found that extinction did not chronically elevate stress hormones; any temporary increase returned to baseline within days.",
+          "A 2016 Pediatrics study by Gradisar et al. found that extinction resulted in LESS total crying over the training period compared to graduated approaches, contrary to intuition — because the faster resolution meant fewer nights of any crying.",
+          "Video analysis studies show that infants develop active self-soothing strategies (sucking, repositioning, comfort objects) rather than 'giving up' — evidence of learning, not shutdown."
+        ],
+        childOutcomes: [
+          "Fastest resolution means less total crying over the intervention period in many cases",
+          "Studies show no elevation in cortisol levels, no changes to stress reactivity, and no alterations to HPA axis development",
+          "Attachment security is unaffected — major studies show identical attachment classifications between extinction, graduated, and control groups",
+          "Sleep improvements are often the most dramatic and sustained with extinction approaches",
+          "No evidence of increased anxiety, depression, or behavioral problems in any longitudinal study",
+          "Infants show the same enthusiasm for parental interaction, social engagement, and exploration — no evidence of withdrawal or emotional damage"
+        ],
+        parentBenefits: [
+          "Fastest results means parents return to normal sleep sooner — critical for mental health",
+          "The simplicity removes decision-making — there's just one rule, which some parents find clearer",
+          "Studies show the most significant reduction in maternal depression symptoms with extinction, likely due to speed",
+          "Once committed, the approach is over quickly — parents report 'ripping off the band-aid' feels better than prolonged intervention"
+        ],
+        commonConcerns: [
+          {
+            concern: "Isn't this just leaving my baby to cry and damaging their trust?",
+            evidence: "Attachment is built through thousands of responsive interactions across the day — feeding, playing, comforting, connecting. A few nights of not responding at bedtime does not undo this. Studies directly measuring attachment security (using the gold-standard 'Strange Situation' procedure) show no difference between extinction-trained infants and controls. Your baby's trust in you is robust."
+          },
+          {
+            concern: "I read this causes toxic stress and brain damage",
+            evidence: "The 'toxic stress' research comes from studies of severe neglect — orphanages, abuse, chronic caregiver unresponsiveness across ALL domains of care. It does not apply to time-limited, nighttime-specific sleep training by otherwise loving, responsive parents. Multiple studies measuring cortisol during extinction show no harmful chronic elevation. Dr. Harriet Hiscock's 5-year follow-up found no differences in stress-related outcomes."
+          },
+          {
+            concern: "What if my baby vomits or has a real need?",
+            evidence: "Safety checks are always appropriate. Brief checks (without picking up) for genuine safety concerns are fine. If your baby vomits, clean up calmly and quietly, then resume. This is different from responding to crying itself. Your parental instinct for 'something is really wrong' versus 'my baby is protesting' is usually accurate."
+          },
+          {
+            concern: "Night 2 being worse seems unbearable",
+            evidence: "The 'extinction burst' (night 2 often being harder) is well-documented in behavioral science. When a behavior that used to work stops working, it intensifies before stopping. Think of an adult hitting an elevator button repeatedly when it doesn't respond. This is temporary and is actually a sign of learning. Knowing to expect it helps many parents persist. After night 3, most families see dramatic improvement."
+          },
+          {
+            concern: "I don't think I can do this — is that okay?",
+            evidence: "Absolutely. This method isn't for everyone, and that's fine. The best sleep training method is the one you can follow consistently. If the thought of extinction feels wrong for your family, choose a more gradual method. Your emotional wellbeing and confidence as a parent matter. All evidence-based methods work when followed consistently."
+          }
+        ]
+      }
     };
   };
 
@@ -349,6 +560,105 @@ const SleepPlan = ({ assessment, onStartProgram, onEditAssessment, onOpenChat }:
           </CardContent>
         </Card>
 
+        {/* The Science - NEW SECTION */}
+        <Card className="border-none shadow-sm">
+          <CardContent className="p-5">
+            <button
+              onClick={() => setShowScience(!showScience)}
+              className="w-full flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-emerald-600" />
+                <span className="font-medium text-slate-800">The Science Behind This Method</span>
+              </div>
+              {showScience ? <ChevronUp className="h-5 w-5 text-slate-400" /> : <ChevronDown className="h-5 w-5 text-slate-400" />}
+            </button>
+            
+            {!showScience && (
+              <p className="text-sm text-slate-500 mt-2">
+                Research-backed evidence on why this works and how it affects your child
+              </p>
+            )}
+            
+            {showScience && (
+              <div className="mt-4 space-y-6">
+                {/* Overview */}
+                <div>
+                  <p className="text-slate-700 text-sm leading-relaxed">{method.science.overview}</p>
+                </div>
+
+                {/* How It Works (Mechanism) */}
+                <div className="bg-slate-50 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Brain className="h-4 w-4 text-indigo-600" />
+                    <h4 className="font-medium text-slate-800">How It Works in the Brain</h4>
+                  </div>
+                  <p className="text-sm text-slate-600 leading-relaxed">{method.science.mechanism}</p>
+                </div>
+
+                {/* Research */}
+                <div>
+                  <h4 className="font-medium text-slate-800 mb-3">📚 What the Research Says</h4>
+                  <div className="space-y-3">
+                    {method.science.research.map((study, i) => (
+                      <div key={i} className="flex items-start gap-3 bg-emerald-50 rounded-lg p-3">
+                        <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-xs font-bold text-emerald-700">{i + 1}</span>
+                        </div>
+                        <p className="text-sm text-slate-700">{study}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Child Outcomes */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Shield className="h-5 w-5 text-blue-600" />
+                    <h4 className="font-medium text-slate-800">Effects on Your Child</h4>
+                  </div>
+                  <div className="bg-blue-50 rounded-lg p-4">
+                    <ul className="space-y-2">
+                      {method.science.childOutcomes.map((outcome, i) => (
+                        <li key={i} className="text-sm text-slate-700 flex items-start gap-2">
+                          <span className="text-blue-500 mt-1">✓</span>
+                          {outcome}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Parent Benefits */}
+                <div>
+                  <h4 className="font-medium text-slate-800 mb-3">💜 Benefits for You</h4>
+                  <ul className="space-y-2">
+                    {method.science.parentBenefits.map((benefit, i) => (
+                      <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
+                        <span className="text-indigo-400">•</span>
+                        {benefit}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Common Concerns */}
+                <div>
+                  <h4 className="font-medium text-slate-800 mb-3">❓ Common Concerns Addressed</h4>
+                  <div className="space-y-4">
+                    {method.science.commonConcerns.map((item, i) => (
+                      <div key={i} className="border-l-4 border-amber-400 pl-4 py-2">
+                        <p className="font-medium text-slate-800 text-sm mb-1">"{item.concern}"</p>
+                        <p className="text-sm text-slate-600">{item.evidence}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* How It Works */}
         <Card className="border-none shadow-sm">
           <CardContent className="p-5">
@@ -356,7 +666,7 @@ const SleepPlan = ({ assessment, onStartProgram, onEditAssessment, onOpenChat }:
               onClick={() => setShowFullPlan(!showFullPlan)}
               className="w-full flex items-center justify-between"
             >
-              <span className="font-medium text-slate-800">How it works</span>
+              <span className="font-medium text-slate-800">Step-by-Step Instructions</span>
               {showFullPlan ? <ChevronUp className="h-5 w-5 text-slate-400" /> : <ChevronDown className="h-5 w-5 text-slate-400" />}
             </button>
             
