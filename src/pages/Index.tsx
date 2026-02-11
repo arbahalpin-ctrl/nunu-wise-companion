@@ -45,9 +45,15 @@ const Index = () => {
     }
   };
 
+  // Chat gets full width on desktop for better UX
+  const isChat = activeTab === 'chat';
+
   return (
     <div className="min-h-screen bg-slate-100 flex justify-center">
-      <div className="w-full max-w-md min-h-screen bg-gradient-to-b from-sky-50 to-white shadow-xl relative">
+      <div className={`
+        w-full min-h-screen bg-gradient-to-b from-sky-50 to-white shadow-xl relative
+        ${isChat ? 'max-w-4xl' : 'max-w-md'}
+      `}>
         {renderActiveTab()}
         <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
       </div>

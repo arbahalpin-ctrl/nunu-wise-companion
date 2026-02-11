@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Clock, Trash2, Plus, MessageSquare, X, Bookmark, Check } from 'lucide-react';
+import { Send, Bot, User, Clock, Trash2, Plus, MessageSquare, X, Bookmark, Check, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { getSleepContext, clearUnread } from '@/utils/chatIntegration';
@@ -65,7 +65,7 @@ const ChatAssistant = () => {
     const convos = loadConversations();
     return convos[0]?.id || '';
   });
-  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
   
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -80,6 +80,7 @@ const ChatAssistant = () => {
     return new Set();
   });
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const activeConversation = conversations.find(c => c.id === activeConversationId);
   const messages = activeConversation?.messages || [];
@@ -105,16 +106,21 @@ const ChatAssistant = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Focus input on mount and conversation switch
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [activeConversationId]);
+
   const startNewConversation = () => {
     const newConvo = createNewConversation();
     setConversations(prev => [newConvo, ...prev]);
     setActiveConversationId(newConvo.id);
-    setShowMobileSidebar(false);
+    setShowSidebar(false);
   };
 
   const switchConversation = (id: string) => {
     setActiveConversationId(id);
-    setShowMobileSidebar(false);
+    setShowSidebar(false);
   };
 
   const deleteConversation = (id: string, e: React.MouseEvent) => {
@@ -166,6 +172,7 @@ const ChatAssistant = () => {
     setIsTyping(true);
     
     try {
+      // Send full conversation history for context
       const conversationHistory = updatedMessages.map(msg => ({
         role: msg.role,
         content: msg.content
@@ -220,7 +227,6 @@ const ChatAssistant = () => {
       const saved = localStorage.getItem(SAVED_RECIPES_KEY);
       const recipes: SavedRecipe[] = saved ? JSON.parse(saved) : [];
       
-      // Check if already saved
       if (recipes.some(r => r.id === message.id)) return;
       
       const newRecipe: SavedRecipe = {
@@ -257,7 +263,7 @@ const ChatAssistant = () => {
     return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
   };
 
-  // Sidebar content (reused for both mobile and desktop)
+  // Sidebar content
   const SidebarContent = () => (
     <>
       <div className="p-3">
@@ -266,11 +272,12 @@ const ChatAssistant = () => {
           className="w-full flex items-center gap-2 px-3 py-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors"
         >
           <Plus className="h-4 w-4" />
-          New conversation
+          New chat
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 pb-20">
+      <div className="flex-1 overflow-y-auto px-3 pb-4">
+        <p className="text-xs text-slate-400 px-2 mb-2">Previous chats</p>
         {conversations.map((convo) => (
           <div
             key={convo.id}
@@ -300,20 +307,20 @@ const ChatAssistant = () => {
   );
 
   return (
-    <div className="pb-20 h-screen bg-gradient-to-b from-sky-50 to-white flex">
-      {/* Desktop Sidebar - Always visible on md+ screens */}
-      <div className="hidden md:flex md:flex-col w-64 bg-white border-r border-slate-200 flex-shrink-0">
+    <div className="h-[calc(100vh-80px)] bg-white flex overflow-hidden">
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex md:flex-col w-64 bg-slate-50 border-r border-slate-200 flex-shrink-0">
         <div className="p-4 border-b border-slate-100">
-          <h2 className="font-semibold text-slate-800">Conversations</h2>
+          <h2 className="font-semibold text-slate-800">Chats</h2>
         </div>
         <SidebarContent />
       </div>
 
       {/* Mobile Sidebar Overlay */}
-      {showMobileSidebar && (
+      {showSidebar && (
         <div 
           className="md:hidden fixed inset-0 bg-black/30 z-40"
-          onClick={() => setShowMobileSidebar(false)}
+          onClick={() => setShowSidebar(false)}
         />
       )}
 
@@ -321,12 +328,12 @@ const ChatAssistant = () => {
       <div className={`
         md:hidden fixed top-0 left-0 h-full w-72 bg-white shadow-xl z-50 
         transform transition-transform duration-300 ease-in-out flex flex-col
-        ${showMobileSidebar ? 'translate-x-0' : '-translate-x-full'}
+        ${showSidebar ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-          <h2 className="font-semibold text-slate-800">Conversations</h2>
+          <h2 className="font-semibold text-slate-800">Your Chats</h2>
           <button
-            onClick={() => setShowMobileSidebar(false)}
+            onClick={() => setShowSidebar(false)}
             className="p-1 text-slate-400 hover:text-slate-600 rounded"
           >
             <X className="h-5 w-5" />
@@ -336,33 +343,34 @@ const ChatAssistant = () => {
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 bg-gradient-to-b from-sky-50/50 to-white">
         {/* Header */}
-        <div className="p-4 md:p-6 flex-shrink-0 border-b border-slate-100 bg-white/80 backdrop-blur">
+        <div className="px-4 py-3 flex-shrink-0 border-b border-slate-100 bg-white/90 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {/* Mobile menu button */}
               <button
-                onClick={() => setShowMobileSidebar(true)}
-                className="md:hidden p-2 -ml-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+                onClick={() => setShowSidebar(true)}
+                className="md:hidden p-2 -ml-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                title="View chats"
               >
-                <MessageSquare className="h-5 w-5" />
+                <ChevronLeft className="h-5 w-5" />
               </button>
-              <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-slate-700 to-slate-900 rounded-full flex items-center justify-center shadow-sm">
                 <Bot className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-semibold text-slate-800">Nunu</h1>
-                <div className="flex items-center gap-1 text-xs text-slate-400">
-                  <div className="w-2 h-2 bg-emerald-400 rounded-full" />
-                  Sleep & wellbeing expert
+                <h1 className="text-base font-semibold text-slate-800">Nunu</h1>
+                <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                  <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                  Sleep & wellbeing support
                 </div>
               </div>
             </div>
             <button
               onClick={startNewConversation}
-              className="md:hidden p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
-              title="New conversation"
+              className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+              title="New chat"
             >
               <Plus className="h-5 w-5" />
             </button>
@@ -377,13 +385,13 @@ const ChatAssistant = () => {
               className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {message.role === 'assistant' && (
-                <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <div className="w-8 h-8 bg-gradient-to-br from-slate-700 to-slate-900 rounded-full flex items-center justify-center flex-shrink-0 mt-1 shadow-sm">
                   <Bot className="h-4 w-4 text-white" />
                 </div>
               )}
               
               <div className={`
-                max-w-[85%] md:max-w-[70%] rounded-2xl p-4
+                max-w-[85%] md:max-w-[75%] rounded-2xl px-4 py-3
                 ${message.role === 'user' 
                   ? 'bg-slate-800 text-white' 
                   : 'bg-white shadow-sm border border-slate-100'
@@ -391,8 +399,8 @@ const ChatAssistant = () => {
               `}>
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
                 <div className={`
-                  flex items-center justify-between mt-2
-                  ${message.role === 'user' ? 'text-slate-300' : 'text-slate-400'}
+                  flex items-center justify-between mt-2 gap-3
+                  ${message.role === 'user' ? 'text-slate-400' : 'text-slate-400'}
                 `}>
                   <div className="flex items-center gap-1 text-xs">
                     <Clock className="h-3 w-3" />
@@ -401,12 +409,12 @@ const ChatAssistant = () => {
                   {message.role === 'assistant' && message.id !== '1' && (
                     <button
                       onClick={() => saveRecipe(message)}
-                      className={`p-1.5 rounded-full transition-colors ${
+                      className={`p-1 rounded-full transition-colors ${
                         savedMessageIds.has(message.id)
                           ? 'text-emerald-500 bg-emerald-50'
                           : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
                       }`}
-                      title={savedMessageIds.has(message.id) ? 'Saved!' : 'Save to My Recipes'}
+                      title={savedMessageIds.has(message.id) ? 'Saved!' : 'Save this advice'}
                     >
                       {savedMessageIds.has(message.id) ? (
                         <Check className="h-3.5 w-3.5" />
@@ -428,14 +436,14 @@ const ChatAssistant = () => {
 
           {isTyping && (
             <div className="flex gap-3 justify-start">
-              <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-gradient-to-br from-slate-700 to-slate-900 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
                 <Bot className="h-4 w-4 text-white" />
               </div>
-              <div className="bg-white shadow-sm border border-slate-100 rounded-2xl p-4">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-slate-300 rounded-full animate-pulse" />
-                  <div className="w-2 h-2 bg-slate-300 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
-                  <div className="w-2 h-2 bg-slate-300 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
+              <div className="bg-white shadow-sm border border-slate-100 rounded-2xl px-4 py-3">
+                <div className="flex gap-1.5">
+                  <div className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <div className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
               </div>
             </div>
@@ -444,16 +452,16 @@ const ChatAssistant = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick Prompts */}
+        {/* Quick Prompts - only show for new conversations */}
         {messages.length <= 1 && (
-          <div className="px-4 py-3 flex-shrink-0 border-t border-slate-100 bg-white/50">
-            <p className="text-xs text-slate-400 mb-2">Quick topics:</p>
+          <div className="px-4 py-3 flex-shrink-0 bg-white/80">
+            <p className="text-xs text-slate-500 mb-2">Tap to start:</p>
             <div className="flex flex-wrap gap-2">
               {quickPrompts.map((prompt, index) => (
                 <button
                   key={index}
                   onClick={() => setNewMessage(prompt)}
-                  className="px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-full text-slate-600 hover:bg-slate-50 transition-colors"
+                  className="px-3 py-1.5 text-sm bg-white border border-slate-200 rounded-full text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-colors"
                 >
                   {prompt}
                 </button>
@@ -464,23 +472,27 @@ const ChatAssistant = () => {
 
         {/* Input */}
         <div className="p-4 flex-shrink-0 border-t border-slate-100 bg-white">
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-end">
             <Input
+              ref={inputRef}
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Type your message..."
-              className="rounded-full bg-slate-50 border-slate-200 focus:border-slate-400 focus:bg-white"
+              className="rounded-full bg-slate-50 border-slate-200 focus:border-slate-400 focus:bg-white py-3 px-4"
               onKeyPress={handleKeyPress}
               disabled={isTyping}
             />
             <Button 
               onClick={sendMessage}
               disabled={!newMessage.trim() || isTyping}
-              className="rounded-full w-12 h-10 p-0 bg-slate-800 hover:bg-slate-700 disabled:opacity-50"
+              className="rounded-full w-11 h-11 p-0 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 flex-shrink-0"
             >
               <Send className="h-4 w-4" />
             </Button>
           </div>
+          <p className="text-xs text-slate-400 text-center mt-2">
+            Nunu remembers your conversation in each chat
+          </p>
         </div>
       </div>
     </div>
