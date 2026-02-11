@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, X, AlertTriangle, ChevronLeft, Star, Clock, Bookmark, BookmarkCheck, Info, ChefHat, Snowflake, Users, MessageCircle, Sparkles, Send, Bot, User, Check } from 'lucide-react';
+import { Search, X, AlertTriangle, ChevronLeft, Star, Clock, Bookmark, BookmarkCheck, Info, ChefHat, Snowflake, Users, MessageCircle, Sparkles, Send, Bot, User, Check, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -234,7 +234,43 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
     setRecipeChatMessages([initialMessage]);
     localStorage.removeItem(RECIPE_CHAT_KEY);
   };
-  const [activeTab, setActiveTab] = useState<'foods' | 'recipes'>('foods');
+  const [activeTab, setActiveTab] = useState<'foods' | 'recipes' | 'saved'>('foods');
+  const [savedChatRecipes, setSavedChatRecipes] = useState<SavedRecipe[]>([]);
+  const [expandedSavedId, setExpandedSavedId] = useState<string | null>(null);
+
+  // Load saved chat recipes
+  useEffect(() => {
+    const loadSaved = () => {
+      try {
+        const saved = localStorage.getItem(CHAT_SAVED_KEY);
+        if (saved) {
+          setSavedChatRecipes(JSON.parse(saved));
+        }
+      } catch (e) {
+        console.error('Failed to load saved recipes:', e);
+      }
+    };
+    loadSaved();
+    // Also reload when tab changes to saved
+    if (activeTab === 'saved') {
+      loadSaved();
+    }
+  }, [activeTab]);
+
+  const deleteSavedRecipe = (id: string) => {
+    const updated = savedChatRecipes.filter(r => r.id !== id);
+    setSavedChatRecipes(updated);
+    localStorage.setItem(CHAT_SAVED_KEY, JSON.stringify(updated));
+    setSavedRecipeIds(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(id);
+      return newSet;
+    });
+  };
+
+  const formatSavedDate = (timestamp: number) => {
+    return new Date(timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' });
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFood, setSelectedFood] = useState<Food | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
@@ -724,7 +760,7 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
         <div className="flex bg-white rounded-xl p-1 shadow-sm">
           <button
             onClick={() => setActiveTab('foods')}
-            className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 py-2.5 px-2 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-1 ${
               activeTab === 'foods'
                 ? 'bg-amber-500 text-white shadow-md'
                 : 'text-slate-600 hover:bg-slate-50'
@@ -734,7 +770,7 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
           </button>
           <button
             onClick={() => setActiveTab('recipes')}
-            className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 py-2.5 px-2 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-1 ${
               activeTab === 'recipes'
                 ? 'bg-orange-500 text-white shadow-md'
                 : 'text-slate-600 hover:bg-slate-50'
@@ -742,7 +778,24 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
           >
             <ChefHat className="h-4 w-4" />
             Recipes
-            <span className="bg-orange-200 text-orange-700 text-xs px-1.5 py-0.5 rounded-full">{recipes.length}</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('saved')}
+            className={`flex-1 py-2.5 px-2 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-1 ${
+              activeTab === 'saved'
+                ? 'bg-rose-500 text-white shadow-md'
+                : 'text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <Bookmark className="h-4 w-4" />
+            Saved
+            {savedChatRecipes.length > 0 && (
+              <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                activeTab === 'saved' 
+                  ? 'bg-rose-400 text-white' 
+                  : 'bg-rose-100 text-rose-600'
+              }`}>{savedChatRecipes.length}</span>
+            )}
           </button>
         </div>
       </div>
@@ -973,6 +1026,92 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
               <MessageCircle className="h-5 w-5 text-white/70" />
             </div>
           </button>
+        </div>
+      )}
+
+      {/* SAVED TAB */}
+      {activeTab === 'saved' && (
+        <div className="px-6 space-y-4">
+          {savedChatRecipes.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Bookmark className="h-8 w-8 text-rose-400" />
+              </div>
+              <h3 className="font-semibold text-slate-700 mb-2">No saved recipes yet</h3>
+              <p className="text-slate-500 text-sm mb-6 max-w-xs mx-auto">
+                Ask Nunu for recipe ideas and tap the bookmark icon to save your favorites here
+              </p>
+              <button
+                onClick={() => setShowRecipeChat(true)}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-3 rounded-full font-medium shadow-md hover:shadow-lg transition-shadow"
+              >
+                <Sparkles className="h-5 w-5" />
+                Get Recipe Ideas
+              </button>
+            </div>
+          ) : (
+            <>
+              <p className="text-sm text-slate-500">
+                {savedChatRecipes.length} saved recipe{savedChatRecipes.length !== 1 ? 's' : ''} from chat
+              </p>
+              
+              <div className="space-y-3">
+                {savedChatRecipes.map((recipe) => (
+                  <Card key={recipe.id} className="border-none shadow-sm overflow-hidden">
+                    <button
+                      onClick={() => setExpandedSavedId(expandedSavedId === recipe.id ? null : recipe.id)}
+                      className="w-full p-4 flex items-start gap-3 text-left hover:bg-slate-50 transition-colors"
+                    >
+                      <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <ChefHat className="h-5 w-5 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-slate-800 line-clamp-1">{recipe.title}</h3>
+                        <p className="text-xs text-slate-400 mt-0.5">Saved {formatSavedDate(recipe.savedAt)}</p>
+                      </div>
+                      {expandedSavedId === recipe.id ? (
+                        <X className="h-5 w-5 text-slate-400 flex-shrink-0" />
+                      ) : (
+                        <ChevronLeft className="h-5 w-5 text-slate-400 flex-shrink-0 rotate-180" />
+                      )}
+                    </button>
+                    
+                    {expandedSavedId === recipe.id && (
+                      <div className="px-4 pb-4 border-t border-slate-100">
+                        <div className="bg-amber-50 rounded-xl p-4 mt-3 max-h-80 overflow-y-auto">
+                          <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{recipe.content}</p>
+                        </div>
+                        <button
+                          onClick={() => deleteSavedRecipe(recipe.id)}
+                          className="mt-3 flex items-center gap-1.5 text-sm text-red-500 hover:text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Remove from saved
+                        </button>
+                      </div>
+                    )}
+                  </Card>
+                ))}
+              </div>
+
+              {/* Get More Ideas Button */}
+              <button
+                onClick={() => setShowRecipeChat(true)}
+                className="w-full mt-4 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-4 text-left shadow-md hover:shadow-lg transition-shadow"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-white">Get more ideas</h3>
+                    <p className="text-orange-100 text-xs">Ask Nunu for new recipes</p>
+                  </div>
+                  <MessageCircle className="h-5 w-5 text-white/70" />
+                </div>
+              </button>
+            </>
+          )}
         </div>
       )}
 
