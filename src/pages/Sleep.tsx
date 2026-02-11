@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Component } from 'react';
-import { Moon, Sun, Clock, BookOpen, TrendingUp, ChevronRight, CheckCircle2, AlertCircle, ThermometerSun, Volume2, Baby, Calendar, Play, Pause, RotateCcw, Sparkles, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Moon, Sun, Clock, BookOpen, TrendingUp, ChevronRight, CheckCircle2, AlertCircle, ThermometerSun, Volume2, Baby, Calendar, Play, Pause, RotateCcw, Sparkles, MessageCircle, ChevronDown, ChevronUp, Plus, Trash2, Edit3, X, Check } from 'lucide-react';
 import SleepAssessment, { SleepAssessmentData } from '@/components/SleepAssessment';
 import SleepPlan from '@/components/SleepPlan';
 import SleepProgram from '@/components/SleepProgram';
@@ -12,6 +12,22 @@ const PROGRAM_STORAGE_KEY = 'nunu-sleep-program';
 const BABY_AGE_KEY = 'nunu-baby-age-months';
 const WAKE_TIME_KEY = 'nunu-last-wake-time';
 const NAP_LOG_KEY = 'nunu-nap-log';
+const TIMER_STATE_KEY = 'nunu-timer-state';
+
+interface NapLog {
+  id: string;
+  date: string;
+  wakeTime: number;
+  napStart: number | null;
+  napEnd: number | null;
+  duration: number | null;
+}
+
+interface TimerState {
+  isRunning: boolean;
+  wakeTime: number | null;
+  napStartTime: number | null;
+}
 
 // Wake window data by age (in minutes)
 const WAKE_WINDOWS: Record<string, { min: number; max: number; naps: string; totalDay: string }> = {
@@ -40,13 +56,28 @@ const getAgeCategory = (months: number): string => {
   return '18-24m';
 };
 
-const formatTime = (minutes: number): string => {
+const formatDuration = (minutes: number): string => {
   const hrs = Math.floor(minutes / 60);
-  const mins = minutes % 60;
+  const mins = Math.round(minutes % 60);
   if (hrs > 0) {
     return mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
   }
   return `${mins}m`;
+};
+
+const formatTimeOfDay = (timestamp: number): string => {
+  return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+};
+
+const formatDate = (dateStr: string): string => {
+  const date = new Date(dateStr);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  
+  if (date.toDateString() === today.toDateString()) return 'Today';
+  if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
+  return date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
 };
 
 // Error boundary wrapper
@@ -92,7 +123,7 @@ interface SleepProps {
 }
 
 type SleepStage = 'assessment' | 'plan' | 'program';
-type SleepSubTab = 'learn' | 'track' | 'improve';
+type SleepSubTab = 'learn' | 'track' | 'plan';
 
 const Sleep = ({ onTabChange }: SleepProps) => {
   // Sub-tab navigation
@@ -104,25 +135,54 @@ const Sleep = ({ onTabChange }: SleepProps) => {
     return saved ? parseInt(saved) : 4;
   });
 
-  // Wake window tracker
-  const [lastWakeTime, setLastWakeTime] = useState<number | null>(() => {
-    const saved = localStorage.getItem(WAKE_TIME_KEY);
-    return saved ? parseInt(saved) : null;
+  // Timer state
+  const [timerState, setTimerState] = useState<TimerState>(() => {
+    try {
+      const saved = localStorage.getItem(TIMER_STATE_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return { isRunning: false, wakeTime: null, napStartTime: null };
   });
   const [currentTime, setCurrentTime] = useState(Date.now());
+  
+  // Nap logs
+  const [napLogs, setNapLogs] = useState<NapLog[]>(() => {
+    try {
+      const saved = localStorage.getItem(NAP_LOG_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return [];
+  });
+  
+  // Edit modal state
+  const [editingNap, setEditingNap] = useState<NapLog | null>(null);
+  const [showAddNap, setShowAddNap] = useState(false);
+  const [newNapWake, setNewNapWake] = useState('');
+  const [newNapStart, setNewNapStart] = useState('');
+  const [newNapEnd, setNewNapEnd] = useState('');
   
   // Learn section state
   const [expandedLearnSection, setExpandedLearnSection] = useState<string | null>('wake-windows');
   
-  // Improve section (existing assessment flow)
+  // Sleep Plan section (existing assessment flow)
   const [stage, setStage] = useState<SleepStage>('assessment');
   const [assessment, setAssessment] = useState<SleepAssessmentData | null>(null);
 
-  // Update current time every second for the timer
+  // Update current time every second
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(Date.now()), 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Save timer state
+  useEffect(() => {
+    localStorage.setItem(TIMER_STATE_KEY, JSON.stringify(timerState));
+  }, [timerState]);
+
+  // Save nap logs
+  useEffect(() => {
+    localStorage.setItem(NAP_LOG_KEY, JSON.stringify(napLogs));
+  }, [napLogs]);
 
   // Load saved assessment state
   useEffect(() => {
@@ -153,22 +213,107 @@ const Sleep = ({ onTabChange }: SleepProps) => {
     localStorage.setItem(BABY_AGE_KEY, babyAgeMonths.toString());
   }, [babyAgeMonths]);
 
-  // Save wake time
-  useEffect(() => {
-    if (lastWakeTime) {
-      localStorage.setItem(WAKE_TIME_KEY, lastWakeTime.toString());
-    }
-  }, [lastWakeTime]);
-
   const ageCategory = getAgeCategory(babyAgeMonths);
   const wakeWindow = WAKE_WINDOWS[ageCategory];
   
-  const minutesSinceWake = lastWakeTime ? Math.floor((currentTime - lastWakeTime) / 60000) : 0;
-  const wakeWindowProgress = lastWakeTime ? Math.min((minutesSinceWake / wakeWindow.max) * 100, 100) : 0;
+  // Calculate timer values
+  const minutesSinceWake = timerState.wakeTime ? Math.floor((currentTime - timerState.wakeTime) / 60000) : 0;
+  const wakeWindowProgress = timerState.wakeTime ? Math.min((minutesSinceWake / wakeWindow.max) * 100, 100) : 0;
   const isOvertime = minutesSinceWake > wakeWindow.max;
   const isNearEnd = minutesSinceWake >= wakeWindow.min && !isOvertime;
 
-  // Improve section handlers
+  // Timer actions
+  const startTimer = () => {
+    setTimerState({
+      isRunning: true,
+      wakeTime: Date.now(),
+      napStartTime: null
+    });
+  };
+
+  const startNap = () => {
+    setTimerState(prev => ({
+      ...prev,
+      isRunning: false,
+      napStartTime: Date.now()
+    }));
+  };
+
+  const endNap = () => {
+    if (timerState.wakeTime && timerState.napStartTime) {
+      const napEnd = Date.now();
+      const duration = Math.round((napEnd - timerState.napStartTime) / 60000);
+      
+      const newLog: NapLog = {
+        id: Date.now().toString(),
+        date: new Date().toISOString().split('T')[0],
+        wakeTime: timerState.wakeTime,
+        napStart: timerState.napStartTime,
+        napEnd: napEnd,
+        duration: duration
+      };
+      
+      setNapLogs(prev => [newLog, ...prev].slice(0, 50)); // Keep last 50 naps
+    }
+    
+    // Reset and start new wake window
+    setTimerState({
+      isRunning: true,
+      wakeTime: Date.now(),
+      napStartTime: null
+    });
+  };
+
+  const resetTimer = () => {
+    setTimerState({
+      isRunning: false,
+      wakeTime: null,
+      napStartTime: null
+    });
+  };
+
+  // Manual nap entry
+  const addManualNap = () => {
+    const today = new Date().toISOString().split('T')[0];
+    const wakeTimestamp = new Date(`${today}T${newNapWake}`).getTime();
+    const startTimestamp = new Date(`${today}T${newNapStart}`).getTime();
+    const endTimestamp = new Date(`${today}T${newNapEnd}`).getTime();
+    
+    if (wakeTimestamp && startTimestamp && endTimestamp) {
+      const duration = Math.round((endTimestamp - startTimestamp) / 60000);
+      
+      const newLog: NapLog = {
+        id: Date.now().toString(),
+        date: today,
+        wakeTime: wakeTimestamp,
+        napStart: startTimestamp,
+        napEnd: endTimestamp,
+        duration: duration
+      };
+      
+      setNapLogs(prev => [newLog, ...prev].slice(0, 50));
+      setShowAddNap(false);
+      setNewNapWake('');
+      setNewNapStart('');
+      setNewNapEnd('');
+    }
+  };
+
+  const deleteNap = (id: string) => {
+    setNapLogs(prev => prev.filter(n => n.id !== id));
+  };
+
+  const updateNap = (updatedNap: NapLog) => {
+    setNapLogs(prev => prev.map(n => n.id === updatedNap.id ? updatedNap : n));
+    setEditingNap(null);
+  };
+
+  // Get today's naps
+  const today = new Date().toISOString().split('T')[0];
+  const todaysNaps = napLogs.filter(n => n.date === today);
+  const recentNaps = napLogs.slice(0, 10);
+
+  // Sleep Plan section handlers
   const handleAssessmentComplete = (data: SleepAssessmentData) => {
     setAssessment(data);
     setBabyAgeMonths(data.babyAgeMonths);
@@ -320,7 +465,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
             <div className="px-4 pb-4 border-t border-slate-100 pt-4">
               <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-4 text-white mb-4">
                 <p className="text-amber-100 text-xs mb-1">At {babyAgeMonths} months, aim for</p>
-                <p className="text-2xl font-bold">{formatTime(wakeWindow.min)} – {formatTime(wakeWindow.max)}</p>
+                <p className="text-2xl font-bold">{formatDuration(wakeWindow.min)} – {formatDuration(wakeWindow.max)}</p>
                 <p className="text-amber-100 text-sm mt-1">awake between sleeps</p>
               </div>
               
@@ -353,7 +498,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
                       }`}
                     >
                       <span>{age}</span>
-                      <span>{formatTime(data.min)} – {formatTime(data.max)}</span>
+                      <span>{formatDuration(data.min)} – {formatDuration(data.max)}</span>
                     </div>
                   ))}
                 </div>
@@ -558,99 +703,177 @@ const Sleep = ({ onTabChange }: SleepProps) => {
     <div className="px-6 space-y-4 pb-24">
       {/* Wake Window Timer */}
       <Card className="border-none shadow-md overflow-hidden">
-        <div className={`p-6 ${isOvertime ? 'bg-rose-500' : isNearEnd ? 'bg-amber-500' : 'bg-indigo-500'} text-white`}>
+        <div className={`p-6 ${
+          timerState.napStartTime ? 'bg-slate-600' :
+          isOvertime ? 'bg-rose-500' : 
+          isNearEnd ? 'bg-amber-500' : 
+          timerState.isRunning ? 'bg-indigo-500' : 'bg-slate-400'
+        } text-white transition-colors`}>
           <div className="text-center">
-            <p className="text-white/80 text-sm mb-1">
-              {lastWakeTime ? 'Awake for' : 'Wake window timer'}
-            </p>
-            <p className="text-5xl font-bold">
-              {lastWakeTime ? formatTime(minutesSinceWake) : '--:--'}
-            </p>
-            {lastWakeTime && (
-              <p className="text-white/80 text-sm mt-2">
-                {isOvertime 
-                  ? '⚠️ Over wake window — baby may be overtired'
-                  : isNearEnd 
-                    ? '💤 Sleepy window — good time to start nap routine'
-                    : `Target: ${formatTime(wakeWindow.min)} – ${formatTime(wakeWindow.max)}`
-                }
-              </p>
+            {timerState.napStartTime ? (
+              <>
+                <p className="text-white/80 text-sm mb-1">Napping for</p>
+                <p className="text-5xl font-bold">
+                  {formatDuration(Math.floor((currentTime - timerState.napStartTime) / 60000))}
+                </p>
+                <p className="text-white/80 text-sm mt-2">😴 Sweet dreams...</p>
+              </>
+            ) : timerState.isRunning ? (
+              <>
+                <p className="text-white/80 text-sm mb-1">Awake for</p>
+                <p className="text-5xl font-bold">{formatDuration(minutesSinceWake)}</p>
+                <p className="text-white/80 text-sm mt-2">
+                  {isOvertime 
+                    ? '⚠️ Over wake window — baby may be overtired'
+                    : isNearEnd 
+                      ? '💤 Sleepy window — good time for nap'
+                      : `Target: ${formatDuration(wakeWindow.min)} – ${formatDuration(wakeWindow.max)}`
+                  }
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-white/80 text-sm mb-1">Wake Window Timer</p>
+                <p className="text-5xl font-bold">--:--</p>
+                <p className="text-white/80 text-sm mt-2">Tap below when baby wakes</p>
+              </>
             )}
           </div>
 
-          {lastWakeTime && (
+          {timerState.isRunning && !timerState.napStartTime && (
             <div className="mt-4">
               <div className="h-2 bg-white/20 rounded-full overflow-hidden">
                 <div 
-                  className={`h-full transition-all duration-1000 ${isOvertime ? 'bg-white' : 'bg-white/80'}`}
+                  className="h-full bg-white/80 transition-all duration-1000"
                   style={{ width: `${wakeWindowProgress}%` }}
                 />
               </div>
               <div className="flex justify-between text-xs text-white/60 mt-1">
                 <span>0</span>
-                <span>{formatTime(wakeWindow.min)}</span>
-                <span>{formatTime(wakeWindow.max)}</span>
+                <span>{formatDuration(wakeWindow.min)}</span>
+                <span>{formatDuration(wakeWindow.max)}</span>
               </div>
             </div>
           )}
         </div>
 
         <CardContent className="p-4">
-          <div className="flex gap-2">
-            {!lastWakeTime ? (
-              <Button 
-                onClick={() => setLastWakeTime(Date.now())}
-                className="flex-1 bg-indigo-600 hover:bg-indigo-700"
-              >
-                <Play className="h-4 w-4 mr-2" />
-                Baby just woke
+          {!timerState.isRunning && !timerState.napStartTime ? (
+            <Button onClick={startTimer} className="w-full bg-indigo-600 hover:bg-indigo-700">
+              <Sun className="h-4 w-4 mr-2" />
+              Baby Just Woke Up
+            </Button>
+          ) : timerState.napStartTime ? (
+            <div className="flex gap-2">
+              <Button onClick={endNap} className="flex-1 bg-emerald-600 hover:bg-emerald-700">
+                <Sun className="h-4 w-4 mr-2" />
+                Nap Ended — Woke Up
               </Button>
-            ) : (
-              <>
-                <Button 
-                  onClick={() => setLastWakeTime(Date.now())}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  <RotateCcw className="h-4 w-4 mr-2" />
-                  Reset (woke again)
-                </Button>
-                <Button 
-                  onClick={() => {
-                    setLastWakeTime(null);
-                    localStorage.removeItem(WAKE_TIME_KEY);
-                  }}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  <Pause className="h-4 w-4 mr-2" />
-                  Nap started
-                </Button>
-              </>
-            )}
-          </div>
+              <Button onClick={resetTimer} variant="outline" className="px-3">
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <Button onClick={startNap} className="flex-1 bg-slate-700 hover:bg-slate-800">
+                <Moon className="h-4 w-4 mr-2" />
+                Nap Started
+              </Button>
+              <Button onClick={startTimer} variant="outline" className="px-3" title="Reset">
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
       {/* Quick Info */}
-      <Card className="border-none shadow-sm bg-slate-50">
+      <Card className="border-none shadow-sm bg-amber-50">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-slate-500">At {babyAgeMonths} months</p>
-              <p className="font-medium text-slate-800">Wake window: {formatTime(wakeWindow.min)} – {formatTime(wakeWindow.max)}</p>
+              <p className="text-xs text-amber-700">At {babyAgeMonths} months</p>
+              <p className="font-medium text-amber-900">Wake window: {formatDuration(wakeWindow.min)} – {formatDuration(wakeWindow.max)}</p>
             </div>
-            <button
-              onClick={() => setActiveSubTab('learn')}
-              className="text-indigo-600 text-sm hover:underline"
+            <select
+              value={babyAgeMonths}
+              onChange={(e) => setBabyAgeMonths(parseInt(e.target.value))}
+              className="bg-white border border-amber-200 rounded-lg px-2 py-1 text-amber-700 text-sm"
             >
-              Learn more
-            </button>
+              {[...Array(25)].map((_, i) => (
+                <option key={i} value={i}>{i}mo</option>
+              ))}
+            </select>
           </div>
         </CardContent>
       </Card>
 
-      {/* Sleepy Cues Reminder */}
+      {/* Today's Naps */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-semibold text-slate-800">Today's Naps</h3>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setShowAddNap(true)}
+            className="text-xs"
+          >
+            <Plus className="h-3 w-3 mr-1" />
+            Add Manually
+          </Button>
+        </div>
+
+        {todaysNaps.length === 0 ? (
+          <Card className="border-none shadow-sm bg-slate-50">
+            <CardContent className="p-4 text-center">
+              <p className="text-slate-500 text-sm">No naps logged today</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-2">
+            {todaysNaps.map((nap, i) => (
+              <Card key={nap.id} className="border-none shadow-sm">
+                <CardContent className="p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                        <span className="text-sm font-medium text-indigo-600">#{todaysNaps.length - i}</span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-800">
+                          {nap.napStart && nap.napEnd ? (
+                            `${formatTimeOfDay(nap.napStart)} → ${formatTimeOfDay(nap.napEnd)}`
+                          ) : 'In progress'}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {nap.duration ? `${formatDuration(nap.duration)} nap` : ''} 
+                          {nap.wakeTime && ` • Awake at ${formatTimeOfDay(nap.wakeTime)}`}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button 
+                        onClick={() => setEditingNap(nap)}
+                        className="p-1.5 text-slate-400 hover:text-slate-600"
+                      >
+                        <Edit3 className="h-4 w-4" />
+                      </button>
+                      <button 
+                        onClick={() => deleteNap(nap.id)}
+                        className="p-1.5 text-slate-400 hover:text-red-500"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Sleepy Cues */}
       <Card className="border-none shadow-sm">
         <CardContent className="p-4">
           <h3 className="font-medium text-slate-800 mb-3">Watch for sleepy cues:</h3>
@@ -667,21 +890,138 @@ const Sleep = ({ onTabChange }: SleepProps) => {
             <div className="flex items-center gap-2 text-slate-600">
               <span className="text-lg">🙈</span> Looking away
             </div>
-            <div className="flex items-center gap-2 text-slate-600">
-              <span className="text-lg">✊</span> Clenched fists
-            </div>
-            <div className="flex items-center gap-2 text-slate-600">
-              <span className="text-lg">😴</span> Zoning out
-            </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Add Nap Modal */}
+      {showAddNap && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-slate-800">Add Nap Manually</h3>
+                <button onClick={() => setShowAddNap(false)} className="text-slate-400">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm text-slate-600">Woke up at</label>
+                  <input
+                    type="time"
+                    value={newNapWake}
+                    onChange={(e) => setNewNapWake(e.target.value)}
+                    className="w-full mt-1 px-3 py-2 border rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-slate-600">Nap started at</label>
+                  <input
+                    type="time"
+                    value={newNapStart}
+                    onChange={(e) => setNewNapStart(e.target.value)}
+                    className="w-full mt-1 px-3 py-2 border rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-slate-600">Nap ended at</label>
+                  <input
+                    type="time"
+                    value={newNapEnd}
+                    onChange={(e) => setNewNapEnd(e.target.value)}
+                    className="w-full mt-1 px-3 py-2 border rounded-lg"
+                  />
+                </div>
+              </div>
+              
+              <Button 
+                onClick={addManualNap} 
+                className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700"
+                disabled={!newNapWake || !newNapStart || !newNapEnd}
+              >
+                Add Nap
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Edit Nap Modal */}
+      {editingNap && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-slate-800">Edit Nap</h3>
+                <button onClick={() => setEditingNap(null)} className="text-slate-400">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm text-slate-600">Woke up at</label>
+                  <input
+                    type="time"
+                    defaultValue={editingNap.wakeTime ? new Date(editingNap.wakeTime).toTimeString().slice(0,5) : ''}
+                    onChange={(e) => {
+                      const date = new Date(editingNap.date);
+                      const [h, m] = e.target.value.split(':');
+                      date.setHours(parseInt(h), parseInt(m));
+                      setEditingNap({...editingNap, wakeTime: date.getTime()});
+                    }}
+                    className="w-full mt-1 px-3 py-2 border rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-slate-600">Nap started at</label>
+                  <input
+                    type="time"
+                    defaultValue={editingNap.napStart ? new Date(editingNap.napStart).toTimeString().slice(0,5) : ''}
+                    onChange={(e) => {
+                      const date = new Date(editingNap.date);
+                      const [h, m] = e.target.value.split(':');
+                      date.setHours(parseInt(h), parseInt(m));
+                      setEditingNap({...editingNap, napStart: date.getTime()});
+                    }}
+                    className="w-full mt-1 px-3 py-2 border rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-slate-600">Nap ended at</label>
+                  <input
+                    type="time"
+                    defaultValue={editingNap.napEnd ? new Date(editingNap.napEnd).toTimeString().slice(0,5) : ''}
+                    onChange={(e) => {
+                      const date = new Date(editingNap.date);
+                      const [h, m] = e.target.value.split(':');
+                      date.setHours(parseInt(h), parseInt(m));
+                      const napEnd = date.getTime();
+                      const duration = editingNap.napStart ? Math.round((napEnd - editingNap.napStart) / 60000) : null;
+                      setEditingNap({...editingNap, napEnd, duration});
+                    }}
+                    className="w-full mt-1 px-3 py-2 border rounded-lg"
+                  />
+                </div>
+              </div>
+              
+              <Button 
+                onClick={() => updateNap(editingNap)} 
+                className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700"
+              >
+                Save Changes
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 
-  // Render Improve tab (existing assessment flow)
-  const renderImproveTab = () => {
-    // Check if already in assessment flow
+  // Render Sleep Plan tab (existing assessment flow)
+  const renderPlanTab = () => {
     if (stage === 'assessment') {
       return (
         <SleepAssessment 
@@ -717,12 +1057,12 @@ const Sleep = ({ onTabChange }: SleepProps) => {
       );
     }
 
-    // Show intro card if no assessment yet
+    // Intro when no assessment
     return (
       <div className="px-6 space-y-4 pb-24">
         <div className="text-center py-8">
-          <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Sparkles className="h-10 w-10 text-indigo-600" />
+          <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Sparkles className="h-10 w-10 text-purple-600" />
           </div>
           <h2 className="text-xl font-bold text-slate-800 mb-2">Ready to improve sleep?</h2>
           <p className="text-slate-500 mb-6 max-w-xs mx-auto">
@@ -730,30 +1070,30 @@ const Sleep = ({ onTabChange }: SleepProps) => {
           </p>
           <Button 
             onClick={() => setStage('assessment')}
-            className="bg-indigo-600 hover:bg-indigo-700"
+            className="bg-purple-600 hover:bg-purple-700"
           >
             Start Sleep Assessment
           </Button>
         </div>
 
-        <Card className="border-none shadow-sm bg-indigo-50">
+        <Card className="border-none shadow-sm bg-purple-50">
           <CardContent className="p-4">
-            <h3 className="font-medium text-indigo-800 mb-2">What you'll get:</h3>
-            <ul className="space-y-2 text-sm text-indigo-700">
+            <h3 className="font-medium text-purple-800 mb-2">What you'll get:</h3>
+            <ul className="space-y-2 text-sm text-purple-700">
               <li className="flex items-start gap-2">
-                <CheckCircle2 className="h-4 w-4 text-indigo-500 mt-0.5" />
+                <CheckCircle2 className="h-4 w-4 text-purple-500 mt-0.5" />
                 Personalized method recommendation
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle2 className="h-4 w-4 text-indigo-500 mt-0.5" />
+                <CheckCircle2 className="h-4 w-4 text-purple-500 mt-0.5" />
                 Optimal schedule for your baby's age
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle2 className="h-4 w-4 text-indigo-500 mt-0.5" />
+                <CheckCircle2 className="h-4 w-4 text-purple-500 mt-0.5" />
                 Night-by-night guidance
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle2 className="h-4 w-4 text-indigo-500 mt-0.5" />
+                <CheckCircle2 className="h-4 w-4 text-purple-500 mt-0.5" />
                 Science-backed explanations
               </li>
             </ul>
@@ -762,7 +1102,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
 
         <button
           onClick={handleOpenChat}
-          className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl p-4 text-left shadow-md"
+          className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-2xl p-4 text-left shadow-md"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -770,7 +1110,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-white">Not sure if you're ready?</h3>
-              <p className="text-indigo-100 text-sm">Chat with Nunu first</p>
+              <p className="text-purple-100 text-sm">Chat with Nunu first</p>
             </div>
             <ChevronRight className="h-5 w-5 text-white/70" />
           </div>
@@ -785,7 +1125,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
         {/* Header */}
         <div className="p-6 pb-2">
           <h1 className="text-2xl font-bold text-slate-800">Sleep</h1>
-          <p className="text-slate-500 mt-1">Learn, track, and improve baby sleep</p>
+          <p className="text-slate-500 mt-1">Learn, track & plan better sleep</p>
         </div>
 
         {/* Sub-tab Navigation */}
@@ -814,15 +1154,15 @@ const Sleep = ({ onTabChange }: SleepProps) => {
               Track
             </button>
             <button
-              onClick={() => setActiveSubTab('improve')}
+              onClick={() => setActiveSubTab('plan')}
               className={`flex-1 py-2.5 px-2 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-1.5 ${
-                activeSubTab === 'improve'
+                activeSubTab === 'plan'
                   ? 'bg-purple-500 text-white shadow-md'
                   : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
-              <TrendingUp className="h-4 w-4" />
-              Improve
+              <Moon className="h-4 w-4" />
+              Sleep Plan
             </button>
           </div>
         </div>
@@ -830,7 +1170,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
         {/* Tab Content */}
         {activeSubTab === 'learn' && renderLearnTab()}
         {activeSubTab === 'track' && renderTrackTab()}
-        {activeSubTab === 'improve' && renderImproveTab()}
+        {activeSubTab === 'plan' && renderPlanTab()}
       </div>
     </SleepErrorBoundary>
   );
