@@ -20,14 +20,59 @@ interface Conversation {
 }
 
 const STORAGE_KEY = 'nunu-conversations';
-const SAVED_RECIPES_KEY = 'nunu-saved-recipes';
+const CHAT_SAVED_KEY = 'nunu-chat-saved';
 
 interface SavedRecipe {
   id: string;
+  title: string;
   content: string;
   savedAt: number;
   conversationTitle: string;
 }
+
+// Extract recipe/advice title from message content
+const extractTitle = (content: string): string => {
+  // Try to find a recipe name or title from the content
+  const lines = content.split('\n').filter(l => l.trim());
+  
+  // Pattern 1: Markdown headers like "# Recipe Name" or "## Recipe Name"
+  for (const line of lines) {
+    const headerMatch = line.match(/^#{1,3}\s+(.+)/);
+    if (headerMatch) {
+      return headerMatch[1].replace(/\*+/g, '').trim().slice(0, 50);
+    }
+  }
+  
+  // Pattern 2: Bold text at start like "**Recipe Name**"
+  for (const line of lines.slice(0, 3)) {
+    const boldMatch = line.match(/^\*\*(.+?)\*\*/);
+    if (boldMatch) {
+      return boldMatch[1].trim().slice(0, 50);
+    }
+  }
+  
+  // Pattern 3: Look for recipe-like patterns
+  const recipePatterns = [
+    /(?:recipe|dish|meal):\s*(.+)/i,
+    /(?:here's|try|make)\s+(?:a\s+)?(?:simple\s+)?(.+?(?:puree|mash|porridge|fingers|bites|pancakes|muffins|soup|stew))/i,
+  ];
+  
+  for (const pattern of recipePatterns) {
+    const match = content.match(pattern);
+    if (match) {
+      return match[1].trim().slice(0, 50);
+    }
+  }
+  
+  // Pattern 4: First meaningful line if it's short (likely a title)
+  const firstLine = lines[0]?.replace(/[\*#]/g, '').trim();
+  if (firstLine && firstLine.length <= 60 && !firstLine.includes('.')) {
+    return firstLine.slice(0, 50);
+  }
+  
+  // Fallback: first 40 chars of content
+  return content.slice(0, 40).replace(/\n/g, ' ').trim() + '...';
+};
 
 const getInitialMessage = (): Message => ({
   id: '1',
@@ -71,7 +116,7 @@ const ChatAssistant = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [savedMessageIds, setSavedMessageIds] = useState<Set<string>>(() => {
     try {
-      const saved = localStorage.getItem(SAVED_RECIPES_KEY);
+      const saved = localStorage.getItem(CHAT_SAVED_KEY);
       if (saved) {
         const recipes: SavedRecipe[] = JSON.parse(saved);
         return new Set(recipes.map(r => r.id));
@@ -224,20 +269,24 @@ const ChatAssistant = () => {
 
   const saveRecipe = (message: Message) => {
     try {
-      const saved = localStorage.getItem(SAVED_RECIPES_KEY);
+      const saved = localStorage.getItem(CHAT_SAVED_KEY);
       const recipes: SavedRecipe[] = saved ? JSON.parse(saved) : [];
       
       if (recipes.some(r => r.id === message.id)) return;
       
+      // Extract a meaningful title from the message content
+      const title = extractTitle(message.content);
+      
       const newRecipe: SavedRecipe = {
         id: message.id,
+        title,
         content: message.content,
         savedAt: Date.now(),
         conversationTitle: activeConversation?.title || 'Chat'
       };
       
       recipes.unshift(newRecipe);
-      localStorage.setItem(SAVED_RECIPES_KEY, JSON.stringify(recipes));
+      localStorage.setItem(CHAT_SAVED_KEY, JSON.stringify(recipes));
       setSavedMessageIds(prev => new Set([...prev, message.id]));
     } catch (e) {
       console.error('Failed to save recipe:', e);

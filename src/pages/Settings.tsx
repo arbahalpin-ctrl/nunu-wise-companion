@@ -1,13 +1,48 @@
-import { useState } from 'react';
-import { Bell, Shield, HelpCircle, Phone, Heart, ExternalLink, X, Mail, Baby, Trash2, AlertTriangle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bell, Shield, HelpCircle, Phone, Heart, ExternalLink, X, Mail, Baby, Trash2, AlertTriangle, Bookmark, ChevronRight, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+
+interface SavedItem {
+  id: string;
+  title: string;
+  content: string;
+  savedAt: number;
+  conversationTitle: string;
+}
+
+const CHAT_SAVED_KEY = 'nunu-chat-saved';
 
 const Settings = () => {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showSavedItems, setShowSavedItems] = useState(false);
+  const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
+  const [expandedItem, setExpandedItem] = useState<string | null>(null);
+
+  // Load saved items
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(CHAT_SAVED_KEY);
+      if (saved) {
+        setSavedItems(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error('Failed to load saved items:', e);
+    }
+  }, []);
+
+  const deleteSavedItem = (id: string) => {
+    const updated = savedItems.filter(item => item.id !== id);
+    setSavedItems(updated);
+    localStorage.setItem(CHAT_SAVED_KEY, JSON.stringify(updated));
+  };
+
+  const formatDate = (timestamp: number) => {
+    return new Date(timestamp).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+  };
 
   const handleClearOnboarding = () => {
     localStorage.removeItem('nunu-onboarding-completed');
@@ -53,6 +88,73 @@ const Settings = () => {
                 <Switch defaultChecked />
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Saved from Chat */}
+        <Card className="border-none shadow-sm">
+          <CardContent className="p-5">
+            <button
+              onClick={() => setShowSavedItems(!showSavedItems)}
+              className="w-full flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <Bookmark className="h-5 w-5 text-amber-500" />
+                <div className="text-left">
+                  <h2 className="font-semibold text-slate-800">Saved from Chat</h2>
+                  <p className="text-xs text-slate-400">{savedItems.length} saved item{savedItems.length !== 1 ? 's' : ''}</p>
+                </div>
+              </div>
+              {showSavedItems ? (
+                <ChevronDown className="h-5 w-5 text-slate-400" />
+              ) : (
+                <ChevronRight className="h-5 w-5 text-slate-400" />
+              )}
+            </button>
+            
+            {showSavedItems && (
+              <div className="mt-4 space-y-3">
+                {savedItems.length === 0 ? (
+                  <p className="text-sm text-slate-400 text-center py-4">
+                    No saved items yet. Tap the bookmark icon on any chat message to save it here.
+                  </p>
+                ) : (
+                  savedItems.map((item) => (
+                    <div key={item.id} className="border border-slate-200 rounded-lg overflow-hidden">
+                      <button
+                        onClick={() => setExpandedItem(expandedItem === item.id ? null : item.id)}
+                        className="w-full p-3 flex items-start justify-between text-left hover:bg-slate-50"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-slate-800 text-sm truncate">{item.title}</p>
+                          <p className="text-xs text-slate-400 mt-0.5">{formatDate(item.savedAt)}</p>
+                        </div>
+                        {expandedItem === item.id ? (
+                          <ChevronDown className="h-4 w-4 text-slate-400 flex-shrink-0 ml-2" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4 text-slate-400 flex-shrink-0 ml-2" />
+                        )}
+                      </button>
+                      
+                      {expandedItem === item.id && (
+                        <div className="px-3 pb-3 border-t border-slate-100">
+                          <div className="bg-slate-50 rounded-lg p-3 mt-3 max-h-64 overflow-y-auto">
+                            <p className="text-sm text-slate-700 whitespace-pre-wrap">{item.content}</p>
+                          </div>
+                          <button
+                            onClick={() => deleteSavedItem(item.id)}
+                            className="mt-2 text-xs text-red-500 hover:text-red-600 flex items-center gap-1"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                            Remove
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 
