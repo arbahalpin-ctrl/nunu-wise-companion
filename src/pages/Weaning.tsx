@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, X, AlertTriangle, ChevronLeft, Star, Clock, Bookmark, BookmarkCheck, Info, ChefHat, Snowflake, Users } from 'lucide-react';
+import { Search, X, AlertTriangle, ChevronLeft, Star, Clock, Bookmark, BookmarkCheck, Info, ChefHat, Snowflake, Users, MessageCircle, Sparkles } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { foods, Food } from '@/data/foods';
@@ -44,7 +44,11 @@ const CuttingGuide = ({ foodId }: { foodId: string }) => {
   );
 };
 
-const Weaning = () => {
+interface WeaningProps {
+  onOpenChat?: () => void;
+}
+
+const Weaning = ({ onOpenChat }: WeaningProps) => {
   const [activeTab, setActiveTab] = useState<'foods' | 'recipes'>('foods');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFood, setSelectedFood] = useState<Food | null>(null);
@@ -638,6 +642,27 @@ const Weaning = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Chat Inspiration Card */}
+          {onOpenChat && (
+            <button
+              onClick={onOpenChat}
+              className="w-full mt-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-5 text-left shadow-md hover:shadow-lg transition-shadow"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="h-6 w-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-white text-base">Need ideas?</h3>
+                  <p className="text-amber-100 text-sm mt-0.5">
+                    Ask Nunu what to make with ingredients you have
+                  </p>
+                </div>
+                <MessageCircle className="h-5 w-5 text-white/70" />
+              </div>
+            </button>
+          )}
         </div>
       )}
 
@@ -746,6 +771,27 @@ const Weaning = () => {
           <p className="text-center text-xs text-slate-400 pt-2">
             {filteredRecipes.length} recipe{filteredRecipes.length !== 1 ? 's' : ''} available for {babyAge}+ months
           </p>
+
+          {/* Chat Inspiration Card */}
+          {onOpenChat && (
+            <button
+              onClick={onOpenChat}
+              className="w-full mt-6 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-5 text-left shadow-md hover:shadow-lg transition-shadow"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="h-6 w-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-white text-base">Looking for inspo?</h3>
+                  <p className="text-orange-100 text-sm mt-0.5">
+                    Chat with Nunu for custom recipe ideas based on what you have
+                  </p>
+                </div>
+                <MessageCircle className="h-5 w-5 text-white/70" />
+              </div>
+            </button>
+          )}
         </div>
       )}
     </div>

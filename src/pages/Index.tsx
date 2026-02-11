@@ -33,7 +33,7 @@ const Index = () => {
       case 'sleep':
         return <Sleep onTabChange={setActiveTab} />;
       case 'weaning':
-        return <Weaning />;
+        return <Weaning onOpenChat={() => setActiveTab('chat')} />;
       case 'milestones':
         return <Milestones />;
       case 'chat':
