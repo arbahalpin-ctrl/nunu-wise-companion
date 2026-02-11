@@ -58,11 +58,11 @@ export const clearUnread = (): void => {
 };
 
 const METHOD_NAMES: Record<string, string> = {
-  fading: 'Gentle Fading',
-  pupd: 'Pick Up / Put Down',
-  chair: 'Chair Method',
-  ferber: 'Ferber Method',
-  extinction: 'Full Extinction'
+  fading: 'Gentle Steps',
+  pupd: 'Comfort & Settle',
+  chair: 'Gradual Presence',
+  ferber: 'Timed Reassurance',
+  extinction: 'Confident Sleep'
 };
 
 /**

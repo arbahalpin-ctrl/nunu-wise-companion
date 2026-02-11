@@ -151,12 +151,12 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
                        currentNight === 2 ? [5, 10, 12] :
                        currentNight >= 3 ? [10, 12, 15] : [3, 5, 10];
       return {
-        title: `Night ${currentNight}: Ferber Method`,
+        title: `Night ${currentNight}: Timed Reassurance`,
         intervals,
         guidance: currentNight === 1 
           ? "First night is the hardest. Expect 30-60 minutes of crying. You'll do check-ins at 3, 5, then 10 minute intervals. You've got this!"
           : currentNight === 2
-          ? "Night 2 is often worse — it's called an extinction burst. This is normal and actually means it's working. Start with 5 minute intervals tonight."
+          ? "Night 2 is often more intense — this is normal and actually means it's working. Start with 5 minute intervals tonight."
           : currentNight === 3
           ? "Night 3 is usually when you start seeing improvement. If last night was rough, tonight should be better. Start with 10 minute intervals."
           : currentNight <= 5
@@ -165,14 +165,14 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
         tips: currentNight === 1 
           ? ["Have a distraction ready for yourself", "Watch on monitor if it helps", "Text a friend for support"]
           : currentNight === 2
-          ? ["Don't give up — night 2 being worse is expected", "This is the most important night to stay consistent", "Tomorrow will likely be better"]
+          ? ["Don't give up — night 2 being more intense is expected", "This is the most important night to stay consistent", "Tomorrow will likely be better"]
           : ["Consistency is paying off", "Keep the same routine", "Celebrate small wins!"]
       };
     }
     
     if (methodId === 'pupd') {
       return {
-        title: `Night ${currentNight}: Pick Up / Put Down`,
+        title: `Night ${currentNight}: Comfort & Settle`,
         guidance: currentNight === 1
           ? "Tonight may take many repetitions (20-40+). Stay calm and patient. Pick up when crying, put down when calm."
           : currentNight === 2
@@ -186,7 +186,7 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
     
     if (methodId === 'fading') {
       return {
-        title: `Night ${currentNight}: Gentle Fading`,
+        title: `Night ${currentNight}: Gentle Steps`,
         guidance: currentNight === 1
           ? "Tonight, just try stopping your soothing slightly earlier than usual. Small steps!"
           : currentNight <= 7
@@ -196,13 +196,13 @@ const SleepProgram = ({ assessment, onOpenChat, onResetProgram }: SleepProgramPr
       };
     }
     
-    // Extinction
+    // Confident Sleep
     return {
-      title: `Night ${currentNight}: Full Extinction`,
+      title: `Night ${currentNight}: Confident Sleep`,
       guidance: currentNight === 1
-        ? "Put baby down, say goodnight, and don't go back in. This is hard but usually the fastest method. Watch on monitor for safety."
+        ? "Put baby down, say goodnight, and trust them to settle. This is hard but usually the fastest approach. Watch on monitor for safety."
         : currentNight === 2
-        ? "Night 2 is often the hardest (extinction burst). Stay strong — this usually means it's working."
+        ? "Night 2 is often the most intense. Stay strong — this usually means it's working."
         : currentNight >= 3
         ? "You should see significant improvement from here. Most of the hard work is done!"
         : "Stay consistent with the approach.",

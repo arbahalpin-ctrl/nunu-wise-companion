@@ -36,11 +36,11 @@ const SleepPlan = ({ assessment, onStartProgram, onEditAssessment, onOpenChat }:
     if (cryingTolerance <= 2 || babyAgeMonths < 4) {
       return {
         id: 'fading',
-        name: 'Gentle Fading',
-        description: 'Gradually reduce sleep associations over 2-3 weeks with minimal crying.',
+        name: 'Gentle Steps',
+        description: 'Our most gradual approach — tiny changes over 2-3 weeks with minimal tears.',
         whyForYou: cryingTolerance <= 2 
-          ? "Based on your preference for minimal crying, this gentle approach will feel right for your family."
-          : `At ${babyAgeMonths} months, a gentle approach works best while ${assessment.babyName}'s sleep matures.`,
+          ? "Based on your comfort level, Gentle Steps will feel right for your family. Small changes, big results over time."
+          : `At ${babyAgeMonths} months, Gentle Steps works beautifully while ${assessment.babyName}'s sleep naturally matures.`,
         howItWorks: [
           `Continue your current way of helping ${assessment.babyName} sleep, but make tiny changes`,
           'If you rock to sleep, rock until drowsy then place down (not fully asleep)',
@@ -70,9 +70,9 @@ const SleepPlan = ({ assessment, onStartProgram, onEditAssessment, onOpenChat }:
       if (previousAttempts.includes('pupd')) {
         return {
           id: 'chair',
-          name: 'Chair Method (Gradual Retreat)',
-          description: 'Stay in the room and gradually move farther away over 2 weeks.',
-          whyForYou: "You want to be present but encourage independence. Since PUPD didn't work before, the chair method offers a different kind of support.",
+          name: 'Gradual Presence',
+          description: 'Stay close while slowly building independence — you retreat as confidence grows.',
+          whyForYou: "You want to be there for your baby while teaching self-settling. Gradual Presence lets you support without creating new dependencies.",
           howItWorks: [
             `Put ${assessment.babyName} down drowsy but awake`,
             'Sit in a chair right next to the crib',
@@ -101,9 +101,9 @@ const SleepPlan = ({ assessment, onStartProgram, onEditAssessment, onOpenChat }:
       
       return {
         id: 'pupd',
-        name: 'Pick Up / Put Down',
-        description: 'Pick up to calm, put down when calm. Repeat as needed.',
-        whyForYou: "This keeps you very hands-on while teaching independent sleep. Perfect for parents who want to be responsive but make progress.",
+        name: 'Comfort & Settle',
+        description: 'Hands-on reassurance — pick up to calm, put down to sleep. Repeat with love.',
+        whyForYou: "You want to stay responsive while teaching self-settling. Comfort & Settle keeps you connected throughout the process.",
         howItWorks: [
           `Put ${assessment.babyName} down drowsy but awake`,
           'When crying starts, pick up and comfort until calm',
@@ -129,13 +129,13 @@ const SleepPlan = ({ assessment, onStartProgram, onEditAssessment, onOpenChat }:
       };
     }
     
-    // Higher tolerance — Ferber
+    // Higher tolerance — Timed Reassurance
     if (cryingTolerance === 4) {
       return {
         id: 'ferber',
-        name: 'Ferber Method (Graduated Extinction)',
-        description: 'Timed check-ins at increasing intervals. Effective and structured.',
-        whyForYou: "You want a proven method that balances effectiveness with some reassurance. Ferber is the most-studied sleep training approach.",
+        name: 'Timed Reassurance',
+        description: 'Structured check-ins at growing intervals — effective, research-backed, and balanced.',
+        whyForYou: "You want structure with reassurance. Timed Reassurance is our most popular approach — clear steps, proven results.",
         howItWorks: [
           `Put ${assessment.babyName} down drowsy but awake`,
           'Leave the room',
@@ -164,12 +164,12 @@ const SleepPlan = ({ assessment, onStartProgram, onEditAssessment, onOpenChat }:
       };
     }
     
-    // Highest tolerance — Full extinction
+    // Highest tolerance — Confident Sleep
     return {
       id: 'extinction',
-      name: 'Full Extinction (CIO)',
-      description: 'Put down awake and don\'t return until morning. Fastest results.',
-      whyForYou: "You want the most direct path to independent sleep. This is the fastest method with the strongest research support.",
+      name: 'Confident Sleep',
+      description: 'Full trust in your baby\'s ability to self-settle. Clear, direct, fastest results.',
+      whyForYou: "You're ready for the most direct approach. Confident Sleep gets results quickly — usually within 3-5 nights.",
       howItWorks: [
         `Put ${assessment.babyName} down drowsy but awake`,
         'Say goodnight and leave the room',
