@@ -8,6 +8,39 @@ import { recipes, Recipe, getRecipeCategories } from '@/data/recipes';
 
 const SAVED_FOODS_KEY = 'nunu-saved-foods';
 const SAVED_RECIPES_KEY = 'nunu-saved-recipes';
+
+// Simple markdown renderer for chat messages
+const renderMarkdown = (text: string) => {
+  const lines = text.split('\n');
+  
+  return lines.map((line, lineIndex) => {
+    const parts: (string | JSX.Element)[] = [];
+    let remaining = line;
+    let keyCounter = 0;
+    
+    while (remaining.length > 0) {
+      const boldMatch = remaining.match(/\*\*(.+?)\*\*/);
+      
+      if (boldMatch && boldMatch.index !== undefined) {
+        if (boldMatch.index > 0) {
+          parts.push(remaining.slice(0, boldMatch.index));
+        }
+        parts.push(<strong key={`b-${lineIndex}-${keyCounter++}`} className="font-semibold">{boldMatch[1]}</strong>);
+        remaining = remaining.slice(boldMatch.index + boldMatch[0].length);
+      } else {
+        parts.push(remaining);
+        break;
+      }
+    }
+    
+    return (
+      <span key={`line-${lineIndex}`}>
+        {parts}
+        {lineIndex < lines.length - 1 && <br />}
+      </span>
+    );
+  });
+};
 const BABY_AGE_KEY = 'nunu-baby-age-months';
 const RECIPE_CHAT_KEY = 'nunu-recipe-chat';
 const CHAT_SAVED_KEY = 'nunu-chat-saved';
@@ -1079,7 +1112,7 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
                     {expandedSavedId === recipe.id && (
                       <div className="px-4 pb-4 border-t border-slate-100">
                         <div className="bg-amber-50 rounded-xl p-4 mt-3 max-h-80 overflow-y-auto">
-                          <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{recipe.content}</p>
+                          <div className="text-sm text-slate-700 leading-relaxed">{renderMarkdown(recipe.content)}</div>
                         </div>
                         <button
                           onClick={() => deleteSavedRecipe(recipe.id)}
@@ -1159,7 +1192,7 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
                     : 'bg-white shadow-sm border border-orange-100'
                   }
                 `}>
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                  <div className="text-sm leading-relaxed">{renderMarkdown(message.content)}</div>
                   <div className={`
                     flex items-center justify-between mt-2 gap-3
                     ${message.role === 'user' ? 'text-orange-200' : 'text-slate-400'}

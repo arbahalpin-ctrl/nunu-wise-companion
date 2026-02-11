@@ -1,5 +1,45 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Clock, Trash2, Plus, MessageSquare, X, Bookmark, Check, ChevronLeft } from 'lucide-react';
+
+// Simple markdown renderer for chat messages
+const renderMarkdown = (text: string) => {
+  // Split by newlines first to handle paragraphs
+  const lines = text.split('\n');
+  
+  return lines.map((line, lineIndex) => {
+    // Process inline formatting
+    const parts: (string | JSX.Element)[] = [];
+    let remaining = line;
+    let keyCounter = 0;
+    
+    // Process bold (**text**)
+    while (remaining.length > 0) {
+      const boldMatch = remaining.match(/\*\*(.+?)\*\*/);
+      
+      if (boldMatch && boldMatch.index !== undefined) {
+        // Add text before the match
+        if (boldMatch.index > 0) {
+          parts.push(remaining.slice(0, boldMatch.index));
+        }
+        // Add bold text
+        parts.push(<strong key={`b-${lineIndex}-${keyCounter++}`} className="font-semibold">{boldMatch[1]}</strong>);
+        remaining = remaining.slice(boldMatch.index + boldMatch[0].length);
+      } else {
+        // No more matches, add remaining text
+        parts.push(remaining);
+        break;
+      }
+    }
+    
+    // Return line with line break if not last line
+    return (
+      <span key={`line-${lineIndex}`}>
+        {parts}
+        {lineIndex < lines.length - 1 && <br />}
+      </span>
+    );
+  });
+};
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { getSleepContext, clearUnread } from '@/utils/chatIntegration';
@@ -446,7 +486,7 @@ const ChatAssistant = () => {
                   : 'bg-white shadow-sm border border-slate-100'
                 }
               `}>
-                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                <div className="text-sm leading-relaxed">{renderMarkdown(message.content)}</div>
                 <div className={`
                   flex items-center justify-between mt-2 gap-3
                   ${message.role === 'user' ? 'text-slate-400' : 'text-slate-400'}
