@@ -1,13 +1,63 @@
-import { useState, useEffect } from 'react';
-import { Search, X, AlertTriangle, ChevronLeft, Star, Clock, Bookmark, BookmarkCheck, Info, ChefHat, Snowflake, Users, MessageCircle, Sparkles } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Search, X, AlertTriangle, ChevronLeft, Star, Clock, Bookmark, BookmarkCheck, Info, ChefHat, Snowflake, Users, MessageCircle, Sparkles, Send, Bot, User, Check } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { foods, Food } from '@/data/foods';
 import { recipes, Recipe, getRecipeCategories } from '@/data/recipes';
 
 const SAVED_FOODS_KEY = 'nunu-saved-foods';
 const SAVED_RECIPES_KEY = 'nunu-saved-recipes';
 const BABY_AGE_KEY = 'nunu-baby-age-months';
+const RECIPE_CHAT_KEY = 'nunu-recipe-chat';
+const CHAT_SAVED_KEY = 'nunu-chat-saved';
+
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+}
+
+interface SavedRecipe {
+  id: string;
+  title: string;
+  content: string;
+  savedAt: number;
+  conversationTitle: string;
+}
+
+// Extract recipe title from content
+const extractRecipeTitle = (content: string): string => {
+  const lines = content.split('\n').filter(l => l.trim());
+  
+  for (const line of lines) {
+    const headerMatch = line.match(/^#{1,3}\s+(.+)/);
+    if (headerMatch) return headerMatch[1].replace(/\*+/g, '').trim().slice(0, 50);
+  }
+  
+  for (const line of lines.slice(0, 3)) {
+    const boldMatch = line.match(/^\*\*(.+?)\*\*/);
+    if (boldMatch) return boldMatch[1].trim().slice(0, 50);
+  }
+  
+  const recipePatterns = [
+    /(?:recipe|dish|meal):\s*(.+)/i,
+    /(?:here's|try|make)\s+(?:a\s+)?(?:simple\s+)?(.+?(?:puree|mash|porridge|fingers|bites|pancakes|muffins|soup|stew))/i,
+  ];
+  
+  for (const pattern of recipePatterns) {
+    const match = content.match(pattern);
+    if (match) return match[1].trim().slice(0, 50);
+  }
+  
+  const firstLine = lines[0]?.replace(/[\*#]/g, '').trim();
+  if (firstLine && firstLine.length <= 60 && !firstLine.includes('.')) {
+    return firstLine.slice(0, 50);
+  }
+  
+  return content.slice(0, 40).replace(/\n/g, ' ').trim() + '...';
+};
 
 type AgeGroup = '6' | '7-8' | '9-12' | '12+';
 
@@ -49,6 +99,141 @@ interface WeaningProps {
 }
 
 const Weaning = ({ onOpenChat }: WeaningProps) => {
+  // Recipe Chat State
+  const [showRecipeChat, setShowRecipeChat] = useState(false);
+  const [recipeChatMessages, setRecipeChatMessages] = useState<ChatMessage[]>(() => {
+    try {
+      const saved = localStorage.getItem(RECIPE_CHAT_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return [{
+      id: '1',
+      role: 'assistant',
+      content: "Hey! 🍳 I'm here to help with recipe ideas. Tell me what ingredients you have, your baby's age, or any dietary needs — I'll suggest something yummy!\n\n💡 Tip: Save any recipe by tapping the bookmark icon, then find it in Settings → Saved from Chat.",
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }];
+  });
+  const [recipeChatInput, setRecipeChatInput] = useState('');
+  const [isRecipeChatTyping, setIsRecipeChatTyping] = useState(false);
+  const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem(CHAT_SAVED_KEY);
+      if (saved) {
+        const items: SavedRecipe[] = JSON.parse(saved);
+        return new Set(items.map(r => r.id));
+      }
+    } catch (e) {}
+    return new Set();
+  });
+  const recipeChatEndRef = useRef<HTMLDivElement>(null);
+  const recipeChatInputRef = useRef<HTMLInputElement>(null);
+
+  // Save recipe chat messages
+  useEffect(() => {
+    if (recipeChatMessages.length > 1) {
+      localStorage.setItem(RECIPE_CHAT_KEY, JSON.stringify(recipeChatMessages));
+    }
+  }, [recipeChatMessages]);
+
+  // Scroll to bottom of recipe chat
+  useEffect(() => {
+    recipeChatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [recipeChatMessages]);
+
+  // Focus input when chat opens
+  useEffect(() => {
+    if (showRecipeChat) {
+      setTimeout(() => recipeChatInputRef.current?.focus(), 100);
+    }
+  }, [showRecipeChat]);
+
+  const sendRecipeChatMessage = async () => {
+    if (!recipeChatInput.trim() || isRecipeChatTyping) return;
+
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: recipeChatInput.trim(),
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    const updatedMessages = [...recipeChatMessages, userMessage];
+    setRecipeChatMessages(updatedMessages);
+    setRecipeChatInput('');
+    setIsRecipeChatTyping(true);
+
+    try {
+      const conversationHistory = updatedMessages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+
+      const response = await fetch('/api/recipe-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: conversationHistory, babyAge }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error || 'Failed to get response');
+
+      const aiMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: data.message,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      setRecipeChatMessages([...updatedMessages, aiMessage]);
+    } catch (error) {
+      console.error('Recipe chat error:', error);
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: "Oops! I'm having trouble connecting. Try again in a moment? 🍳",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setRecipeChatMessages([...updatedMessages, errorMessage]);
+    } finally {
+      setIsRecipeChatTyping(false);
+    }
+  };
+
+  const saveRecipeFromChat = (message: ChatMessage) => {
+    try {
+      const saved = localStorage.getItem(CHAT_SAVED_KEY);
+      const items: SavedRecipe[] = saved ? JSON.parse(saved) : [];
+
+      if (items.some(r => r.id === message.id)) return;
+
+      const title = extractRecipeTitle(message.content);
+      const newRecipe: SavedRecipe = {
+        id: message.id,
+        title,
+        content: message.content,
+        savedAt: Date.now(),
+        conversationTitle: 'Recipe Ideas'
+      };
+
+      items.unshift(newRecipe);
+      localStorage.setItem(CHAT_SAVED_KEY, JSON.stringify(items));
+      setSavedRecipeIds(prev => new Set([...prev, message.id]));
+    } catch (e) {
+      console.error('Failed to save recipe:', e);
+    }
+  };
+
+  const clearRecipeChat = () => {
+    const initialMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: 'assistant',
+      content: "Fresh start! 🍳 What would you like to make today? Tell me what ingredients you have or what you're in the mood for.",
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    setRecipeChatMessages([initialMessage]);
+    localStorage.removeItem(RECIPE_CHAT_KEY);
+  };
   const [activeTab, setActiveTab] = useState<'foods' | 'recipes'>('foods');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFood, setSelectedFood] = useState<Food | null>(null);
@@ -644,25 +829,23 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
           </div>
 
           {/* Chat Inspiration Card */}
-          {onOpenChat && (
-            <button
-              onClick={onOpenChat}
-              className="w-full mt-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-5 text-left shadow-md hover:shadow-lg transition-shadow"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Sparkles className="h-6 w-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-white text-base">Need ideas?</h3>
-                  <p className="text-amber-100 text-sm mt-0.5">
-                    Ask Nunu what to make with ingredients you have
-                  </p>
-                </div>
-                <MessageCircle className="h-5 w-5 text-white/70" />
+          <button
+            onClick={() => setShowRecipeChat(true)}
+            className="w-full mt-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-5 text-left shadow-md hover:shadow-lg transition-shadow"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <Sparkles className="h-6 w-6 text-white" />
               </div>
-            </button>
-          )}
+              <div className="flex-1">
+                <h3 className="font-semibold text-white text-base">Need ideas?</h3>
+                <p className="text-amber-100 text-sm mt-0.5">
+                  Get custom recipes — save your favorites!
+                </p>
+              </div>
+              <MessageCircle className="h-5 w-5 text-white/70" />
+            </div>
+          </button>
         </div>
       )}
 
@@ -773,25 +956,172 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
           </p>
 
           {/* Chat Inspiration Card */}
-          {onOpenChat && (
-            <button
-              onClick={onOpenChat}
-              className="w-full mt-6 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-5 text-left shadow-md hover:shadow-lg transition-shadow"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Sparkles className="h-6 w-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-white text-base">Looking for inspo?</h3>
-                  <p className="text-orange-100 text-sm mt-0.5">
-                    Chat with Nunu for custom recipe ideas based on what you have
-                  </p>
-                </div>
-                <MessageCircle className="h-5 w-5 text-white/70" />
+          <button
+            onClick={() => setShowRecipeChat(true)}
+            className="w-full mt-6 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-5 text-left shadow-md hover:shadow-lg transition-shadow"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <Sparkles className="h-6 w-6 text-white" />
               </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-white text-base">Looking for inspo?</h3>
+                <p className="text-orange-100 text-sm mt-0.5">
+                  Get custom recipe ideas — save favorites for later!
+                </p>
+              </div>
+              <MessageCircle className="h-5 w-5 text-white/70" />
+            </div>
+          </button>
+        </div>
+      )}
+
+      {/* Recipe Chat Modal */}
+      {showRecipeChat && (
+        <div className="fixed inset-0 z-50 bg-gradient-to-b from-orange-50 to-amber-50 flex flex-col">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-orange-500 to-amber-500 px-4 py-4 flex items-center justify-between shadow-md">
+            <button
+              onClick={() => setShowRecipeChat(false)}
+              className="flex items-center gap-2 text-white"
+            >
+              <ChevronLeft className="h-5 w-5" />
+              <span className="font-medium">Back</span>
             </button>
+            <div className="text-center">
+              <h1 className="font-semibold text-white">Recipe Ideas</h1>
+              <p className="text-orange-100 text-xs">Ask me anything!</p>
+            </div>
+            <button
+              onClick={clearRecipeChat}
+              className="text-orange-100 text-sm hover:text-white"
+            >
+              Clear
+            </button>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+            {recipeChatMessages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                {message.role === 'assistant' && (
+                  <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1 shadow-sm">
+                    <ChefHat className="h-4 w-4 text-white" />
+                  </div>
+                )}
+                
+                <div className={`
+                  max-w-[85%] rounded-2xl px-4 py-3
+                  ${message.role === 'user' 
+                    ? 'bg-orange-500 text-white' 
+                    : 'bg-white shadow-sm border border-orange-100'
+                  }
+                `}>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                  <div className={`
+                    flex items-center justify-between mt-2 gap-3
+                    ${message.role === 'user' ? 'text-orange-200' : 'text-slate-400'}
+                  `}>
+                    <div className="flex items-center gap-1 text-xs">
+                      <Clock className="h-3 w-3" />
+                      {message.timestamp}
+                    </div>
+                    {message.role === 'assistant' && message.id !== '1' && (
+                      <button
+                        onClick={() => saveRecipeFromChat(message)}
+                        className={`p-1 rounded-full transition-colors ${
+                          savedRecipeIds.has(message.id)
+                            ? 'text-orange-500 bg-orange-50'
+                            : 'text-slate-400 hover:text-orange-500 hover:bg-orange-50'
+                        }`}
+                        title={savedRecipeIds.has(message.id) ? 'Saved!' : 'Save this recipe'}
+                      >
+                        {savedRecipeIds.has(message.id) ? (
+                          <Check className="h-3.5 w-3.5" />
+                        ) : (
+                          <Bookmark className="h-3.5 w-3.5" />
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {message.role === 'user' && (
+                  <div className="w-8 h-8 bg-orange-200 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <User className="h-4 w-4 text-orange-600" />
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {isRecipeChatTyping && (
+              <div className="flex gap-3 justify-start">
+                <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
+                  <ChefHat className="h-4 w-4 text-white" />
+                </div>
+                <div className="bg-white shadow-sm border border-orange-100 rounded-2xl px-4 py-3">
+                  <div className="flex gap-1.5">
+                    <div className="w-2 h-2 bg-orange-300 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-2 h-2 bg-orange-300 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-2 h-2 bg-orange-300 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div ref={recipeChatEndRef} />
+          </div>
+
+          {/* Quick Prompts */}
+          {recipeChatMessages.length <= 1 && (
+            <div className="px-4 py-3 bg-white/80 border-t border-orange-100">
+              <p className="text-xs text-slate-500 mb-2">Try asking:</p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  "Easy breakfast ideas",
+                  "What can I make with banana?",
+                  "Iron-rich finger foods",
+                  "Freezer-friendly meals"
+                ].map((prompt, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setRecipeChatInput(prompt)}
+                    className="px-3 py-1.5 text-sm bg-orange-100 border border-orange-200 rounded-full text-orange-700 hover:bg-orange-200 transition-colors"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
+
+          {/* Input */}
+          <div className="p-4 bg-white border-t border-orange-100">
+            <div className="flex gap-2 items-end">
+              <Input
+                ref={recipeChatInputRef}
+                value={recipeChatInput}
+                onChange={(e) => setRecipeChatInput(e.target.value)}
+                placeholder="What would you like to make?"
+                className="rounded-full bg-orange-50 border-orange-200 focus:border-orange-400 focus:bg-white py-3 px-4"
+                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendRecipeChatMessage()}
+                disabled={isRecipeChatTyping}
+              />
+              <Button 
+                onClick={sendRecipeChatMessage}
+                disabled={!recipeChatInput.trim() || isRecipeChatTyping}
+                className="rounded-full w-11 h-11 p-0 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 flex-shrink-0"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+            <p className="text-xs text-slate-400 text-center mt-2">
+              💡 Save recipes to find them in Settings → Saved from Chat
+            </p>
+          </div>
         </div>
       )}
     </div>
