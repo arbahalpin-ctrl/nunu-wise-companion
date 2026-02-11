@@ -65,6 +65,21 @@ const formatDuration = (minutes: number): string => {
   return `${mins}m`;
 };
 
+const formatDurationWithSeconds = (ms: number): string => {
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+  if (minutes > 0) {
+    return `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
+  }
+  return `${seconds}s`;
+};
+
 const formatTimeOfDay = (timestamp: number): string => {
   return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
@@ -712,19 +727,23 @@ const Sleep = ({ onTabChange }: SleepProps) => {
           <div className="text-center">
             {timerState.napStartTime ? (
               <>
-                <p className="text-white/80 text-sm mb-1">Napping for</p>
-                <p className="text-5xl font-bold">
-                  {formatDuration(Math.floor((currentTime - timerState.napStartTime) / 60000))}
+                <p className="text-white/80 text-sm mb-1">😴 Napping for</p>
+                <p className="text-5xl font-bold font-mono">
+                  {formatDurationWithSeconds(currentTime - timerState.napStartTime)}
                 </p>
-                <p className="text-white/80 text-sm mt-2">😴 Sweet dreams...</p>
+                <p className="text-white/80 text-sm mt-2">
+                  Started at {formatTimeOfDay(timerState.napStartTime)}
+                </p>
               </>
-            ) : timerState.isRunning ? (
+            ) : timerState.isRunning && timerState.wakeTime ? (
               <>
-                <p className="text-white/80 text-sm mb-1">Awake for</p>
-                <p className="text-5xl font-bold">{formatDuration(minutesSinceWake)}</p>
+                <p className="text-white/80 text-sm mb-1">☀️ Awake for</p>
+                <p className="text-5xl font-bold font-mono">
+                  {formatDurationWithSeconds(currentTime - timerState.wakeTime)}
+                </p>
                 <p className="text-white/80 text-sm mt-2">
                   {isOvertime 
-                    ? '⚠️ Over wake window — baby may be overtired'
+                    ? '⚠️ Over wake window — may be overtired'
                     : isNearEnd 
                       ? '💤 Sleepy window — good time for nap'
                       : `Target: ${formatDuration(wakeWindow.min)} – ${formatDuration(wakeWindow.max)}`
