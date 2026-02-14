@@ -328,6 +328,27 @@ const Sleep = ({ onTabChange }: SleepProps) => {
   const todaysNaps = napLogs.filter(n => n.date === today);
   const recentNaps = napLogs.slice(0, 10);
 
+  // Calculate next nap time based on last wake
+  const getNextNapWindow = () => {
+    if (todaysNaps.length === 0) return null;
+    const lastNap = todaysNaps[0]; // Most recent
+    if (!lastNap.napEnd) return null;
+    
+    const lastWakeTime = lastNap.napEnd;
+    const minNapTime = new Date(lastWakeTime + wakeWindow.min * 60000);
+    const maxNapTime = new Date(lastWakeTime + wakeWindow.max * 60000);
+    
+    return {
+      wakeTime: new Date(lastWakeTime),
+      minTime: minNapTime,
+      maxTime: maxNapTime,
+      isNow: Date.now() >= minNapTime.getTime() && Date.now() <= maxNapTime.getTime(),
+      isPast: Date.now() > maxNapTime.getTime()
+    };
+  };
+
+  const nextNap = getNextNapWindow();
+
   // Sleep Plan section handlers
   const handleAssessmentComplete = (data: SleepAssessmentData) => {
     setAssessment(data);
@@ -857,27 +878,6 @@ const Sleep = ({ onTabChange }: SleepProps) => {
       </button>
     </div>
   );
-
-  // Calculate next nap time based on last wake
-  const getNextNapWindow = () => {
-    if (todaysNaps.length === 0) return null;
-    const lastNap = todaysNaps[0]; // Most recent
-    if (!lastNap.napEnd) return null;
-    
-    const wakeTime = lastNap.napEnd;
-    const minNapTime = new Date(wakeTime + wakeWindow.min * 60000);
-    const maxNapTime = new Date(wakeTime + wakeWindow.max * 60000);
-    
-    return {
-      wakeTime: new Date(wakeTime),
-      minTime: minNapTime,
-      maxTime: maxNapTime,
-      isNow: Date.now() >= minNapTime.getTime() && Date.now() <= maxNapTime.getTime(),
-      isPast: Date.now() > maxNapTime.getTime()
-    };
-  };
-
-  const nextNap = getNextNapWindow();
 
   // Render Track tab - SIMPLIFIED VERSION
   const renderTrackTab = () => (
