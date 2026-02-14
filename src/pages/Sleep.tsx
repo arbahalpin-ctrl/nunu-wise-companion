@@ -289,18 +289,20 @@ const Sleep = ({ onTabChange }: SleepProps) => {
 
   // Manual nap entry
   const addManualNap = () => {
+    if (!newNapStart || !newNapEnd) return;
+    
     const today = new Date().toISOString().split('T')[0];
-    const wakeTimestamp = new Date(`${today}T${newNapWake}`).getTime();
     const startTimestamp = new Date(`${today}T${newNapStart}`).getTime();
     const endTimestamp = new Date(`${today}T${newNapEnd}`).getTime();
     
-    if (wakeTimestamp && startTimestamp && endTimestamp) {
+    if (startTimestamp && endTimestamp && endTimestamp > startTimestamp) {
       const duration = Math.round((endTimestamp - startTimestamp) / 60000);
       
+      // Use nap end time as "wake time" for next window calculation
       const newLog: NapLog = {
         id: Date.now().toString(),
         date: today,
-        wakeTime: wakeTimestamp,
+        wakeTime: endTimestamp,
         napStart: startTimestamp,
         napEnd: endTimestamp,
         duration: duration
@@ -1064,11 +1066,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
               </div>
               
               <Button 
-                onClick={() => {
-                  // Set wake time to nap end for next calculation
-                  setNewNapWake(newNapEnd);
-                  addManualNap();
-                }} 
+                onClick={addManualNap} 
                 className="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 py-4 text-lg rounded-xl"
                 disabled={!newNapStart || !newNapEnd}
               >
