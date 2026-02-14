@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nunu TikTok Frames</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #1a1a2e;
+      color: white;
+      padding: 20px;
+    }
+    
+    .frame {
+      width: 360px;
+      height: 640px;
+      margin: 20px auto;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 30px;
+      text-align: center;
+      page-break-after: always;
+    }
+    
+    .frame-title {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    
+    /* Frame 11: Spin Class */
+    .frame-11 {
+      background: linear-gradient(145deg, #1a1a2e 0%, #2d1f3d 50%, #1a1a2e 100%);
+    }
+    
+    .big-stat {
+      font-size: 72px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #f8b500 0%, #ff6b6b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    
+    .stat-label {
+      font-size: 24px;
+      color: #f8b500;
+      margin-bottom: 30px;
+    }
+    
+    .comparison {
+      font-size: 18px;
+      color: #aaa;
+      margin-bottom: 15px;
+    }
+    
+    .comparison strong {
+      color: white;
+    }
+    
+    .punchline {
+      font-size: 20px;
+      color: #ff6b6b;
+      font-weight: 600;
+      margin-top: 20px;
+    }
+    
+    /* Frame 14: Unpaid Job */
+    .frame-14 {
+      background: linear-gradient(145deg, #0d1b2a 0%, #1b263b 100%);
+    }
+    
+    .job-title {
+      font-size: 14px;
+      color: #778da9;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+    
+    .salary {
+      font-size: 48px;
+      font-weight: 800;
+      color: #4ade80;
+      margin-bottom: 10px;
+    }
+    
+    .salary-sub {
+      font-size: 18px;
+      color: #4ade80;
+      opacity: 0.8;
+      margin-bottom: 30px;
+    }
+    
+    .job-reqs {
+      text-align: left;
+      margin: 20px 0;
+    }
+    
+    .job-req {
+      font-size: 14px;
+      color: #aaa;
+      margin: 8px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+    
+    .job-req::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #4ade80;
+    }
+    
+    /* Frame 13: Missing Sleep */
+    .frame-13 {
+      background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+    }
+    
+    .sleep-stat {
+      font-size: 80px;
+      font-weight: 800;
+      color: #818cf8;
+    }
+    
+    .sleep-label {
+      font-size: 22px;
+      color: #a5b4fc;
+      margin-bottom: 30px;
+    }
+    
+    .sleep-equiv {
+      font-size: 16px;
+      color: #64748b;
+      margin: 10px 0;
+    }
+    
+    .sleep-equiv strong {
+      color: #818cf8;
+    }
+    
+    /* Frame 15: CEO Brain */
+    .frame-15 {
+      background: linear-gradient(145deg, #1e1e2e 0%, #2d2d44 100%);
+    }
+    
+    .decisions {
+      font-size: 56px;
+      font-weight: 800;
+      color: #f472b6;
+    }
+    
+    .decisions-label {
+      font-size: 18px;
+      color: #f9a8d4;
+      margin-bottom: 30px;
+    }
+    
+    .vs-ceo {
+      background: rgba(244, 114, 182, 0.2);
+      padding: 15px 25px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+    
+    .vs-ceo-text {
+      font-size: 16px;
+      color: #f9a8d4;
+    }
+    
+    /* Frame 1: 3am Friend */
+    .frame-01 {
+      background: linear-gradient(145deg, #0f0f1a 0%, #1a1a2e 100%);
+    }
+    
+    .time {
+      font-size: 72px;
+      font-weight: 300;
+      color: #6366f1;
+      font-family: monospace;
+    }
+    
+    .am {
+      font-size: 24px;
+      color: #818cf8;
+      margin-bottom: 40px;
+    }
+    
+    .friend-text {
+      font-size: 22px;
+      color: #e0e7ff;
+      line-height: 1.6;
+      max-width: 280px;
+    }
+    
+    .friend-text em {
+      color: #a5b4fc;
+      font-style: normal;
+    }
+    
+    /* Nunu branding */
+    .nunu-logo {
+      position: absolute;
+      bottom: 30px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 3px;
+    }
+    
+    .panda-emoji {
+      font-size: 40px;
+      margin-bottom: 20px;
+    }
+    
+    /* Text overlay style */
+    .text-overlay {
+      position: absolute;
+      bottom: 80px;
+      background: rgba(0,0,0,0.7);
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <p class="frame-title">Clip 11: The Spin Class</p>
+  <div class="frame frame-11">
+    <div class="panda-emoji">🐼</div>
+    <div class="big-stat">500</div>
+    <div class="stat-label">calories / day</div>
+    <div class="comparison">= a <strong>spin class</strong></div>
+    <div class="comparison">= a <strong>5 mile run</strong></div>
+    <div class="punchline">Every. Single. Day.</div>
+    <div class="nunu-logo">NUNU</div>
+  </div>
+
+  <p class="frame-title">Clip 14: The Unpaid Job</p>
+  <div class="frame frame-14">
+    <div class="panda-emoji">🐼</div>
+    <div class="job-title">IF "MUM" WAS A JOB</div>
+    <div class="salary">£100k–180k</div>
+    <div class="salary-sub">per year</div>
+    <div class="job-reqs">
+      <div class="job-req">24/7 availability</div>
+      <div class="job-req">Night shifts mandatory</div>
+      <div class="job-req">No breaks</div>
+      <div class="job-req">No pay</div>
+    </div>
+    <div class="punchline" style="color: #4ade80;">You're the whole company.</div>
+    <div class="nunu-logo">NUNU</div>
+  </div>
+
+  <p class="frame-title">Clip 13: The Missing Sleep</p>
+  <div class="frame frame-13">
+    <div class="panda-emoji">🐼</div>
+    <div class="sleep-stat">44</div>
+    <div class="sleep-label">nights of sleep lost</div>
+    <div class="sleep-equiv">= <strong>400–750 hours</strong> in year one</div>
+    <div class="sleep-equiv">= legally drunk levels of fatigue</div>
+    <div class="punchline" style="color: #818cf8;">That's not you failing. That's science.</div>
+    <div class="nunu-logo">NUNU</div>
+  </div>
+
+  <p class="frame-title">Clip 15: The CEO Brain</p>
+  <div class="frame frame-15">
+    <div class="panda-emoji">🐼</div>
+    <div class="decisions">1,750</div>
+    <div class="decisions-label">decisions per day</div>
+    <div class="vs-ceo">
+      <div class="vs-ceo-text">That's more than a <strong>CEO</strong></div>
+    </div>
+    <div class="comparison" style="color: #f9a8d4; font-size: 14px; margin-top: 20px;">
+      Hungry? Tired? Too hot?<br>What's that rash?
+    </div>
+    <div class="punchline" style="color: #f472b6;">You're running a Fortune 500<br>in your living room.</div>
+    <div class="nunu-logo">NUNU</div>
+  </div>
+
+  <p class="frame-title">Clip 1: The 3am Friend</p>
+  <div class="frame frame-01">
+    <div class="time">3:00</div>
+    <div class="am">AM</div>
+    <div class="panda-emoji">🐼</div>
+    <div class="friend-text">
+      You're not the only one awake right now.<br><br>
+      <em>Thousands of mums are doing exactly this.</em>
+    </div>
+    <div class="punchline" style="color: #6366f1; margin-top: 30px;">You're not alone.</div>
+    <div class="nunu-logo">NUNU</div>
+  </div>
+
+</body>
+</html>

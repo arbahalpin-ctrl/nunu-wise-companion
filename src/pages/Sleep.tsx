@@ -1014,9 +1014,9 @@ const Sleep = ({ onTabChange }: SleepProps) => {
 
       {/* Add Nap Modal - Simplified */}
       {showAddNap && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-          <Card className="w-full sm:max-w-sm sm:mx-4 rounded-t-3xl sm:rounded-2xl">
-            <CardContent className="p-6">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center pb-20 sm:pb-0">
+          <Card className="w-full sm:max-w-sm sm:mx-4 rounded-t-3xl sm:rounded-2xl max-h-[80vh] overflow-y-auto">
+            <CardContent className="p-6 pb-8">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-slate-800">Log Nap</h3>
                 <button 
@@ -1065,13 +1065,15 @@ const Sleep = ({ onTabChange }: SleepProps) => {
                 )}
               </div>
               
-              <Button 
-                onClick={addManualNap} 
-                className="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 py-4 text-lg rounded-xl"
-                disabled={!newNapStart || !newNapEnd}
-              >
-                Save Nap
-              </Button>
+              <div className="mt-6 pt-4 border-t border-slate-100">
+                <Button 
+                  onClick={addManualNap} 
+                  className="w-full bg-indigo-600 hover:bg-indigo-700 py-4 text-lg rounded-xl"
+                  disabled={!newNapStart || !newNapEnd}
+                >
+                  ✓ Save Nap
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
