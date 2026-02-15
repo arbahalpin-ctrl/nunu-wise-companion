@@ -12,6 +12,31 @@ interface HomeProps {
 const BABY_AGE_KEY = 'nunu-baby-age-months';
 const LAST_NAP_KEY = 'nunu-last-nap-time';
 const MOOD_ENTRIES_KEY = 'nunu-mood-entries';
+const BEDTIME_KEY = 'nunu-bedtime';
+const LAST_BEDTIME_KEY = 'nunu-last-bedtime';
+
+// Check if a given time is after bedtime (night waking)
+const isNightWaking = (wakeTime: number, bedtimeHour: number, lastBedtime: number | null): boolean => {
+  // If we have an actual bedtime logged and wake is after it, it's a night waking
+  if (lastBedtime && wakeTime > lastBedtime) {
+    const hoursSinceBedtime = (wakeTime - lastBedtime) / (1000 * 60 * 60);
+    // If it's been less than 12 hours since bedtime, this is a night waking
+    if (hoursSinceBedtime < 12) {
+      return true;
+    }
+  }
+  
+  // Fallback: check based on typical bedtime hour
+  const wakeDate = new Date(wakeTime);
+  const wakeHour = wakeDate.getHours();
+  
+  // Consider it a night waking if between bedtime and 6am
+  if (wakeHour >= bedtimeHour || wakeHour < 6) {
+    return true;
+  }
+  
+  return false;
+};
 
 // Wake windows by age in months (in minutes)
 const getWakeWindow = (ageMonths: number): { min: number; max: number; label: string } => {
@@ -100,6 +125,16 @@ const Home = ({ onTabChange }: HomeProps) => {
     const saved = localStorage.getItem(MOOD_ENTRIES_KEY);
     return saved ? JSON.parse(saved) : [];
   });
+  const [bedtimeHour, setBedtimeHour] = useState<number>(() => {
+    const saved = localStorage.getItem(BEDTIME_KEY);
+    return saved ? parseInt(saved) : 19; // Default 7pm
+  });
+  const [lastBedtime, setLastBedtime] = useState<number | null>(() => {
+    const saved = localStorage.getItem(LAST_BEDTIME_KEY);
+    return saved ? parseInt(saved) : null;
+  });
+  const [showBedtimeInput, setShowBedtimeInput] = useState(false);
+  const [isCurrentlyNightWake, setIsCurrentlyNightWake] = useState(false);
 
   const moods = [
     { id: 'good', emoji: '😊', label: 'Good', color: 'bg-emerald-100 border-emerald-200' },
@@ -117,7 +152,7 @@ const Home = ({ onTabChange }: HomeProps) => {
     }
   }, [babyAgeMonths]);
 
-  // Timer for nap countdown
+  // Timer for nap countdown + night wake detection
   useEffect(() => {
     if (!lastNapTime) return;
     
@@ -133,12 +168,15 @@ const Home = ({ onTabChange }: HomeProps) => {
       } else {
         setTimeSinceNap(`${mins}m ago`);
       }
+      
+      // Check if this is a night waking
+      setIsCurrentlyNightWake(isNightWaking(lastNapTime, bedtimeHour, lastBedtime));
     };
     
     updateTimer();
     const interval = setInterval(updateTimer, 60000);
     return () => clearInterval(interval);
-  }, [lastNapTime]);
+  }, [lastNapTime, bedtimeHour, lastBedtime]);
 
   const saveAge = () => {
     const months = parseInt(ageInput);
@@ -153,6 +191,49 @@ const Home = ({ onTabChange }: HomeProps) => {
     const now = Date.now();
     setLastNapTime(now);
     localStorage.setItem(LAST_NAP_KEY, now.toString());
+  };
+
+  const logBedtime = () => {
+    const now = Date.now();
+    setLastBedtime(now);
+    localStorage.setItem(LAST_BEDTIME_KEY, now.toString());
+    // Clear last nap time when going to bed
+    setLastNapTime(null);
+    localStorage.removeItem(LAST_NAP_KEY);
+  };
+
+  const saveBedtimeHour = (hour: number) => {
+    setBedtimeHour(hour);
+    localStorage.setItem(BEDTIME_KEY, hour.toString());
+    setShowBedtimeInput(false);
+  };
+
+  const getNextSleepSuggestion = (): string | null => {
+    if (!lastNapTime || !wakeWindow) return null;
+    
+    // If it's a night waking, don't suggest wake window timing
+    if (isCurrentlyNightWake) return null;
+    
+    const nextSleepMin = lastNapTime + wakeWindow.min * 60000;
+    const nextSleepMax = lastNapTime + wakeWindow.max * 60000;
+    const now = Date.now();
+    
+    // If we're already past the max window, baby might be overtired
+    if (now > nextSleepMax) {
+      return "Baby may be overtired - watch for sleepy cues";
+    }
+    
+    // If we're in the window
+    if (now >= nextSleepMin) {
+      return "In the sweet spot - watch for sleepy cues now";
+    }
+    
+    // Format the next sleep time
+    const minTime = new Date(nextSleepMin);
+    const maxTime = new Date(nextSleepMax);
+    const formatTime = (d: Date) => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    return `Next nap window: ${formatTime(minTime)} - ${formatTime(maxTime)}`;
   };
 
   const wakeWindow = babyAgeMonths !== null ? getWakeWindow(babyAgeMonths) : null;
@@ -286,38 +367,118 @@ const Home = ({ onTabChange }: HomeProps) => {
                 </div>
                 
                 {wakeWindow && (
-                  <div className="bg-sky-50 rounded-lg p-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs text-slate-500 mb-1">Wake window</p>
-                        <p className="font-semibold text-slate-800">{wakeWindow.label}</p>
-                      </div>
-                      <Clock className="h-8 w-8 text-sky-400" />
-                    </div>
-                    
-                    {lastNapTime && (
-                      <div className="mt-3 pt-3 border-t border-sky-100 flex items-center justify-between">
-                        <div>
-                          <p className="text-xs text-slate-500">Last woke up</p>
-                          <p className="text-sm font-medium text-slate-700">{timeSinceNap}</p>
+                  <div className="space-y-3">
+                    {/* Night waking detection */}
+                    {lastNapTime && isCurrentlyNightWake && (
+                      <div className="bg-indigo-50 rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Moon className="h-5 w-5 text-indigo-400" />
+                          <span className="font-medium text-indigo-800">Night waking</span>
                         </div>
-                        <button
-                          onClick={logNapWake}
-                          className="text-xs px-3 py-1.5 bg-white border border-slate-200 rounded-full text-slate-600 hover:bg-slate-50"
-                        >
-                          Update
-                        </button>
+                        <p className="text-sm text-indigo-700 mb-3">
+                          This looks like a night waking, not a nap. Baby should go back to sleep — wake windows don't apply here.
+                        </p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setLastNapTime(null);
+                              localStorage.removeItem(LAST_NAP_KEY);
+                            }}
+                            className="text-xs px-3 py-1.5 bg-indigo-100 border border-indigo-200 rounded-full text-indigo-700 hover:bg-indigo-200"
+                          >
+                            Baby's back asleep
+                          </button>
+                          <button
+                            onClick={() => {
+                              // Mark as morning wake - clear bedtime
+                              setLastBedtime(null);
+                              localStorage.removeItem(LAST_BEDTIME_KEY);
+                              setIsCurrentlyNightWake(false);
+                            }}
+                            className="text-xs px-3 py-1.5 bg-white border border-slate-200 rounded-full text-slate-600 hover:bg-slate-50"
+                          >
+                            Actually, it's morning
+                          </button>
+                        </div>
                       </div>
                     )}
                     
-                    {!lastNapTime && (
-                      <button
-                        onClick={logNapWake}
-                        className="mt-3 w-full text-sm py-2 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50"
-                      >
-                        Log wake time
-                      </button>
+                    {/* Daytime wake window tracking */}
+                    {(!lastNapTime || !isCurrentlyNightWake) && (
+                      <div className="bg-sky-50 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs text-slate-500 mb-1">Wake window</p>
+                            <p className="font-semibold text-slate-800">{wakeWindow.label}</p>
+                          </div>
+                          <Clock className="h-8 w-8 text-sky-400" />
+                        </div>
+                        
+                        {lastNapTime && !isCurrentlyNightWake && (
+                          <>
+                            <div className="mt-3 pt-3 border-t border-sky-100 flex items-center justify-between">
+                              <div>
+                                <p className="text-xs text-slate-500">Last woke up</p>
+                                <p className="text-sm font-medium text-slate-700">{timeSinceNap}</p>
+                              </div>
+                              <button
+                                onClick={logNapWake}
+                                className="text-xs px-3 py-1.5 bg-white border border-slate-200 rounded-full text-slate-600 hover:bg-slate-50"
+                              >
+                                Update
+                              </button>
+                            </div>
+                            {getNextSleepSuggestion() && (
+                              <div className="mt-2 text-xs text-sky-700 bg-sky-100 rounded px-2 py-1.5">
+                                💤 {getNextSleepSuggestion()}
+                              </div>
+                            )}
+                          </>
+                        )}
+                        
+                        {!lastNapTime && (
+                          <div className="mt-3 flex gap-2">
+                            <button
+                              onClick={logNapWake}
+                              className="flex-1 text-sm py-2 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50"
+                            >
+                              🌞 Woke from nap
+                            </button>
+                            <button
+                              onClick={logBedtime}
+                              className="flex-1 text-sm py-2 bg-indigo-100 border border-indigo-200 rounded-lg text-indigo-700 hover:bg-indigo-200"
+                            >
+                              🌙 Going to bed
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     )}
+                    
+                    {/* Bedtime setting */}
+                    <div className="text-xs text-slate-400 flex items-center justify-between">
+                      <span>Typical bedtime: {bedtimeHour}:00</span>
+                      {showBedtimeInput ? (
+                        <div className="flex items-center gap-1">
+                          <select
+                            value={bedtimeHour}
+                            onChange={(e) => saveBedtimeHour(parseInt(e.target.value))}
+                            className="text-xs border rounded px-1 py-0.5"
+                          >
+                            {[17, 18, 19, 20, 21, 22].map(h => (
+                              <option key={h} value={h}>{h}:00</option>
+                            ))}
+                          </select>
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={() => setShowBedtimeInput(true)}
+                          className="hover:text-slate-600"
+                        >
+                          edit
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
