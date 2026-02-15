@@ -95,6 +95,22 @@ const formatDate = (dateStr: string): string => {
   return date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
 };
 
+// Get local date string (YYYY-MM-DD) - avoids timezone issues with toISOString()
+const getLocalDateString = (date: Date = new Date()): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+// Parse time string to timestamp for a given date (handles local timezone correctly)
+const parseTimeToTimestamp = (timeStr: string, dateStr: string): number => {
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const date = new Date(year, month - 1, day, hours, minutes, 0, 0);
+  return date.getTime();
+};
+
 // Error boundary wrapper
 class SleepErrorBoundary extends Component<
   { children: React.ReactNode; onReset: () => void },
@@ -261,7 +277,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
       
       const newLog: NapLog = {
         id: Date.now().toString(),
-        date: new Date().toISOString().split('T')[0],
+        date: getLocalDateString(),
         wakeTime: timerState.wakeTime,
         napStart: timerState.napStartTime,
         napEnd: napEnd,
@@ -291,9 +307,9 @@ const Sleep = ({ onTabChange }: SleepProps) => {
   const addManualNap = () => {
     if (!newNapStart || !newNapEnd) return;
     
-    const today = new Date().toISOString().split('T')[0];
-    const startTimestamp = new Date(`${today}T${newNapStart}`).getTime();
-    const endTimestamp = new Date(`${today}T${newNapEnd}`).getTime();
+    const today = getLocalDateString();
+    const startTimestamp = parseTimeToTimestamp(newNapStart, today);
+    const endTimestamp = parseTimeToTimestamp(newNapEnd, today);
     
     if (startTimestamp && endTimestamp && endTimestamp > startTimestamp) {
       const duration = Math.round((endTimestamp - startTimestamp) / 60000);
@@ -326,7 +342,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
   };
 
   // Get today's naps
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDateString();
   const todaysNaps = napLogs.filter(n => n.date === today);
   const recentNaps = napLogs.slice(0, 10);
 
@@ -363,7 +379,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
     const methodId = getMethodId();
     const intervals = assessment && assessment.cryingTolerance >= 4 ? [3, 5, 10, 10, 12, 15] : [];
     const newProgram = {
-      startDate: new Date().toISOString().split('T')[0],
+      startDate: getLocalDateString(),
       methodId,
       nightLogs: [],
       currentNight: 1,
