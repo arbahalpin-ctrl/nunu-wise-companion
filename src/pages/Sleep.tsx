@@ -308,8 +308,14 @@ const Sleep = ({ onTabChange }: SleepProps) => {
     if (!newNapStart || !newNapEnd) return;
     
     const today = getLocalDateString();
-    const startTimestamp = parseTimeToTimestamp(newNapStart, today);
-    const endTimestamp = parseTimeToTimestamp(newNapEnd, today);
+    let startTimestamp = parseTimeToTimestamp(newNapStart, today);
+    let endTimestamp = parseTimeToTimestamp(newNapEnd, today);
+    
+    // Handle overnight naps (e.g., started 18:40, ended 01:36 next day)
+    if (endTimestamp <= startTimestamp) {
+      // End time is the next day
+      endTimestamp += 24 * 60 * 60 * 1000; // Add 24 hours
+    }
     
     if (startTimestamp && endTimestamp && endTimestamp > startTimestamp) {
       const duration = Math.round((endTimestamp - startTimestamp) / 60000);
@@ -1073,7 +1079,11 @@ const Sleep = ({ onTabChange }: SleepProps) => {
                       Nap duration: {(() => {
                         const [sh, sm] = newNapStart.split(':').map(Number);
                         const [eh, em] = newNapEnd.split(':').map(Number);
-                        const mins = (eh * 60 + em) - (sh * 60 + sm);
+                        let mins = (eh * 60 + em) - (sh * 60 + sm);
+                        // Handle overnight (e.g., 18:40 to 01:36)
+                        if (mins <= 0) {
+                          mins += 24 * 60; // Add 24 hours worth of minutes
+                        }
                         return mins > 0 ? formatDuration(mins) : '--';
                       })()}
                     </span>
