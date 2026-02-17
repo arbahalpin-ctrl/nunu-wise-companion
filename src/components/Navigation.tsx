@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Home, Moon, MessageCircle, Settings, Utensils, Baby } from 'lucide-react';
+import { Home, Moon, MessageCircle, Settings, Baby, Heart } from 'lucide-react';
 import { getUnreadCount } from '@/utils/chatIntegration';
 
 interface NavigationProps {
@@ -27,8 +27,8 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const tabs = [
     { id: 'home', icon: Home, label: 'Home' },
     { id: 'chat', icon: MessageCircle, label: 'Chat' },
+    { id: 'feeding', icon: Heart, label: 'Feeding' },
     { id: 'sleep', icon: Moon, label: 'Sleep' },
-    { id: 'weaning', icon: Utensils, label: 'Weaning' },
     { id: 'milestones', icon: Baby, label: 'Milestones' },
     { id: 'settings', icon: Settings, label: 'Settings' },
   ];
