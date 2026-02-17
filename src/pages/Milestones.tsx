@@ -1,6 +1,36 @@
-import { useState } from 'react';
-import { Baby, Heart, Eye, Hand, MessageCircle as Speech, Brain, Footprints } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Baby, Heart, Eye, Hand, MessageCircle as Speech, Brain, Footprints, Plus, Trash2, TrendingUp, Scale, Ruler, Circle, X, Edit3, Check } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+
+// Storage keys
+const GROWTH_LOG_KEY = 'nunu-growth-log';
+const BABY_NAME_KEY = 'nunu-baby-name';
+const BABY_BIRTHDATE_KEY = 'nunu-baby-birthdate';
+
+interface GrowthEntry {
+  id: string;
+  date: string;
+  weight?: number; // kg
+  height?: number; // cm
+  headCirc?: number; // cm
+  notes?: string;
+}
+
+// Get local date string
+const getLocalDateString = (date: Date = new Date()): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+// Format date for display
+const formatDateDisplay = (dateStr: string): string => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+};
 
 interface MilestoneCategory {
   icon: React.ReactNode;
@@ -737,7 +767,35 @@ const MILESTONES_BY_AGE: Record<number, AgeData> = {
 };
 
 const Milestones = () => {
+  const [activeTab, setActiveTab] = useState<'milestones' | 'growth'>('milestones');
   const [selectedAge, setSelectedAge] = useState(6);
+  const [babyName, setBabyName] = useState('');
+  
+  // Growth tracking state
+  const [growthLogs, setGrowthLogs] = useState<GrowthEntry[]>(() => {
+    try {
+      const saved = localStorage.getItem(GROWTH_LOG_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+  const [showAddEntry, setShowAddEntry] = useState(false);
+  const [newDate, setNewDate] = useState(getLocalDateString());
+  const [newWeight, setNewWeight] = useState('');
+  const [newHeight, setNewHeight] = useState('');
+  const [newHeadCirc, setNewHeadCirc] = useState('');
+  const [newNotes, setNewNotes] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  // Load baby name
+  useEffect(() => {
+    const name = localStorage.getItem(BABY_NAME_KEY);
+    if (name) setBabyName(name);
+  }, []);
+
+  // Save growth logs
+  useEffect(() => {
+    localStorage.setItem(GROWTH_LOG_KEY, JSON.stringify(growthLogs));
+  }, [growthLogs]);
 
   const ageOptions = [
     { value: 0, label: 'Newborn' },
@@ -760,6 +818,73 @@ const Milestones = () => {
 
   const currentMilestones = MILESTONES_BY_AGE[selectedAge] || MILESTONES_BY_AGE[6];
 
+  // Growth tracking functions
+  const saveGrowthEntry = () => {
+    const weight = newWeight ? parseFloat(newWeight) : undefined;
+    const height = newHeight ? parseFloat(newHeight) : undefined;
+    const headCirc = newHeadCirc ? parseFloat(newHeadCirc) : undefined;
+    
+    if (!weight && !height && !headCirc) return;
+    
+    if (editingId) {
+      setGrowthLogs(prev => prev.map(entry => 
+        entry.id === editingId 
+          ? { ...entry, date: newDate, weight, height, headCirc, notes: newNotes || undefined }
+          : entry
+      ));
+      setEditingId(null);
+    } else {
+      const newEntry: GrowthEntry = {
+        id: Date.now().toString(),
+        date: newDate,
+        weight,
+        height,
+        headCirc,
+        notes: newNotes || undefined
+      };
+      setGrowthLogs(prev => [...prev, newEntry].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+    }
+    
+    resetForm();
+  };
+
+  const resetForm = () => {
+    setShowAddEntry(false);
+    setNewDate(getLocalDateString());
+    setNewWeight('');
+    setNewHeight('');
+    setNewHeadCirc('');
+    setNewNotes('');
+    setEditingId(null);
+  };
+
+  const editEntry = (entry: GrowthEntry) => {
+    setEditingId(entry.id);
+    setNewDate(entry.date);
+    setNewWeight(entry.weight?.toString() || '');
+    setNewHeight(entry.height?.toString() || '');
+    setNewHeadCirc(entry.headCirc?.toString() || '');
+    setNewNotes(entry.notes || '');
+    setShowAddEntry(true);
+  };
+
+  const deleteEntry = (id: string) => {
+    setGrowthLogs(prev => prev.filter(e => e.id !== id));
+  };
+
+  // Get latest measurements for summary
+  const latestWeight = growthLogs.find(e => e.weight)?.weight;
+  const latestHeight = growthLogs.find(e => e.height)?.height;
+  const latestHeadCirc = growthLogs.find(e => e.headCirc)?.headCirc;
+
+  // Calculate growth trends
+  const getGrowthTrend = (metric: 'weight' | 'height' | 'headCirc') => {
+    const entries = growthLogs.filter(e => e[metric]).slice(0, 2);
+    if (entries.length < 2) return null;
+    const diff = (entries[0][metric] as number) - (entries[1][metric] as number);
+    return diff;
+  };
+
   return (
     <div className="pb-24 min-h-screen bg-gradient-to-b from-purple-50 to-white">
       {/* Header */}
@@ -769,70 +894,322 @@ const Milestones = () => {
             <Baby className="h-5 w-5 text-purple-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">Milestones</h1>
-            <p className="text-slate-500">Track your baby's development</p>
+            <h1 className="text-2xl font-bold text-slate-800">
+              {babyName ? `${babyName}'s` : 'Baby'} Development
+            </h1>
+            <p className="text-slate-500 text-sm">Milestones & growth tracking</p>
           </div>
         </div>
       </div>
 
-      <div className="px-6 space-y-4">
-        {/* Age Selector */}
-        <Card className="border-none shadow-sm">
-          <CardContent className="p-4">
-            <label className="text-sm text-slate-600 mb-2 block">Baby's age</label>
-            <select
-              value={selectedAge}
-              onChange={(e) => setSelectedAge(Number(e.target.value))}
-              className="w-full bg-slate-100 border-none rounded-lg px-4 py-3 text-slate-700 font-medium text-lg"
-            >
-              {ageOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </CardContent>
-        </Card>
-
-        {/* Disclaimer */}
-        <Card className="border-none shadow-sm bg-amber-50">
-          <CardContent className="p-4">
-            <p className="text-sm text-amber-800 leading-relaxed">
-              💛 Every baby develops at their own pace. These milestones are general guidelines, 
-              not a checklist. If you have concerns about your baby's development, chat with your 
-              health visitor or GP. Your baby is unique and wonderful exactly as they are. ❤️
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Milestones */}
-        <div className="space-y-3">
-          <h2 className="text-lg font-semibold text-slate-800 px-1">
-            {currentMilestones.label}
-          </h2>
-          
-          {currentMilestones.categories.map((category, index) => (
-            <Card key={index} className="border-none shadow-sm">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
-                    {category.icon}
-                  </div>
-                  <h3 className="font-medium text-slate-800">{category.title}</h3>
-                </div>
-                <ul className="space-y-2">
-                  {category.milestones.map((milestone, mIndex) => (
-                    <li key={mIndex} className="flex items-start gap-2 text-sm text-slate-600">
-                      <span className="text-purple-400 mt-1">•</span>
-                      <span>{milestone}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          ))}
+      {/* Tabs */}
+      <div className="bg-white border-b border-slate-100 px-6 sticky top-0 z-10">
+        <div className="flex gap-1">
+          <button
+            onClick={() => setActiveTab('milestones')}
+            className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'milestones'
+                ? 'border-purple-500 text-purple-600'
+                : 'border-transparent text-slate-400'
+            }`}
+          >
+            📋 Milestones
+          </button>
+          <button
+            onClick={() => setActiveTab('growth')}
+            className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'growth'
+                ? 'border-purple-500 text-purple-600'
+                : 'border-transparent text-slate-400'
+            }`}
+          >
+            📈 Growth
+          </button>
         </div>
       </div>
+
+      {/* MILESTONES TAB */}
+      {activeTab === 'milestones' && (
+        <div className="px-6 py-4 space-y-4">
+          {/* Age Selector */}
+          <Card className="border-none shadow-sm">
+            <CardContent className="p-4">
+              <label className="text-sm text-slate-600 mb-2 block">Baby's age</label>
+              <select
+                value={selectedAge}
+                onChange={(e) => setSelectedAge(Number(e.target.value))}
+                className="w-full bg-slate-100 border-none rounded-lg px-4 py-3 text-slate-700 font-medium text-lg"
+              >
+                {ageOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </CardContent>
+          </Card>
+
+          {/* Disclaimer */}
+          <Card className="border-none shadow-sm bg-amber-50">
+            <CardContent className="p-4">
+              <p className="text-sm text-amber-800 leading-relaxed">
+                💛 Every baby develops at their own pace. These milestones are general guidelines, 
+                not a checklist. If you have concerns, chat with your health visitor or GP.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Milestones */}
+          <div className="space-y-3">
+            <h2 className="text-lg font-semibold text-slate-800 px-1">
+              {currentMilestones.label}
+            </h2>
+            
+            {currentMilestones.categories.map((category, index) => (
+              <Card key={index} className="border-none shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
+                      {category.icon}
+                    </div>
+                    <h3 className="font-medium text-slate-800">{category.title}</h3>
+                  </div>
+                  <ul className="space-y-2">
+                    {category.milestones.map((milestone, mIndex) => (
+                      <li key={mIndex} className="flex items-start gap-2 text-sm text-slate-600">
+                        <span className="text-purple-400 mt-1">•</span>
+                        <span>{milestone}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* GROWTH TAB */}
+      {activeTab === 'growth' && (
+        <div className="px-6 py-4 space-y-4">
+          {/* Summary Cards */}
+          <div className="grid grid-cols-3 gap-3">
+            <Card className="border-none shadow-sm">
+              <CardContent className="p-3 text-center">
+                <Scale className="h-5 w-5 text-blue-500 mx-auto mb-1" />
+                <div className="text-lg font-bold text-slate-800">
+                  {latestWeight ? `${latestWeight} kg` : '—'}
+                </div>
+                <div className="text-xs text-slate-500">Weight</div>
+                {getGrowthTrend('weight') !== null && (
+                  <div className={`text-xs mt-1 ${getGrowthTrend('weight')! >= 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                    {getGrowthTrend('weight')! >= 0 ? '+' : ''}{getGrowthTrend('weight')!.toFixed(2)} kg
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            
+            <Card className="border-none shadow-sm">
+              <CardContent className="p-3 text-center">
+                <Ruler className="h-5 w-5 text-emerald-500 mx-auto mb-1" />
+                <div className="text-lg font-bold text-slate-800">
+                  {latestHeight ? `${latestHeight} cm` : '—'}
+                </div>
+                <div className="text-xs text-slate-500">Height</div>
+                {getGrowthTrend('height') !== null && (
+                  <div className={`text-xs mt-1 ${getGrowthTrend('height')! >= 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                    {getGrowthTrend('height')! >= 0 ? '+' : ''}{getGrowthTrend('height')!.toFixed(1)} cm
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            
+            <Card className="border-none shadow-sm">
+              <CardContent className="p-3 text-center">
+                <Circle className="h-5 w-5 text-purple-500 mx-auto mb-1" />
+                <div className="text-lg font-bold text-slate-800">
+                  {latestHeadCirc ? `${latestHeadCirc} cm` : '—'}
+                </div>
+                <div className="text-xs text-slate-500">Head</div>
+                {getGrowthTrend('headCirc') !== null && (
+                  <div className={`text-xs mt-1 ${getGrowthTrend('headCirc')! >= 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                    {getGrowthTrend('headCirc')! >= 0 ? '+' : ''}{getGrowthTrend('headCirc')!.toFixed(1)} cm
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Add Entry Button */}
+          {!showAddEntry && (
+            <Button 
+              onClick={() => setShowAddEntry(true)}
+              className="w-full bg-purple-500 hover:bg-purple-600"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Log Measurements
+            </Button>
+          )}
+
+          {/* Add/Edit Form */}
+          {showAddEntry && (
+            <Card className="border-none shadow-md">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-slate-800">
+                    {editingId ? 'Edit Entry' : 'New Entry'}
+                  </h3>
+                  <button onClick={resetForm} className="text-slate-400">
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm text-slate-600 mb-1 block">Date</label>
+                    <Input
+                      type="date"
+                      value={newDate}
+                      onChange={(e) => setNewDate(e.target.value)}
+                      max={getLocalDateString()}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="text-sm text-slate-600 mb-1 block">Weight (kg)</label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={newWeight}
+                        onChange={(e) => setNewWeight(e.target.value)}
+                        placeholder="e.g. 5.5"
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-slate-600 mb-1 block">Height (cm)</label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        value={newHeight}
+                        onChange={(e) => setNewHeight(e.target.value)}
+                        placeholder="e.g. 60"
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-slate-600 mb-1 block">Head (cm)</label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        value={newHeadCirc}
+                        onChange={(e) => setNewHeadCirc(e.target.value)}
+                        placeholder="e.g. 40"
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-slate-600 mb-1 block">Notes (optional)</label>
+                    <Input
+                      type="text"
+                      value={newNotes}
+                      onChange={(e) => setNewNotes(e.target.value)}
+                      placeholder="e.g. Health visitor check-up"
+                      className="w-full"
+                    />
+                  </div>
+
+                  <Button 
+                    onClick={saveGrowthEntry}
+                    className="w-full bg-purple-500 hover:bg-purple-600"
+                    disabled={!newWeight && !newHeight && !newHeadCirc}
+                  >
+                    <Check className="h-4 w-4 mr-2" />
+                    {editingId ? 'Save Changes' : 'Save Entry'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Growth History */}
+          <div>
+            <h3 className="font-semibold text-slate-800 mb-3">History</h3>
+            
+            {growthLogs.length === 0 ? (
+              <Card className="border-none shadow-sm">
+                <CardContent className="p-6 text-center">
+                  <TrendingUp className="h-10 w-10 text-slate-200 mx-auto mb-2" />
+                  <p className="text-slate-400">No measurements logged yet</p>
+                  <p className="text-slate-300 text-sm">Start tracking to see growth over time</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-2">
+                {growthLogs.map((entry) => (
+                  <Card key={entry.id} className="border-none shadow-sm">
+                    <CardContent className="p-3">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="font-medium text-slate-700 text-sm">
+                            {formatDateDisplay(entry.date)}
+                          </p>
+                          <div className="flex gap-4 mt-1">
+                            {entry.weight && (
+                              <span className="text-xs text-slate-500">
+                                <Scale className="h-3 w-3 inline mr-1 text-blue-400" />
+                                {entry.weight} kg
+                              </span>
+                            )}
+                            {entry.height && (
+                              <span className="text-xs text-slate-500">
+                                <Ruler className="h-3 w-3 inline mr-1 text-emerald-400" />
+                                {entry.height} cm
+                              </span>
+                            )}
+                            {entry.headCirc && (
+                              <span className="text-xs text-slate-500">
+                                <Circle className="h-3 w-3 inline mr-1 text-purple-400" />
+                                {entry.headCirc} cm
+                              </span>
+                            )}
+                          </div>
+                          {entry.notes && (
+                            <p className="text-xs text-slate-400 mt-1 italic">{entry.notes}</p>
+                          )}
+                        </div>
+                        <div className="flex gap-1">
+                          <button onClick={() => editEntry(entry)} className="p-1 text-slate-300 hover:text-slate-500">
+                            <Edit3 className="h-4 w-4" />
+                          </button>
+                          <button onClick={() => deleteEntry(entry.id)} className="p-1 text-slate-300 hover:text-red-400">
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Info */}
+          <Card className="border-none shadow-sm bg-purple-50">
+            <CardContent className="p-4">
+              <p className="text-sm text-purple-800 leading-relaxed">
+                💜 Track measurements from health visitor check-ups or weigh-ins. 
+                Growth patterns matter more than single readings — your health visitor 
+                will use percentile charts to track progress over time.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
