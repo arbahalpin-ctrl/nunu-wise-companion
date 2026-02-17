@@ -10,6 +10,8 @@ interface HomeProps {
 }
 
 const BABY_AGE_KEY = 'nunu-baby-age-months';
+const BABY_NAME_KEY = 'nunu-baby-name';
+const PARENT_NAME_KEY = 'nunu-parent-name';
 const LAST_NAP_KEY = 'nunu-last-nap-time';
 const MOOD_ENTRIES_KEY = 'nunu-mood-entries';
 const BEDTIME_KEY = 'nunu-bedtime';
@@ -107,6 +109,12 @@ const getMoodResponse = (mood: string): string => {
 };
 
 const Home = ({ onTabChange }: HomeProps) => {
+  const [babyName, setBabyName] = useState<string>(() => {
+    return localStorage.getItem(BABY_NAME_KEY) || '';
+  });
+  const [parentName, setParentName] = useState<string>(() => {
+    return localStorage.getItem(PARENT_NAME_KEY) || '';
+  });
   const [babyAgeMonths, setBabyAgeMonths] = useState<number | null>(() => {
     const saved = localStorage.getItem(BABY_AGE_KEY);
     return saved ? parseInt(saved) : null;
@@ -260,8 +268,12 @@ const Home = ({ onTabChange }: HomeProps) => {
           />
         </div>
         <h1 className="text-xl font-bold text-slate-800">Nunu</h1>
-        <p className="text-sm text-slate-500 mb-3">The Motherhood Companion</p>
-        <p className="text-base font-medium text-slate-700">Hey, you 💛</p>
+        <p className="text-sm text-slate-500 mb-3">
+          {babyName ? `${babyName}'s companion` : 'The Motherhood Companion'}
+        </p>
+        <p className="text-base font-medium text-slate-700">
+          Hey{parentName ? `, ${parentName}` : ''} 💛
+        </p>
         <p className="text-sm text-slate-500">How are you feeling?</p>
       </div>
 
@@ -332,7 +344,9 @@ const Home = ({ onTabChange }: HomeProps) => {
             {babyAgeMonths === null || showAgeInput ? (
               <div className="text-center">
                 <Baby className="h-8 w-8 text-slate-400 mx-auto mb-2" />
-                <p className="text-sm text-slate-600 mb-3">How old is your baby?</p>
+                <p className="text-sm text-slate-600 mb-3">
+                  How old is {babyName || 'your baby'}?
+                </p>
                 <div className="flex gap-2 justify-center">
                   <input
                     type="number"
