@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { ArrowRight, ArrowLeft, Baby, Calendar, Heart, Check } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Baby, Calendar, Heart, Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/contexts/AuthContext';
 import heroImage from '@/assets/nunu-logo.svg';
 
 interface OnboardingProps {
   onComplete: () => void;
 }
 
-// Storage keys
+// Storage keys (kept for local backup)
 const BABY_NAME_KEY = 'nunu-baby-name';
 const BABY_BIRTHDATE_KEY = 'nunu-baby-birthdate';
 const BABY_AGE_KEY = 'nunu-baby-age-months';
@@ -26,26 +27,51 @@ const calculateAgeMonths = (birthdate: string): number => {
 };
 
 const Onboarding = ({ onComplete }: OnboardingProps) => {
+  const { saveBabyProfile, user } = useAuth();
   const [step, setStep] = useState(0);
   const [parentName, setParentName] = useState('');
   const [babyName, setBabyName] = useState('');
   const [birthdate, setBirthdate] = useState('');
   const [isExpecting, setIsExpecting] = useState<boolean | null>(null);
   const [feedingType, setFeedingType] = useState<'breast' | 'formula' | 'combo' | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleComplete = () => {
-    // Save all data
+  const handleComplete = async () => {
+    setSaving(true);
+    setError('');
+    
+    // Calculate age
+    const ageMonths = birthdate ? calculateAgeMonths(birthdate) : 0;
+    
+    // Save to Supabase
+    const { error: saveError } = await saveBabyProfile({
+      name: babyName,
+      birthdate: birthdate || undefined,
+      age_months: ageMonths,
+      feeding_type: feedingType || undefined,
+      is_expecting: isExpecting || false,
+    });
+    
+    if (saveError) {
+      console.error('Error saving baby profile:', saveError);
+      setError('Failed to save. Please try again.');
+      setSaving(false);
+      return;
+    }
+    
+    // Also save to localStorage as backup
     if (parentName) localStorage.setItem(PARENT_NAME_KEY, parentName);
     if (babyName) localStorage.setItem(BABY_NAME_KEY, babyName);
     if (birthdate) {
       localStorage.setItem(BABY_BIRTHDATE_KEY, birthdate);
-      const ageMonths = calculateAgeMonths(birthdate);
       localStorage.setItem(BABY_AGE_KEY, ageMonths.toString());
     } else if (isExpecting) {
       localStorage.setItem(BABY_AGE_KEY, '0');
     }
     if (feedingType) localStorage.setItem(FEEDING_TYPE_KEY, feedingType);
     
+    setSaving(false);
     onComplete();
   };
 
@@ -366,23 +392,36 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
 
         </div>
 
+        {/* Error message */}
+        {error && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
         {/* Continue button */}
         <div className="mt-8">
           <Button 
             onClick={nextStep}
-            disabled={!canProceed()}
+            disabled={!canProceed() || saving}
             size="lg"
             className="w-full rounded-2xl py-6 text-base shadow-lg bg-slate-800 hover:bg-slate-700 disabled:bg-slate-300"
           >
-            {step === 0 ? "Let's get started" : 
-             step === 4 || (step === 3 && isExpecting) ? "Finish setup" : 
-             "Continue"}
-            <ArrowRight className="h-5 w-5 ml-2" />
+            {saving ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <>
+                {step === 0 ? "Let's get started" : 
+                 step === 4 || (step === 3 && isExpecting) ? "Finish setup" : 
+                 "Continue"}
+                <ArrowRight className="h-5 w-5 ml-2" />
+              </>
+            )}
           </Button>
           
           {step === 0 && (
             <p className="text-xs text-slate-400 mt-4 text-center">
-              Your data stays on your device. Private by default.
+              Your data syncs securely to the cloud
             </p>
           )}
         </div>
