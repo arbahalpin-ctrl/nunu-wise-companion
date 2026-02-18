@@ -1,38 +1,28 @@
-import { useState, useEffect } from 'react';
-import { MessageCircle, Moon, Heart, Clock, Baby, Lightbulb, ChevronRight, Settings, Calendar } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { MessageCircle, Moon, Heart, Clock, Baby, Lightbulb, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import MoodCalendar, { MoodEntry } from '@/components/MoodCalendar';
+import MoodCalendar from '@/components/MoodCalendar';
+import { useAuth } from '@/contexts/AuthContext';
+import { moodService, sleepService, settingsService, MoodEntry, SleepLog } from '@/lib/database';
 import koalaHero from '@/assets/nunu-logo.svg';
 
 interface HomeProps {
   onTabChange?: (tab: string) => void;
 }
 
-const BABY_AGE_KEY = 'nunu-baby-age-months';
-const BABY_NAME_KEY = 'nunu-baby-name';
-const PARENT_NAME_KEY = 'nunu-parent-name';
-const LAST_NAP_KEY = 'nunu-last-nap-time';
-const MOOD_ENTRIES_KEY = 'nunu-mood-entries';
-const BEDTIME_KEY = 'nunu-bedtime';
-const LAST_BEDTIME_KEY = 'nunu-last-bedtime';
-
 // Check if a given time is after bedtime (night waking)
 const isNightWaking = (wakeTime: number, bedtimeHour: number, lastBedtime: number | null): boolean => {
-  // If we have an actual bedtime logged and wake is after it, it's a night waking
   if (lastBedtime && wakeTime > lastBedtime) {
     const hoursSinceBedtime = (wakeTime - lastBedtime) / (1000 * 60 * 60);
-    // If it's been less than 12 hours since bedtime, this is a night waking
     if (hoursSinceBedtime < 12) {
       return true;
     }
   }
   
-  // Fallback: check based on typical bedtime hour
   const wakeDate = new Date(wakeTime);
   const wakeHour = wakeDate.getHours();
   
-  // Consider it a night waking if between bedtime and 6am
   if (wakeHour >= bedtimeHour || wakeHour < 6) {
     return true;
   }
@@ -109,40 +99,23 @@ const getMoodResponse = (mood: string): string => {
 };
 
 const Home = ({ onTabChange }: HomeProps) => {
-  const [babyName, setBabyName] = useState<string>(() => {
-    return localStorage.getItem(BABY_NAME_KEY) || '';
-  });
-  const [parentName, setParentName] = useState<string>(() => {
-    return localStorage.getItem(PARENT_NAME_KEY) || '';
-  });
-  const [babyAgeMonths, setBabyAgeMonths] = useState<number | null>(() => {
-    const saved = localStorage.getItem(BABY_AGE_KEY);
-    return saved ? parseInt(saved) : null;
-  });
+  const { user, babyProfile, saveBabyProfile } = useAuth();
+  
+  // State
+  const [babyAgeMonths, setBabyAgeMonths] = useState<number | null>(null);
   const [showAgeInput, setShowAgeInput] = useState(false);
   const [ageInput, setAgeInput] = useState('');
-  const [lastNapTime, setLastNapTime] = useState<number | null>(() => {
-    const saved = localStorage.getItem(LAST_NAP_KEY);
-    return saved ? parseInt(saved) : null;
-  });
+  const [lastNapTime, setLastNapTime] = useState<number | null>(null);
   const [timeSinceNap, setTimeSinceNap] = useState<string>('');
   const [dailyTip, setDailyTip] = useState<string>('');
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [showMoodCalendar, setShowMoodCalendar] = useState(false);
-  const [moodEntries, setMoodEntries] = useState<MoodEntry[]>(() => {
-    const saved = localStorage.getItem(MOOD_ENTRIES_KEY);
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [bedtimeHour, setBedtimeHour] = useState<number>(() => {
-    const saved = localStorage.getItem(BEDTIME_KEY);
-    return saved ? parseInt(saved) : 19; // Default 7pm
-  });
-  const [lastBedtime, setLastBedtime] = useState<number | null>(() => {
-    const saved = localStorage.getItem(LAST_BEDTIME_KEY);
-    return saved ? parseInt(saved) : null;
-  });
+  const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([]);
+  const [bedtimeHour, setBedtimeHour] = useState<number>(19);
+  const [lastBedtime, setLastBedtime] = useState<number | null>(null);
   const [showBedtimeInput, setShowBedtimeInput] = useState(false);
   const [isCurrentlyNightWake, setIsCurrentlyNightWake] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const moods = [
     { id: 'good', emoji: '😊', label: 'Good', color: 'bg-emerald-100 border-emerald-200' },
@@ -152,6 +125,52 @@ const Home = ({ onTabChange }: HomeProps) => {
     { id: 'sad', emoji: '😢', label: 'Sad', color: 'bg-indigo-100 border-indigo-200' },
     { id: 'overwhelmed', emoji: '😩', label: 'Overwhelmed', color: 'bg-rose-100 border-rose-200' },
   ];
+
+  // Load data from database when user is authenticated
+  const loadUserData = useCallback(async () => {
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      // Load mood entries
+      const moods = await moodService.getAll(user.id);
+      setMoodEntries(moods);
+
+      // Load sleep logs
+      const latestNapWake = await sleepService.getLatest(user.id, 'nap_wake');
+      const latestBedtime = await sleepService.getLatest(user.id, 'bedtime');
+      
+      if (latestNapWake) {
+        setLastNapTime(new Date(latestNapWake.timestamp).getTime());
+      }
+      if (latestBedtime) {
+        setLastBedtime(new Date(latestBedtime.timestamp).getTime());
+      }
+
+      // Load settings
+      const settings = await settingsService.get(user.id);
+      if (settings) {
+        setBedtimeHour(settings.bedtime_hour);
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    loadUserData();
+  }, [loadUserData]);
+
+  // Load baby profile data
+  useEffect(() => {
+    if (babyProfile) {
+      setBabyAgeMonths(babyProfile.age_months || null);
+    }
+  }, [babyProfile]);
 
   // Update tip when age changes
   useEffect(() => {
@@ -177,7 +196,6 @@ const Home = ({ onTabChange }: HomeProps) => {
         setTimeSinceNap(`${mins}m ago`);
       }
       
-      // Check if this is a night waking
       setIsCurrentlyNightWake(isNightWaking(lastNapTime, bedtimeHour, lastBedtime));
     };
     
@@ -186,57 +204,95 @@ const Home = ({ onTabChange }: HomeProps) => {
     return () => clearInterval(interval);
   }, [lastNapTime, bedtimeHour, lastBedtime]);
 
-  const saveAge = () => {
+  const saveAge = async () => {
     const months = parseInt(ageInput);
     if (!isNaN(months) && months >= 0 && months <= 48) {
       setBabyAgeMonths(months);
-      localStorage.setItem(BABY_AGE_KEY, months.toString());
       setShowAgeInput(false);
+      
+      // Save to database if logged in
+      if (user && babyProfile) {
+        await saveBabyProfile({ age_months: months });
+      }
     }
   };
 
-  const logNapWake = () => {
+  const logNapWake = async () => {
     const now = Date.now();
     setLastNapTime(now);
-    localStorage.setItem(LAST_NAP_KEY, now.toString());
+    
+    // Save to database if logged in
+    if (user) {
+      await sleepService.add(user.id, 'nap_wake', babyProfile?.id);
+    }
   };
 
-  const logBedtime = () => {
+  const logBedtime = async () => {
     const now = Date.now();
     setLastBedtime(now);
-    localStorage.setItem(LAST_BEDTIME_KEY, now.toString());
-    // Clear last nap time when going to bed
     setLastNapTime(null);
-    localStorage.removeItem(LAST_NAP_KEY);
+    
+    // Save to database if logged in
+    if (user) {
+      await sleepService.add(user.id, 'bedtime', babyProfile?.id);
+    }
   };
 
-  const saveBedtimeHour = (hour: number) => {
+  const saveBedtimeHour = async (hour: number) => {
     setBedtimeHour(hour);
-    localStorage.setItem(BEDTIME_KEY, hour.toString());
     setShowBedtimeInput(false);
+    
+    // Save to database if logged in
+    if (user) {
+      await settingsService.upsert(user.id, { bedtime_hour: hour });
+    }
+  };
+
+  const handleMoodSelect = async (moodId: string) => {
+    setSelectedMood(moodId);
+    
+    // Save to database if logged in
+    if (user) {
+      const newEntry = await moodService.add(user.id, moodId);
+      if (newEntry) {
+        setMoodEntries(prev => [newEntry, ...prev]);
+      }
+    }
+  };
+
+  const handleClearNightWake = async () => {
+    setLastNapTime(null);
+    
+    if (user) {
+      // Could add a specific night wake cleared event if needed
+    }
+  };
+
+  const handleMorningWake = async () => {
+    setLastBedtime(null);
+    setIsCurrentlyNightWake(false);
+    
+    if (user) {
+      await sleepService.add(user.id, 'morning_wake', babyProfile?.id);
+    }
   };
 
   const getNextSleepSuggestion = (): string | null => {
     if (!lastNapTime || !wakeWindow) return null;
-    
-    // If it's a night waking, don't suggest wake window timing
     if (isCurrentlyNightWake) return null;
     
     const nextSleepMin = lastNapTime + wakeWindow.min * 60000;
     const nextSleepMax = lastNapTime + wakeWindow.max * 60000;
     const now = Date.now();
     
-    // If we're already past the max window, baby might be overtired
     if (now > nextSleepMax) {
       return "Baby may be overtired - watch for sleepy cues";
     }
     
-    // If we're in the window
     if (now >= nextSleepMin) {
       return "In the sweet spot - watch for sleepy cues now";
     }
     
-    // Format the next sleep time
     const minTime = new Date(nextSleepMin);
     const maxTime = new Date(nextSleepMax);
     const formatTime = (d: Date) => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -255,6 +311,24 @@ const Home = ({ onTabChange }: HomeProps) => {
     if (remainingMonths === 0) return years === 1 ? '1 year' : `${years} years`;
     return `${years}y ${remainingMonths}m`;
   };
+
+  // Get names from profile or auth
+  const babyName = babyProfile?.name || '';
+  const parentName = user?.user_metadata?.parent_name || '';
+
+  // Convert mood entries for calendar display
+  const calendarMoodEntries = moodEntries.map(m => ({
+    mood: m.mood,
+    timestamp: new Date(m.timestamp).getTime()
+  }));
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white flex items-center justify-center">
+        <div className="text-slate-500">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white flex flex-col pb-24">
@@ -280,7 +354,7 @@ const Home = ({ onTabChange }: HomeProps) => {
       <div className="flex-1 px-6 space-y-4">
         {/* Mood Check-in / Calendar */}
         {showMoodCalendar ? (
-          <MoodCalendar entries={moodEntries} onClose={() => setShowMoodCalendar(false)} />
+          <MoodCalendar entries={calendarMoodEntries} onClose={() => setShowMoodCalendar(false)} />
         ) : (
         <Card className="border-none shadow-md bg-white">
           <CardContent className="p-5">
@@ -289,14 +363,7 @@ const Home = ({ onTabChange }: HomeProps) => {
                 {moods.map((mood) => (
                   <button
                     key={mood.id}
-                    onClick={() => {
-                      setSelectedMood(mood.id);
-                      // Save mood entry
-                      const newEntry: MoodEntry = { mood: mood.id, timestamp: Date.now() };
-                      const updatedEntries = [...moodEntries, newEntry];
-                      setMoodEntries(updatedEntries);
-                      localStorage.setItem(MOOD_ENTRIES_KEY, JSON.stringify(updatedEntries));
-                    }}
+                    onClick={() => handleMoodSelect(mood.id)}
                     className={`
                       p-4 rounded-2xl border-2 transition-all duration-200
                       hover:scale-[1.02] hover:shadow-md active:scale-[0.98]
@@ -394,21 +461,13 @@ const Home = ({ onTabChange }: HomeProps) => {
                         </p>
                         <div className="flex gap-2">
                           <button
-                            onClick={() => {
-                              setLastNapTime(null);
-                              localStorage.removeItem(LAST_NAP_KEY);
-                            }}
+                            onClick={handleClearNightWake}
                             className="text-xs px-3 py-1.5 bg-indigo-100 border border-indigo-200 rounded-full text-indigo-700 hover:bg-indigo-200"
                           >
                             Baby's back asleep
                           </button>
                           <button
-                            onClick={() => {
-                              // Mark as morning wake - clear bedtime
-                              setLastBedtime(null);
-                              localStorage.removeItem(LAST_BEDTIME_KEY);
-                              setIsCurrentlyNightWake(false);
-                            }}
+                            onClick={handleMorningWake}
                             className="text-xs px-3 py-1.5 bg-white border border-slate-200 rounded-full text-slate-600 hover:bg-slate-50"
                           >
                             Actually, it's morning
