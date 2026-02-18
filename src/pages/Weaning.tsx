@@ -1,10 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, X, AlertTriangle, ChevronLeft, Star, Clock, Bookmark, BookmarkCheck, Info, ChefHat, Snowflake, Users, MessageCircle, Sparkles, Send, Bot, User, Check, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { foods, Food } from '@/data/foods';
 import { recipes, Recipe, getRecipeCategories } from '@/data/recipes';
+import { useAuth } from '@/contexts/AuthContext';
+import { recipesService } from '@/lib/database';
+import { supabase } from '@/lib/supabase';
 
 const SAVED_FOODS_KEY = 'nunu-saved-foods';
 const SAVED_RECIPES_KEY = 'nunu-saved-recipes';
@@ -132,6 +135,8 @@ interface WeaningProps {
 }
 
 const Weaning = ({ onOpenChat }: WeaningProps) => {
+  const { user, babyProfile } = useAuth();
+  
   // Recipe Chat State
   const [showRecipeChat, setShowRecipeChat] = useState(false);
   const [recipeChatMessages, setRecipeChatMessages] = useState<ChatMessage[]>(() => {
@@ -233,27 +238,44 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
     }
   };
 
-  const saveRecipeFromChat = (message: ChatMessage) => {
-    try {
-      const saved = localStorage.getItem(CHAT_SAVED_KEY);
-      const items: SavedRecipe[] = saved ? JSON.parse(saved) : [];
+  const saveRecipeFromChat = async (message: ChatMessage) => {
+    if (savedRecipeIds.has(message.id)) return;
+    
+    const title = extractRecipeTitle(message.content);
+    const newRecipe: SavedRecipe = {
+      id: message.id,
+      title,
+      content: message.content,
+      savedAt: Date.now(),
+      conversationTitle: 'Recipe Ideas'
+    };
 
-      if (items.some(r => r.id === message.id)) return;
+    // Optimistic update
+    setSavedChatRecipes(prev => [newRecipe, ...prev]);
+    setSavedRecipeIds(prev => new Set([...prev, message.id]));
 
-      const title = extractRecipeTitle(message.content);
-      const newRecipe: SavedRecipe = {
-        id: message.id,
-        title,
-        content: message.content,
-        savedAt: Date.now(),
-        conversationTitle: 'Recipe Ideas'
-      };
-
-      items.unshift(newRecipe);
-      localStorage.setItem(CHAT_SAVED_KEY, JSON.stringify(items));
-      setSavedRecipeIds(prev => new Set([...prev, message.id]));
-    } catch (e) {
-      console.error('Failed to save recipe:', e);
+    if (user) {
+      try {
+        await supabase.from('saved_chat_recipes').insert({
+          user_id: user.id,
+          message_id: message.id,
+          title,
+          content: message.content,
+          conversation_title: 'Recipe Ideas'
+        });
+      } catch (e) {
+        console.error('Failed to save recipe to database:', e);
+      }
+    } else {
+      // Fallback to localStorage
+      try {
+        const saved = localStorage.getItem(CHAT_SAVED_KEY);
+        const items: SavedRecipe[] = saved ? JSON.parse(saved) : [];
+        items.unshift(newRecipe);
+        localStorage.setItem(CHAT_SAVED_KEY, JSON.stringify(items));
+      } catch (e) {
+        console.error('Failed to save recipe:', e);
+      }
     }
   };
 
@@ -271,34 +293,36 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
   const [savedChatRecipes, setSavedChatRecipes] = useState<SavedRecipe[]>([]);
   const [expandedSavedId, setExpandedSavedId] = useState<string | null>(null);
 
-  // Load saved chat recipes
+  // Reload saved recipes when tab changes to saved
   useEffect(() => {
-    const loadSaved = () => {
-      try {
-        const saved = localStorage.getItem(CHAT_SAVED_KEY);
-        if (saved) {
-          setSavedChatRecipes(JSON.parse(saved));
-        }
-      } catch (e) {
-        console.error('Failed to load saved recipes:', e);
-      }
-    };
-    loadSaved();
-    // Also reload when tab changes to saved
     if (activeTab === 'saved') {
-      loadSaved();
+      loadSavedRecipes();
     }
-  }, [activeTab]);
+  }, [activeTab, loadSavedRecipes]);
 
-  const deleteSavedRecipe = (id: string) => {
+  const deleteSavedRecipe = async (id: string) => {
+    // Optimistic update
     const updated = savedChatRecipes.filter(r => r.id !== id);
     setSavedChatRecipes(updated);
-    localStorage.setItem(CHAT_SAVED_KEY, JSON.stringify(updated));
     setSavedRecipeIds(prev => {
       const newSet = new Set(prev);
       newSet.delete(id);
       return newSet;
     });
+
+    if (user) {
+      try {
+        await supabase
+          .from('saved_chat_recipes')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('message_id', id);
+      } catch (e) {
+        console.error('Failed to delete from database:', e);
+      }
+    } else {
+      localStorage.setItem(CHAT_SAVED_KEY, JSON.stringify(updated));
+    }
   };
 
   const formatSavedDate = (timestamp: number) => {
@@ -315,45 +339,123 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [recipeCategory, setRecipeCategory] = useState<string>('all');
 
-  // Load saved data
+  // Load saved data from database (or localStorage as fallback)
+  const loadSavedRecipes = useCallback(async () => {
+    if (user) {
+      try {
+        const dbRecipes = await recipesService.getAll(user.id);
+        setSavedRecipes(dbRecipes.map(r => r.recipe_id));
+        
+        // Also load chat saved recipes from database
+        const { data: chatRecipes } = await supabase
+          .from('saved_chat_recipes')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('saved_at', { ascending: false });
+        
+        if (chatRecipes) {
+          setSavedChatRecipes(chatRecipes.map(r => ({
+            id: r.id,
+            title: r.title,
+            content: r.content,
+            savedAt: new Date(r.saved_at).getTime(),
+            conversationTitle: r.conversation_title || 'Recipe Ideas'
+          })));
+          setSavedRecipeIds(new Set(chatRecipes.map(r => r.message_id)));
+        }
+      } catch (e) {
+        console.error('Failed to load from database:', e);
+      }
+    } else {
+      // Fallback to localStorage for non-logged-in users
+      try {
+        const savedRec = localStorage.getItem(SAVED_RECIPES_KEY);
+        if (savedRec) setSavedRecipes(JSON.parse(savedRec));
+        
+        const savedChat = localStorage.getItem(CHAT_SAVED_KEY);
+        if (savedChat) {
+          const items = JSON.parse(savedChat);
+          setSavedChatRecipes(items);
+          setSavedRecipeIds(new Set(items.map((r: SavedRecipe) => r.id)));
+        }
+      } catch (e) {
+        console.error('Failed to load from localStorage:', e);
+      }
+    }
+  }, [user]);
+
+  useEffect(() => {
+    loadSavedRecipes();
+  }, [loadSavedRecipes]);
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem(SAVED_FOODS_KEY);
       if (saved) setSavedFoods(JSON.parse(saved));
       
-      const savedRec = localStorage.getItem(SAVED_RECIPES_KEY);
-      if (savedRec) setSavedRecipes(JSON.parse(savedRec));
-      
-      const age = localStorage.getItem(BABY_AGE_KEY);
-      if (age) {
-        const ageNum = parseInt(age);
+      // Use baby profile age if available
+      if (babyProfile?.age_months) {
+        const ageNum = babyProfile.age_months;
         setBabyAge(ageNum);
-        // Set default age group based on baby's age
         if (ageNum < 7) setSelectedAge('6');
         else if (ageNum < 9) setSelectedAge('7-8');
         else if (ageNum < 12) setSelectedAge('9-12');
         else setSelectedAge('12+');
+      } else {
+        const age = localStorage.getItem(BABY_AGE_KEY);
+        if (age) {
+          const ageNum = parseInt(age);
+          setBabyAge(ageNum);
+          if (ageNum < 7) setSelectedAge('6');
+          else if (ageNum < 9) setSelectedAge('7-8');
+          else if (ageNum < 12) setSelectedAge('9-12');
+          else setSelectedAge('12+');
+        }
       }
     } catch (e) {
       console.error('Failed to load saved data:', e);
     }
-  }, []);
+  }, [babyProfile]);
 
-  // Save favorites
+  // Save foods to localStorage (foods don't need database persistence)
   useEffect(() => {
     localStorage.setItem(SAVED_FOODS_KEY, JSON.stringify(savedFoods));
   }, [savedFoods]);
 
-  useEffect(() => {
-    localStorage.setItem(SAVED_RECIPES_KEY, JSON.stringify(savedRecipes));
-  }, [savedRecipes]);
-
-  const toggleSavedRecipe = (recipeId: string) => {
+  const toggleSavedRecipe = async (recipeId: string) => {
+    const isCurrentlySaved = savedRecipes.includes(recipeId);
+    
+    // Optimistic update
     setSavedRecipes(prev => 
-      prev.includes(recipeId) 
+      isCurrentlySaved 
         ? prev.filter(id => id !== recipeId)
         : [...prev, recipeId]
     );
+    
+    // Save to database if logged in
+    if (user) {
+      try {
+        if (isCurrentlySaved) {
+          await recipesService.remove(user.id, recipeId);
+        } else {
+          await recipesService.save(user.id, recipeId);
+        }
+      } catch (e) {
+        console.error('Failed to save recipe:', e);
+        // Revert on error
+        setSavedRecipes(prev => 
+          isCurrentlySaved 
+            ? [...prev, recipeId]
+            : prev.filter(id => id !== recipeId)
+        );
+      }
+    } else {
+      // Save to localStorage for non-logged-in users
+      const updated = isCurrentlySaved
+        ? savedRecipes.filter(id => id !== recipeId)
+        : [...savedRecipes, recipeId];
+      localStorage.setItem(SAVED_RECIPES_KEY, JSON.stringify(updated));
+    }
   };
 
   // Filter recipes
