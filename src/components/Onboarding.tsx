@@ -1,8 +1,7 @@
-import { useState } from 'react';
-import { ChevronRight, ChevronLeft, Baby, Heart, Moon, Utensils, Sparkles } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChevronRight, ChevronLeft, Moon, Utensils, Heart, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
 import koalaLogo from '@/assets/nunu-logo.svg';
 
 interface OnboardingProps {
@@ -21,7 +20,8 @@ export interface OnboardingData {
 }
 
 const Onboarding = ({ onComplete, initialParentName }: OnboardingProps) => {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [data, setData] = useState<OnboardingData>({
     parentName: initialParentName || '',
     isExpecting: false,
@@ -31,32 +31,42 @@ const Onboarding = ({ onComplete, initialParentName }: OnboardingProps) => {
     feedingType: undefined,
     biggestChallenge: undefined,
   });
-  const [useAge, setUseAge] = useState(false); // Toggle between birthdate and age input
+  const [useAge, setUseAge] = useState(false);
 
-  const totalSteps = 4;
+  const totalSteps = 5;
+
+  // Smooth transition between steps
+  const goToStep = (newStep: number) => {
+    setIsAnimating(true);
+    setTimeout(() => {
+      setStep(newStep);
+      setIsAnimating(false);
+    }, 200);
+  };
 
   const canProceed = () => {
     switch (step) {
+      case 0: return true; // Welcome screen
       case 1: return data.parentName.trim().length > 0;
-      case 2: return true; // Can always proceed (expecting is a choice)
+      case 2: return true;
       case 3: 
         if (data.isExpecting) return true;
         return data.babyName.trim().length > 0 && (data.babyBirthdate || data.babyAgeMonths);
-      case 4: return true; // Optional step
+      case 4: return true;
       default: return true;
     }
   };
 
   const handleNext = () => {
-    if (step < totalSteps) {
-      setStep(step + 1);
+    if (step < totalSteps - 1) {
+      goToStep(step + 1);
     } else {
       onComplete(data);
     }
   };
 
   const handleBack = () => {
-    if (step > 1) setStep(step - 1);
+    if (step > 0) goToStep(step - 1);
   };
 
   const calculateAgeFromBirthdate = (birthdate: string): number => {
@@ -67,105 +77,134 @@ const Onboarding = ({ onComplete, initialParentName }: OnboardingProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white flex flex-col">
-      {/* Progress Bar */}
-      <div className="px-6 pt-6">
-        <div className="flex gap-2">
-          {[...Array(totalSteps)].map((_, i) => (
+    <div className="min-h-screen bg-gradient-to-b from-[#f8f5f2] to-white flex flex-col">
+      
+      {/* Progress indicator - subtle dots */}
+      {step > 0 && (
+        <div className="px-6 pt-6 flex justify-center gap-2">
+          {[...Array(totalSteps - 1)].map((_, i) => (
             <div
               key={i}
-              className={`h-1.5 flex-1 rounded-full transition-colors ${
-                i < step ? 'bg-sky-500' : 'bg-slate-200'
+              className={`h-1.5 rounded-full transition-all duration-500 ${
+                i < step ? 'w-6 bg-[#7c9a92]' : 'w-1.5 bg-[#d4cdc5]'
               }`}
             />
           ))}
         </div>
-        <p className="text-xs text-slate-400 mt-2 text-center">Step {step} of {totalSteps}</p>
-      </div>
+      )}
 
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-center px-6 py-8">
+      <div className={`flex-1 flex flex-col justify-center px-8 py-12 transition-opacity duration-200 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
         
-        {/* Step 1: Welcome & Parent Name */}
-        {step === 1 && (
-          <div className="space-y-8 animate-in fade-in duration-300">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-white rounded-full p-3 shadow-lg mx-auto mb-4">
+        {/* Step 0: Welcome */}
+        {step === 0 && (
+          <div className="text-center space-y-8">
+            <div className="w-24 h-24 mx-auto mb-2 relative">
+              <div className="absolute inset-0 bg-[#e8e4df] rounded-full animate-pulse" />
+              <div className="relative w-full h-full bg-white rounded-full p-4 shadow-sm">
                 <img src={koalaLogo} alt="Nunu" className="w-full h-full" />
               </div>
-              <h1 className="text-2xl font-bold text-slate-800">Welcome to Nunu</h1>
-              <p className="text-slate-500 mt-2">Your calm companion through motherhood</p>
+            </div>
+            
+            <div className="space-y-3">
+              <h1 className="text-3xl font-semibold text-[#3d3d3d] tracking-tight">
+                Welcome to Nunu
+              </h1>
+              <p className="text-[#6b6b6b] text-lg leading-relaxed max-w-xs mx-auto">
+                A gentle companion for the journey of motherhood
+              </p>
             </div>
 
-            <Card className="border-none shadow-md">
-              <CardContent className="p-6">
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  What should we call you?
-                </label>
-                <Input
-                  value={data.parentName}
-                  onChange={(e) => setData({ ...data, parentName: e.target.value })}
-                  placeholder="Your name"
-                  className="text-lg py-6"
-                  autoFocus
-                />
-                <p className="text-xs text-slate-400 mt-2">
-                  So Nunu can greet you properly 💛
-                </p>
-              </CardContent>
-            </Card>
+            <div className="pt-4 space-y-3 max-w-xs mx-auto">
+              <div className="flex items-center gap-3 text-left p-3 bg-white/60 rounded-xl">
+                <div className="w-10 h-10 bg-[#f0ebe6] rounded-full flex items-center justify-center flex-shrink-0">
+                  <Moon className="w-5 h-5 text-[#7c9a92]" />
+                </div>
+                <p className="text-sm text-[#5a5a5a]">Sleep guidance tailored to your baby's age</p>
+              </div>
+              <div className="flex items-center gap-3 text-left p-3 bg-white/60 rounded-xl">
+                <div className="w-10 h-10 bg-[#f0ebe6] rounded-full flex items-center justify-center flex-shrink-0">
+                  <Heart className="w-5 h-5 text-[#c4a4a4]" />
+                </div>
+                <p className="text-sm text-[#5a5a5a]">Emotional support when you need it</p>
+              </div>
+              <div className="flex items-center gap-3 text-left p-3 bg-white/60 rounded-xl">
+                <div className="w-10 h-10 bg-[#f0ebe6] rounded-full flex items-center justify-center flex-shrink-0">
+                  <Utensils className="w-5 h-5 text-[#c9a66b]" />
+                </div>
+                <p className="text-sm text-[#5a5a5a]">Weaning recipes and feeding tips</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 1: Name */}
+        {step === 1 && (
+          <div className="space-y-8">
+            <div className="text-center">
+              <h1 className="text-2xl font-semibold text-[#3d3d3d] mb-2">
+                Let's start with you
+              </h1>
+              <p className="text-[#6b6b6b]">
+                What would you like to be called?
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Input
+                value={data.parentName}
+                onChange={(e) => setData({ ...data, parentName: e.target.value })}
+                placeholder="Your name"
+                className="text-center text-xl py-6 border-0 border-b-2 border-[#d4cdc5] rounded-none bg-transparent focus:border-[#7c9a92] focus:ring-0 placeholder:text-[#b5b0a8]"
+                autoFocus
+              />
+            </div>
           </div>
         )}
 
         {/* Step 2: Expecting or Have Baby */}
         {step === 2 && (
-          <div className="space-y-8 animate-in fade-in duration-300">
+          <div className="space-y-8">
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-slate-800">Hi, {data.parentName}!</h1>
-              <p className="text-slate-500 mt-2">Tell us where you're at</p>
+              <h1 className="text-2xl font-semibold text-[#3d3d3d] mb-2">
+                Hi {data.parentName}
+              </h1>
+              <p className="text-[#6b6b6b]">
+                Where are you in your journey?
+              </p>
             </div>
 
             <div className="space-y-4">
               <button
                 onClick={() => setData({ ...data, isExpecting: false })}
-                className={`w-full p-6 rounded-2xl border-2 text-left transition-all ${
+                className={`w-full p-5 rounded-2xl text-left transition-all duration-300 ${
                   !data.isExpecting
-                    ? 'border-sky-500 bg-sky-50 shadow-md'
-                    : 'border-slate-200 bg-white hover:border-slate-300'
+                    ? 'bg-[#7c9a92] shadow-lg transform scale-[1.02]'
+                    : 'bg-white border border-[#e8e4df] hover:border-[#d4cdc5]'
                 }`}
               >
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    !data.isExpecting ? 'bg-sky-500' : 'bg-slate-100'
-                  }`}>
-                    <Baby className={`h-6 w-6 ${!data.isExpecting ? 'text-white' : 'text-slate-400'}`} />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-slate-800">I have a baby</p>
-                    <p className="text-sm text-slate-500">Already in the trenches! 💪</p>
-                  </div>
-                </div>
+                <p className={`font-medium text-lg ${!data.isExpecting ? 'text-white' : 'text-[#3d3d3d]'}`}>
+                  I have a baby
+                </p>
+                <p className={`text-sm mt-1 ${!data.isExpecting ? 'text-white/80' : 'text-[#6b6b6b]'}`}>
+                  I'd like support with sleep, feeding, or just getting through the day
+                </p>
               </button>
 
               <button
                 onClick={() => setData({ ...data, isExpecting: true })}
-                className={`w-full p-6 rounded-2xl border-2 text-left transition-all ${
+                className={`w-full p-5 rounded-2xl text-left transition-all duration-300 ${
                   data.isExpecting
-                    ? 'border-purple-500 bg-purple-50 shadow-md'
-                    : 'border-slate-200 bg-white hover:border-slate-300'
+                    ? 'bg-[#c4a4a4] shadow-lg transform scale-[1.02]'
+                    : 'bg-white border border-[#e8e4df] hover:border-[#d4cdc5]'
                 }`}
               >
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    data.isExpecting ? 'bg-purple-500' : 'bg-slate-100'
-                  }`}>
-                    <Heart className={`h-6 w-6 ${data.isExpecting ? 'text-white' : 'text-slate-400'}`} />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-slate-800">I'm expecting</p>
-                    <p className="text-sm text-slate-500">Getting ready for the journey 🤰</p>
-                  </div>
-                </div>
+                <p className={`font-medium text-lg ${data.isExpecting ? 'text-white' : 'text-[#3d3d3d]'}`}>
+                  I'm expecting
+                </p>
+                <p className={`text-sm mt-1 ${data.isExpecting ? 'text-white/80' : 'text-[#6b6b6b]'}`}>
+                  I want to prepare for what's ahead
+                </p>
               </button>
             </div>
           </div>
@@ -173,135 +212,133 @@ const Onboarding = ({ onComplete, initialParentName }: OnboardingProps) => {
 
         {/* Step 3: Baby Info */}
         {step === 3 && (
-          <div className="space-y-6 animate-in fade-in duration-300">
+          <div className="space-y-8">
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-slate-800">
-                {data.isExpecting ? "That's exciting!" : "Tell us about your little one"}
+              <h1 className="text-2xl font-semibold text-[#3d3d3d] mb-2">
+                {data.isExpecting ? "We'll be here when baby arrives" : "Tell us about your little one"}
               </h1>
-              <p className="text-slate-500 mt-2">
+              <p className="text-[#6b6b6b]">
                 {data.isExpecting 
-                  ? "We'll have tips ready for when baby arrives"
-                  : "So we can personalize your experience"
+                  ? "You can update this later"
+                  : "This helps us personalise your experience"
                 }
               </p>
             </div>
 
             {data.isExpecting ? (
-              <Card className="border-none shadow-md bg-purple-50">
-                <CardContent className="p-6 text-center">
-                  <Heart className="h-12 w-12 text-purple-400 mx-auto mb-3" />
-                  <p className="text-purple-800 font-medium">You're all set for now!</p>
-                  <p className="text-purple-600 text-sm mt-2">
-                    Come back when baby arrives and we'll help you set up their profile
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="text-center py-8">
+                <div className="w-20 h-20 bg-[#f0ebe6] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Heart className="w-10 h-10 text-[#c4a4a4]" />
+                </div>
+                <p className="text-[#6b6b6b] max-w-xs mx-auto">
+                  Nunu will be ready with sleep tips, feeding guidance, and support whenever you need it
+                </p>
+              </div>
             ) : (
-              <Card className="border-none shadow-md">
-                <CardContent className="p-6 space-y-5">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Baby's name
-                    </label>
-                    <Input
-                      value={data.babyName}
-                      onChange={(e) => setData({ ...data, babyName: e.target.value })}
-                      placeholder="e.g., Luna"
-                      className="text-lg py-5"
-                    />
-                  </div>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-[#5a5a5a] mb-2 text-center">
+                    Baby's name
+                  </label>
+                  <Input
+                    value={data.babyName}
+                    onChange={(e) => setData({ ...data, babyName: e.target.value })}
+                    placeholder="Their name"
+                    className="text-center text-lg py-5 border-0 border-b-2 border-[#d4cdc5] rounded-none bg-transparent focus:border-[#7c9a92] focus:ring-0 placeholder:text-[#b5b0a8]"
+                  />
+                </div>
 
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="block text-sm font-medium text-slate-700">
-                        {useAge ? "Baby's age" : "Baby's birthday"}
-                      </label>
-                      <button
-                        onClick={() => setUseAge(!useAge)}
-                        className="text-xs text-sky-600 hover:text-sky-700"
-                      >
-                        {useAge ? "Use birthday instead" : "Use age instead"}
-                      </button>
-                    </div>
-                    
-                    {useAge ? (
-                      <div className="flex items-center gap-2">
-                        <Input
-                          type="number"
-                          value={data.babyAgeMonths || ''}
-                          onChange={(e) => setData({ 
-                            ...data, 
-                            babyAgeMonths: parseInt(e.target.value) || undefined,
-                            babyBirthdate: undefined
-                          })}
-                          placeholder="0"
-                          className="text-lg py-5 w-24"
-                          min="0"
-                          max="48"
-                        />
-                        <span className="text-slate-500">months old</span>
-                      </div>
-                    ) : (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium text-[#5a5a5a]">
+                      {useAge ? "Age in months" : "Date of birth"}
+                    </label>
+                    <button
+                      onClick={() => setUseAge(!useAge)}
+                      className="text-xs text-[#7c9a92] hover:underline"
+                    >
+                      {useAge ? "Use date instead" : "Use age instead"}
+                    </button>
+                  </div>
+                  
+                  {useAge ? (
+                    <div className="flex items-center justify-center gap-3">
                       <Input
-                        type="date"
-                        value={data.babyBirthdate || ''}
+                        type="number"
+                        value={data.babyAgeMonths || ''}
                         onChange={(e) => setData({ 
                           ...data, 
-                          babyBirthdate: e.target.value,
-                          babyAgeMonths: e.target.value ? calculateAgeFromBirthdate(e.target.value) : undefined
+                          babyAgeMonths: parseInt(e.target.value) || undefined,
+                          babyBirthdate: undefined
                         })}
-                        className="text-lg py-5"
-                        max={new Date().toISOString().split('T')[0]}
+                        className="text-center text-lg py-5 border-0 border-b-2 border-[#d4cdc5] rounded-none bg-transparent focus:border-[#7c9a92] focus:ring-0 w-20"
+                        min="0"
+                        max="48"
                       />
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-3">
-                      How are you feeding?
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { value: 'breast', label: 'Breast', emoji: '🤱' },
-                        { value: 'formula', label: 'Formula', emoji: '🍼' },
-                        { value: 'combo', label: 'Both', emoji: '🤱🍼' },
-                      ].map((option) => (
-                        <button
-                          key={option.value}
-                          onClick={() => setData({ ...data, feedingType: option.value as 'breast' | 'formula' | 'combo' })}
-                          className={`p-3 rounded-xl border-2 transition-all ${
-                            data.feedingType === option.value
-                              ? 'border-sky-500 bg-sky-50'
-                              : 'border-slate-200 hover:border-slate-300'
-                          }`}
-                        >
-                          <div className="text-xl mb-1">{option.emoji}</div>
-                          <div className="text-xs font-medium text-slate-700">{option.label}</div>
-                        </button>
-                      ))}
+                      <span className="text-[#6b6b6b]">months</span>
                     </div>
+                  ) : (
+                    <Input
+                      type="date"
+                      value={data.babyBirthdate || ''}
+                      onChange={(e) => setData({ 
+                        ...data, 
+                        babyBirthdate: e.target.value,
+                        babyAgeMonths: e.target.value ? calculateAgeFromBirthdate(e.target.value) : undefined
+                      })}
+                      className="text-center text-lg py-5 border-0 border-b-2 border-[#d4cdc5] rounded-none bg-transparent focus:border-[#7c9a92] focus:ring-0"
+                      max={new Date().toISOString().split('T')[0]}
+                    />
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#5a5a5a] mb-3 text-center">
+                    How are you feeding?
+                  </label>
+                  <div className="flex justify-center gap-3">
+                    {[
+                      { value: 'breast', label: 'Breast' },
+                      { value: 'formula', label: 'Formula' },
+                      { value: 'combo', label: 'Combination' },
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => setData({ ...data, feedingType: option.value as 'breast' | 'formula' | 'combo' })}
+                        className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                          data.feedingType === option.value
+                            ? 'bg-[#7c9a92] text-white shadow-md'
+                            : 'bg-white border border-[#e8e4df] text-[#5a5a5a] hover:border-[#d4cdc5]'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )}
           </div>
         )}
 
-        {/* Step 4: Biggest Challenge (Optional) */}
+        {/* Step 4: Challenges */}
         {step === 4 && (
-          <div className="space-y-6 animate-in fade-in duration-300">
+          <div className="space-y-8">
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-slate-800">Almost there!</h1>
-              <p className="text-slate-500 mt-2">What's your biggest challenge right now?</p>
-              <p className="text-xs text-slate-400 mt-1">(Optional — helps us personalize your tips)</p>
+              <h1 className="text-2xl font-semibold text-[#3d3d3d] mb-2">
+                What matters most to you right now?
+              </h1>
+              <p className="text-[#6b6b6b]">
+                Choose one, or skip this step
+              </p>
             </div>
 
             <div className="space-y-3">
               {[
-                { value: 'sleep', label: 'Sleep', description: "Nobody's getting enough", icon: Moon, color: 'indigo' },
-                { value: 'feeding', label: 'Feeding', description: "Weaning, fussy eating, etc.", icon: Utensils, color: 'orange' },
-                { value: 'overwhelm', label: 'Feeling overwhelmed', description: "Just... everything", icon: Heart, color: 'rose' },
-                { value: 'info', label: 'Need reliable info', description: "So much conflicting advice!", icon: Sparkles, color: 'sky' },
+                { value: 'sleep', label: 'Better sleep', sublabel: 'For baby, for me, for everyone', icon: Moon, color: '#7c9a92' },
+                { value: 'feeding', label: 'Feeding support', sublabel: 'Weaning, schedules, picky eating', icon: Utensils, color: '#c9a66b' },
+                { value: 'overwhelm', label: 'Feeling like myself again', sublabel: 'Managing the mental load', icon: Heart, color: '#c4a4a4' },
+                { value: 'info', label: 'Trusted information', sublabel: 'Cutting through the noise', icon: HelpCircle, color: '#8b9dc3' },
               ].map((option) => {
                 const Icon = option.icon;
                 const isSelected = data.biggestChallenge === option.value;
@@ -312,22 +349,22 @@ const Onboarding = ({ onComplete, initialParentName }: OnboardingProps) => {
                       ...data, 
                       biggestChallenge: isSelected ? undefined : option.value 
                     })}
-                    className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
+                    className={`w-full p-4 rounded-2xl text-left transition-all duration-300 flex items-center gap-4 ${
                       isSelected
-                        ? `border-${option.color}-500 bg-${option.color}-50 shadow-md`
-                        : 'border-slate-200 bg-white hover:border-slate-300'
+                        ? 'bg-white shadow-lg border-2 transform scale-[1.02]'
+                        : 'bg-white border border-[#e8e4df] hover:border-[#d4cdc5]'
                     }`}
+                    style={{ borderColor: isSelected ? option.color : undefined }}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        isSelected ? `bg-${option.color}-500` : 'bg-slate-100'
-                      }`}>
-                        <Icon className={`h-5 w-5 ${isSelected ? 'text-white' : 'text-slate-400'}`} />
-                      </div>
-                      <div>
-                        <p className="font-medium text-slate-800">{option.label}</p>
-                        <p className="text-sm text-slate-500">{option.description}</p>
-                      </div>
+                    <div 
+                      className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300"
+                      style={{ backgroundColor: isSelected ? option.color : '#f0ebe6' }}
+                    >
+                      <Icon className={`h-6 w-6 transition-colors duration-300`} style={{ color: isSelected ? 'white' : option.color }} />
+                    </div>
+                    <div>
+                      <p className="font-medium text-[#3d3d3d]">{option.label}</p>
+                      <p className="text-sm text-[#6b6b6b]">{option.sublabel}</p>
                     </div>
                   </button>
                 );
@@ -337,30 +374,21 @@ const Onboarding = ({ onComplete, initialParentName }: OnboardingProps) => {
         )}
       </div>
 
-      {/* Navigation Buttons */}
-      <div className="px-6 pb-8 space-y-3">
+      {/* Navigation */}
+      <div className="px-8 pb-10 space-y-3">
         <Button
           onClick={handleNext}
           disabled={!canProceed()}
-          className="w-full py-6 text-base rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-50"
+          className="w-full py-6 text-base rounded-2xl bg-[#3d3d3d] hover:bg-[#2d2d2d] disabled:opacity-40 disabled:bg-[#d4cdc5] transition-all duration-300"
         >
-          {step === totalSteps ? (
-            <>
-              <Sparkles className="h-5 w-5 mr-2" />
-              Let's go!
-            </>
-          ) : (
-            <>
-              Continue
-              <ChevronRight className="h-5 w-5 ml-2" />
-            </>
-          )}
+          {step === 0 ? "Get started" : step === totalSteps - 1 ? "Finish" : "Continue"}
+          {step < totalSteps - 1 && <ChevronRight className="h-5 w-5 ml-2" />}
         </Button>
         
-        {step > 1 && (
+        {step > 0 && (
           <button
             onClick={handleBack}
-            className="w-full py-3 text-slate-500 hover:text-slate-700 flex items-center justify-center gap-1"
+            className="w-full py-3 text-[#6b6b6b] hover:text-[#3d3d3d] flex items-center justify-center gap-1 transition-colors"
           >
             <ChevronLeft className="h-4 w-4" />
             Back
@@ -370,9 +398,9 @@ const Onboarding = ({ onComplete, initialParentName }: OnboardingProps) => {
         {step === 4 && (
           <button
             onClick={() => onComplete(data)}
-            className="w-full py-2 text-slate-400 hover:text-slate-600 text-sm"
+            className="w-full py-2 text-[#9a958e] hover:text-[#6b6b6b] text-sm transition-colors"
           >
-            Skip for now
+            Skip this step
           </button>
         )}
       </div>
