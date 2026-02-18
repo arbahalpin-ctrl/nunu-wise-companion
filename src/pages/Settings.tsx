@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Bell, Shield, HelpCircle, Phone, Heart, ExternalLink, X, Mail, Baby, Trash2, AlertTriangle, Bookmark, ChevronRight, ChevronDown, Sparkles, ClipboardCheck, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Bell, Shield, HelpCircle, Phone, Heart, ExternalLink, X, Mail, Baby, Trash2, AlertTriangle, Bookmark, ChevronRight, ChevronDown, Sparkles, ClipboardCheck, ArrowLeft, RefreshCw, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SavedItem {
   id: string;
@@ -118,6 +119,7 @@ interface EpdsResult {
 }
 
 const Settings = () => {
+  const { user, signOut, babyProfile } = useAuth();
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -263,6 +265,32 @@ const Settings = () => {
       </div>
 
       <div className="px-6 space-y-4">
+        {/* Account */}
+        {user && (
+          <Card className="border-none shadow-sm bg-sky-50">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-sky-500 rounded-full flex items-center justify-center">
+                  <User className="h-5 w-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-slate-800">{babyProfile?.name ? `${babyProfile.name}'s parent` : 'Your Account'}</p>
+                  <p className="text-xs text-slate-500">{user.email}</p>
+                </div>
+              </div>
+              
+              <Button 
+                variant="outline" 
+                className="w-full justify-start text-slate-600 border-sky-200 hover:bg-sky-100"
+                onClick={signOut}
+              >
+                <LogOut className="h-4 w-4 mr-3" />
+                Sign Out
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Notifications */}
         <Card className="border-none shadow-sm">
           <CardContent className="p-5">
@@ -516,7 +544,7 @@ const Settings = () => {
               </Button>
             </div>
             <p className="text-xs text-slate-400 mt-3">
-              Your data is stored locally on your device. We don't collect or store any personal information.
+              {user ? "Your data is securely stored in your account and syncs across devices." : "Your data is stored locally on your device."}
             </p>
           </CardContent>
         </Card>
