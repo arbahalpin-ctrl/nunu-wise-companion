@@ -498,6 +498,79 @@ const Sleep = ({ onTabChange }: SleepProps) => {
         </CardContent>
       </Card>
 
+      {/* The Nunu S.L.E.E.P. Method - Our flagship approach */}
+      <Card className="border-none shadow-md bg-gradient-to-br from-indigo-50 to-purple-50">
+        <CardContent className="p-0">
+          <button
+            onClick={() => setExpandedLearnSection(expandedLearnSection === 'sleep-method' ? null : 'sleep-method')}
+            className="w-full p-4 flex items-center justify-between text-left"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                <Sparkles className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-800">The Nunu S.L.E.E.P. Method</h3>
+                <p className="text-sm text-slate-500">Our gentle, evidence-based approach</p>
+              </div>
+            </div>
+            {expandedLearnSection === 'sleep-method' ? (
+              <ChevronUp className="h-5 w-5 text-slate-400" />
+            ) : (
+              <ChevronDown className="h-5 w-5 text-slate-400" />
+            )}
+          </button>
+          
+          {expandedLearnSection === 'sleep-method' && (
+            <div className="px-4 pb-4 border-t border-indigo-100 pt-4 space-y-4">
+              <p className="text-sm text-slate-600">
+                A balanced, judgment-free framework that meets you where you are.
+              </p>
+
+              <div className="space-y-3">
+                <div className="p-3 bg-white rounded-lg border-l-4 border-indigo-500 shadow-sm">
+                  <p className="font-bold text-indigo-700">S — Set the Stage</p>
+                  <p className="text-sm text-slate-600">Create optimal sleep conditions: dark room, white noise, cool temperature (16-20°C), safe sleep space.</p>
+                </div>
+                <div className="p-3 bg-white rounded-lg border-l-4 border-purple-500 shadow-sm">
+                  <p className="font-bold text-purple-700">L — Learn Your Baby</p>
+                  <p className="text-sm text-slate-600">Understand their unique cues, temperament, and developmental stage. Watch baby, not just the clock.</p>
+                </div>
+                <div className="p-3 bg-white rounded-lg border-l-4 border-blue-500 shadow-sm">
+                  <p className="font-bold text-blue-700">E — Establish Routines</p>
+                  <p className="text-sm text-slate-600">Predictable patterns signal sleep time. Consistent bedtime routine (15-20 mins) helps baby anticipate rest.</p>
+                </div>
+                <div className="p-3 bg-white rounded-lg border-l-4 border-emerald-500 shadow-sm">
+                  <p className="font-bold text-emerald-700">E — Empower Independence</p>
+                  <p className="text-sm text-slate-600">When ready, gradually build self-soothing skills. Start gentle, adjust based on what works for YOUR family.</p>
+                </div>
+                <div className="p-3 bg-white rounded-lg border-l-4 border-amber-500 shadow-sm">
+                  <p className="font-bold text-amber-700">P — Practice Patience</p>
+                  <p className="text-sm text-slate-600">Sleep is developmental — progress isn't linear. Setbacks are normal. You're doing great.</p>
+                </div>
+              </div>
+
+              <div className="mt-4 p-4 bg-white rounded-xl shadow-sm">
+                <p className="text-sm text-slate-700">
+                  <strong>💜 Our philosophy:</strong> No judgment, no "shoulds." We support co-sleeping, sleep training, and everything in between. What matters is what works for YOUR family.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <div className="p-2 bg-white border border-slate-200 rounded-lg text-center shadow-sm">
+                  <p className="text-xs text-slate-500">Evidence-based</p>
+                  <p className="text-sm font-medium text-slate-700">✓ Research-backed</p>
+                </div>
+                <div className="p-2 bg-white border border-slate-200 rounded-lg text-center shadow-sm">
+                  <p className="text-xs text-slate-500">Approach</p>
+                  <p className="text-sm font-medium text-slate-700">✓ Gentle-first</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Wake Windows Guide */}
       <Card className="border-none shadow-sm">
         <CardContent className="p-0">
@@ -733,79 +806,6 @@ const Sleep = ({ onTabChange }: SleepProps) => {
                 <p className="text-sm text-rose-800">
                   <strong>The good news:</strong> Most regressions last 2-4 weeks. Stay consistent, and sleep usually returns to baseline.
                 </p>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* The Nunu S.L.E.E.P. Method */}
-      <Card className="border-none shadow-sm">
-        <CardContent className="p-0">
-          <button
-            onClick={() => setExpandedLearnSection(expandedLearnSection === 'sleep-method' ? null : 'sleep-method')}
-            className="w-full p-4 flex items-center justify-between text-left"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-slate-800">The Nunu S.L.E.E.P. Method</h3>
-                <p className="text-sm text-slate-500">Our gentle, evidence-based approach</p>
-              </div>
-            </div>
-            {expandedLearnSection === 'sleep-method' ? (
-              <ChevronUp className="h-5 w-5 text-slate-400" />
-            ) : (
-              <ChevronDown className="h-5 w-5 text-slate-400" />
-            )}
-          </button>
-          
-          {expandedLearnSection === 'sleep-method' && (
-            <div className="px-4 pb-4 border-t border-slate-100 pt-4 space-y-4">
-              <p className="text-sm text-slate-600">
-                A balanced, judgment-free framework that meets you where you are.
-              </p>
-
-              <div className="space-y-3">
-                <div className="p-3 bg-indigo-50 rounded-lg border-l-4 border-indigo-500">
-                  <p className="font-bold text-indigo-700">S — Set the Stage</p>
-                  <p className="text-sm text-slate-600">Create optimal sleep conditions: dark room, white noise, cool temperature (16-20°C), safe sleep space.</p>
-                </div>
-                <div className="p-3 bg-purple-50 rounded-lg border-l-4 border-purple-500">
-                  <p className="font-bold text-purple-700">L — Learn Your Baby</p>
-                  <p className="text-sm text-slate-600">Understand their unique cues, temperament, and developmental stage. Watch baby, not just the clock.</p>
-                </div>
-                <div className="p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-                  <p className="font-bold text-blue-700">E — Establish Routines</p>
-                  <p className="text-sm text-slate-600">Predictable patterns signal sleep time. Consistent bedtime routine (15-20 mins) helps baby anticipate rest.</p>
-                </div>
-                <div className="p-3 bg-emerald-50 rounded-lg border-l-4 border-emerald-500">
-                  <p className="font-bold text-emerald-700">E — Empower Independence</p>
-                  <p className="text-sm text-slate-600">When ready, gradually build self-soothing skills. Start gentle, adjust based on what works for YOUR family.</p>
-                </div>
-                <div className="p-3 bg-amber-50 rounded-lg border-l-4 border-amber-500">
-                  <p className="font-bold text-amber-700">P — Practice Patience</p>
-                  <p className="text-sm text-slate-600">Sleep is developmental — progress isn't linear. Setbacks are normal. You're doing great.</p>
-                </div>
-              </div>
-
-              <div className="mt-4 p-4 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-xl">
-                <p className="text-sm text-slate-700">
-                  <strong>💜 Our philosophy:</strong> No judgment, no "shoulds." We support co-sleeping, sleep training, and everything in between. What matters is what works for YOUR family.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                <div className="p-2 bg-white border border-slate-200 rounded-lg text-center">
-                  <p className="text-xs text-slate-500">Evidence-based</p>
-                  <p className="text-sm font-medium text-slate-700">✓ Research-backed</p>
-                </div>
-                <div className="p-2 bg-white border border-slate-200 rounded-lg text-center">
-                  <p className="text-xs text-slate-500">Approach</p>
-                  <p className="text-sm font-medium text-slate-700">✓ Gentle-first</p>
-                </div>
               </div>
             </div>
           )}
