@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import MoodCalendar from '@/components/MoodCalendar';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNightMode, NightModeToggle } from '@/components/NightMode';
 import { moodService, sleepService, settingsService, MoodEntry, SleepLog } from '@/lib/database';
 import koalaHero from '@/assets/nunu-logo.svg';
 
@@ -358,33 +359,46 @@ const Home = ({ onTabChange }: HomeProps) => {
     timestamp: new Date(m.timestamp).getTime()
   }));
 
+  const { isNightMode } = useNightMode();
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white flex items-center justify-center">
-        <div className="text-slate-500">Loading...</div>
+      <div className={`min-h-screen flex items-center justify-center ${
+        isNightMode ? 'bg-[#1a1a2e]' : 'bg-gradient-to-b from-sky-50 to-white'
+      }`}>
+        <div className={isNightMode ? 'text-amber-200/70' : 'text-slate-500'}>Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white flex flex-col pb-24">
+    <div className={`min-h-screen flex flex-col pb-24 transition-colors duration-500 ${
+      isNightMode ? 'bg-[#1a1a2e]' : 'bg-gradient-to-b from-sky-50 to-white'
+    }`}>
+      {/* Night Mode Toggle */}
+      <div className="absolute top-4 right-4 z-10">
+        <NightModeToggle />
+      </div>
+
       {/* Header */}
       <div className="flex flex-col items-center pt-6 pb-3 px-6">
-        <div className="w-16 h-16 bg-white rounded-full p-2 shadow-md border-2 border-white mb-2">
+        <div className={`w-16 h-16 rounded-full p-2 shadow-md border-2 mb-2 ${
+          isNightMode ? 'bg-[#252542] border-amber-900/30' : 'bg-white border-white'
+        }`}>
           <img 
             src={koalaHero} 
             alt="Nunu" 
             className="w-full h-full object-contain rounded-full"
           />
         </div>
-        <h1 className="text-xl font-bold text-slate-800">Nunu</h1>
-        <p className="text-sm text-slate-500 mb-3">
+        <h1 className={`text-xl font-bold ${isNightMode ? 'text-amber-50' : 'text-slate-800'}`}>Nunu</h1>
+        <p className={`text-sm mb-3 ${isNightMode ? 'text-amber-200/70' : 'text-slate-500'}`}>
           {babyName ? `${babyName}'s companion` : 'The Motherhood Companion'}
         </p>
-        <p className="text-base font-medium text-slate-700">
+        <p className={`text-base font-medium ${isNightMode ? 'text-amber-100' : 'text-slate-700'}`}>
           Hey{parentName ? `, ${parentName}` : ''} 💛
         </p>
-        <p className="text-sm text-slate-500">How are you feeling?</p>
+        <p className={`text-sm ${isNightMode ? 'text-amber-200/70' : 'text-slate-500'}`}>How are you feeling?</p>
       </div>
 
       <div className="flex-1 px-6 space-y-4">

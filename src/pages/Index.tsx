@@ -9,6 +9,7 @@ import Milestones from '@/pages/Milestones';
 import ChatAssistant from '@/pages/ChatAssistant';
 import Settings from '@/pages/Settings';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNightMode } from '@/components/NightMode';
 import { supabase } from '@/lib/supabase';
 import { Loader2 } from 'lucide-react';
 
@@ -132,13 +133,23 @@ const Index = () => {
 
   // Chat gets full width on desktop for better UX
   const isChat = activeTab === 'chat';
+  const { isNightMode } = useNightMode();
 
   return (
-    <div className="min-h-screen bg-slate-100 flex justify-center">
-      <div className={`
-        w-full min-h-screen bg-gradient-to-b from-sky-50 to-white shadow-xl relative
-        ${isChat ? 'max-w-4xl' : 'max-w-md'}
-      `}>
+    <div className={`min-h-screen flex justify-center transition-colors duration-500 ${
+      isNightMode ? 'bg-[#0f0f1a]' : 'bg-slate-100'
+    }`}>
+      <div 
+        className={`
+          w-full min-h-screen shadow-xl relative transition-colors duration-500
+          ${isChat ? 'max-w-4xl' : 'max-w-md'}
+          ${isNightMode 
+            ? 'bg-[#1a1a2e]' 
+            : 'bg-gradient-to-b from-sky-50 to-white'
+          }
+        `}
+        style={isNightMode ? { filter: 'sepia(10%) saturate(90%)' } : undefined}
+      >
         {renderActiveTab()}
         <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
       </div>

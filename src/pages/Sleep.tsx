@@ -6,7 +6,7 @@ import SleepProgram from '@/components/SleepProgram';
 import { injectSleepProgramStartMessage } from '@/utils/chatIntegration';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { NightModeProvider, useNightMode, NightModeToggle } from '@/components/NightMode';
+import { useNightMode, NightModeToggle } from '@/components/NightMode';
 
 const ASSESSMENT_STORAGE_KEY = 'nunu-sleep-assessment';
 const PROGRAM_STORAGE_KEY = 'nunu-sleep-program';
@@ -1278,17 +1278,15 @@ const Sleep = ({ onTabChange }: SleepProps) => {
   };
 
   return (
-    <NightModeProvider>
-      <SleepErrorBoundary onReset={handleResetProgram}>
-        <SleepContent 
-          activeSubTab={activeSubTab}
-          setActiveSubTab={setActiveSubTab}
-          renderLearnTab={renderLearnTab}
-          renderTrackTab={renderTrackTab}
-          renderPlanTab={renderPlanTab}
-        />
-      </SleepErrorBoundary>
-    </NightModeProvider>
+    <SleepErrorBoundary onReset={handleResetProgram}>
+      <SleepContent 
+        activeSubTab={activeSubTab}
+        setActiveSubTab={setActiveSubTab}
+        renderLearnTab={renderLearnTab}
+        renderTrackTab={renderTrackTab}
+        renderPlanTab={renderPlanTab}
+      />
+    </SleepErrorBoundary>
   );
 };
 

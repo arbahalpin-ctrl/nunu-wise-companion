@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Home, Moon, MessageCircle, Settings, Baby, Heart } from 'lucide-react';
 import { getUnreadCount } from '@/utils/chatIntegration';
+import { useNightMode } from '@/components/NightMode';
 
 interface NavigationProps {
   activeTab: string;
@@ -9,6 +10,7 @@ interface NavigationProps {
 
 const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const [unreadCount, setUnreadCount] = useState(0);
+  const { isNightMode } = useNightMode();
 
   // Load unread count and listen for updates
   useEffect(() => {
@@ -34,7 +36,11 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 z-50">
+    <nav className={`fixed bottom-0 left-0 right-0 border-t z-50 transition-colors duration-500 ${
+      isNightMode 
+        ? 'bg-[#1a1a2e] border-amber-900/30' 
+        : 'bg-white border-slate-100'
+    }`}>
       <div className="flex items-center justify-around py-3 px-2 max-w-md mx-auto">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -48,8 +54,8 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
               className={`
                 flex flex-col items-center justify-center p-2 rounded-xl transition-all relative
                 ${isActive 
-                  ? 'text-slate-800' 
-                  : 'text-slate-400 hover:text-slate-600'
+                  ? isNightMode ? 'text-amber-300' : 'text-slate-800'
+                  : isNightMode ? 'text-amber-200/50 hover:text-amber-200/80' : 'text-slate-400 hover:text-slate-600'
                 }
               `}
             >
