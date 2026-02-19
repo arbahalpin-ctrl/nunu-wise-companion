@@ -6,7 +6,7 @@ import SleepProgram from '@/components/SleepProgram';
 import { injectSleepProgramStartMessage } from '@/utils/chatIntegration';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useNightMode, NightModeToggle } from '@/components/NightMode';
+// Night mode handled globally via CSS in index.css
 
 const ASSESSMENT_STORAGE_KEY = 'nunu-sleep-assessment';
 const PROGRAM_STORAGE_KEY = 'nunu-sleep-program';
@@ -1306,40 +1306,24 @@ const SleepContent = ({
   renderTrackTab, 
   renderPlanTab 
 }: SleepContentProps) => {
-  const { isNightMode } = useNightMode();
-  
   return (
-    <div 
-      className={`min-h-screen pb-20 transition-colors duration-500 ${
-        isNightMode 
-          ? 'bg-[#1a1a2e]' 
-          : 'bg-gradient-to-b from-indigo-50 to-white'
-      }`}
-      style={isNightMode ? { filter: 'sepia(15%) saturate(85%)' } : undefined}
-    >
+    <div className="min-h-screen pb-20 transition-colors duration-500 bg-gradient-to-b from-indigo-50 to-white">
+
       {/* Header */}
       <div className="p-6 pb-2">
-        <h1 className={`text-2xl font-bold ${isNightMode ? 'text-amber-50' : 'text-slate-800'}`}>
-          Sleep
-        </h1>
-        <p className={`mt-1 ${isNightMode ? 'text-amber-200/70' : 'text-slate-500'}`}>
-          Learn, track & plan better sleep
-        </p>
+        <h1 className="text-2xl font-bold text-slate-800">Sleep</h1>
+        <p className="text-slate-500 mt-1">Learn, track & plan better sleep</p>
       </div>
 
       {/* Sub-tab Navigation */}
       <div className="px-6 mb-4">
-        <div className={`flex rounded-xl p-1 shadow-sm ${
-          isNightMode ? 'bg-[#252542]' : 'bg-white'
-        }`}>
+        <div className="flex bg-white rounded-xl p-1 shadow-sm">
           <button
             onClick={() => setActiveSubTab('learn')}
             className={`flex-1 py-2.5 px-2 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-1.5 ${
               activeSubTab === 'learn'
                 ? 'bg-indigo-500 text-white shadow-md'
-                : isNightMode 
-                  ? 'text-amber-200/70 hover:bg-amber-900/20'
-                  : 'text-slate-600 hover:bg-slate-50'
+                : 'text-slate-600 hover:bg-slate-50'
             }`}
           >
             <BookOpen className="h-4 w-4" />
@@ -1350,9 +1334,7 @@ const SleepContent = ({
             className={`flex-1 py-2.5 px-2 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-1.5 ${
               activeSubTab === 'track'
                 ? 'bg-amber-500 text-white shadow-md'
-                : isNightMode 
-                  ? 'text-amber-200/70 hover:bg-amber-900/20'
-                  : 'text-slate-600 hover:bg-slate-50'
+                : 'text-slate-600 hover:bg-slate-50'
             }`}
           >
             <Clock className="h-4 w-4" />
@@ -1363,9 +1345,7 @@ const SleepContent = ({
             className={`flex-1 py-2.5 px-2 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-1.5 ${
               activeSubTab === 'plan'
                 ? 'bg-purple-500 text-white shadow-md'
-                : isNightMode 
-                  ? 'text-amber-200/70 hover:bg-amber-900/20'
-                  : 'text-slate-600 hover:bg-slate-50'
+                : 'text-slate-600 hover:bg-slate-50'
             }`}
           >
             <Moon className="h-4 w-4" />
@@ -1373,18 +1353,6 @@ const SleepContent = ({
           </button>
         </div>
       </div>
-
-      {/* Night Mode Indicator */}
-      {isNightMode && (
-        <div className="px-6 mb-4">
-          <div className="bg-amber-900/30 border border-amber-800/30 rounded-lg px-3 py-2 flex items-center gap-2">
-            <Moon className="h-4 w-4 text-amber-400" />
-            <span className="text-xs text-amber-200">
-              Night mode on — easier on your eyes at 2am 💤
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* Tab Content */}
       {activeSubTab === 'learn' && renderLearnTab()}
