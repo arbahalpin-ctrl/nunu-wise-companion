@@ -137,36 +137,74 @@ interface WeaningProps {
 const Weaning = ({ onOpenChat }: WeaningProps) => {
   const { user, babyProfile } = useAuth();
   
+  // ============ ALL STATE DECLARATIONS ============
+  // Tab state
+  const [activeTab, setActiveTab] = useState<'foods' | 'recipes' | 'saved'>('foods');
+  
+  // Search & filters
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [recipeCategory, setRecipeCategory] = useState<string>('all');
+  
+  // Selected items
+  const [selectedFood, setSelectedFood] = useState<Food | null>(null);
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [selectedAge, setSelectedAge] = useState<AgeGroup>('6');
+  const [expandedSavedId, setExpandedSavedId] = useState<string | null>(null);
+  
+  // User data
+  const [babyAge, setBabyAge] = useState<number>(6);
+  const [savedFoods, setSavedFoods] = useState<string[]>([]);
+  const [savedRecipes, setSavedRecipes] = useState<string[]>([]);
+  const [savedChatRecipes, setSavedChatRecipes] = useState<SavedRecipe[]>([]);
+  const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(new Set());
+  
   // Recipe Chat State
   const [showRecipeChat, setShowRecipeChat] = useState(false);
-  const [recipeChatMessages, setRecipeChatMessages] = useState<ChatMessage[]>(() => {
-    try {
-      const saved = localStorage.getItem(RECIPE_CHAT_KEY);
-      if (saved) return JSON.parse(saved);
-    } catch (e) {}
-    return [{
-      id: '1',
-      role: 'assistant',
-      content: "Hey! 🍳 I'm here to help with recipe ideas. Tell me what ingredients you have, your baby's age, or any dietary needs — I'll suggest something yummy!\n\n💡 Tip: Save any recipe by tapping the bookmark icon, then find it in Settings → Saved from Chat.",
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }];
-  });
+  const [recipeChatMessages, setRecipeChatMessages] = useState<ChatMessage[]>([{
+    id: '1',
+    role: 'assistant',
+    content: "Hey! 🍳 I'm here to help with recipe ideas. Tell me what ingredients you have, your baby's age, or any dietary needs — I'll suggest something yummy!\n\n💡 Tip: Save any recipe by tapping the bookmark icon, then find it in Settings → Saved from Chat.",
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  }]);
   const [recipeChatInput, setRecipeChatInput] = useState('');
   const [isRecipeChatTyping, setIsRecipeChatTyping] = useState(false);
-  const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(() => {
-    try {
-      const saved = localStorage.getItem(CHAT_SAVED_KEY);
-      if (saved) {
-        const items: SavedRecipe[] = JSON.parse(saved);
-        return new Set(items.map(r => r.id));
-      }
-    } catch (e) {}
-    return new Set();
-  });
+  
+  // Refs
   const recipeChatEndRef = useRef<HTMLDivElement>(null);
   const recipeChatInputRef = useRef<HTMLInputElement>(null);
 
-  // Save recipe chat messages
+  // ============ INITIALIZATION EFFECTS ============
+  // Load recipe chat messages from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(RECIPE_CHAT_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setRecipeChatMessages(parsed);
+        }
+      }
+      
+      // Load saved recipe IDs
+      const savedChat = localStorage.getItem(CHAT_SAVED_KEY);
+      if (savedChat) {
+        const items: SavedRecipe[] = JSON.parse(savedChat);
+        setSavedRecipeIds(new Set(items.map(r => r.id)));
+      }
+      
+      // Load saved foods
+      const savedFoodsData = localStorage.getItem(SAVED_FOODS_KEY);
+      if (savedFoodsData) {
+        setSavedFoods(JSON.parse(savedFoodsData));
+      }
+    } catch (e) {
+      console.error('Failed to load saved data:', e);
+    }
+  }, []);
+
+  // Save recipe chat messages when they change
   useEffect(() => {
     if (recipeChatMessages.length > 1) {
       localStorage.setItem(RECIPE_CHAT_KEY, JSON.stringify(recipeChatMessages));
@@ -289,9 +327,6 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
     setRecipeChatMessages([initialMessage]);
     localStorage.removeItem(RECIPE_CHAT_KEY);
   };
-  const [activeTab, setActiveTab] = useState<'foods' | 'recipes' | 'saved'>('foods');
-  const [savedChatRecipes, setSavedChatRecipes] = useState<SavedRecipe[]>([]);
-  const [expandedSavedId, setExpandedSavedId] = useState<string | null>(null);
 
   // Reload saved recipes when tab changes to saved
   useEffect(() => {
@@ -328,16 +363,6 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
   const formatSavedDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' });
   };
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFood, setSelectedFood] = useState<Food | null>(null);
-  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
-  const [selectedAge, setSelectedAge] = useState<AgeGroup>('6');
-  const [savedFoods, setSavedFoods] = useState<string[]>([]);
-  const [savedRecipes, setSavedRecipes] = useState<string[]>([]);
-  const [babyAge, setBabyAge] = useState<number>(6);
-  const [showSearch, setShowSearch] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [recipeCategory, setRecipeCategory] = useState<string>('all');
 
   // Load saved data from database (or localStorage as fallback)
   const loadSavedRecipes = useCallback(async () => {
@@ -388,32 +413,25 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
     loadSavedRecipes();
   }, [loadSavedRecipes]);
 
+  // Set baby age from profile or localStorage
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(SAVED_FOODS_KEY);
-      if (saved) setSavedFoods(JSON.parse(saved));
-      
-      // Use baby profile age if available
-      if (babyProfile?.age_months) {
-        const ageNum = babyProfile.age_months;
+    if (babyProfile?.age_months) {
+      const ageNum = babyProfile.age_months;
+      setBabyAge(ageNum);
+      if (ageNum < 7) setSelectedAge('6');
+      else if (ageNum < 9) setSelectedAge('7-8');
+      else if (ageNum < 12) setSelectedAge('9-12');
+      else setSelectedAge('12+');
+    } else {
+      const age = localStorage.getItem(BABY_AGE_KEY);
+      if (age) {
+        const ageNum = parseInt(age);
         setBabyAge(ageNum);
         if (ageNum < 7) setSelectedAge('6');
         else if (ageNum < 9) setSelectedAge('7-8');
         else if (ageNum < 12) setSelectedAge('9-12');
         else setSelectedAge('12+');
-      } else {
-        const age = localStorage.getItem(BABY_AGE_KEY);
-        if (age) {
-          const ageNum = parseInt(age);
-          setBabyAge(ageNum);
-          if (ageNum < 7) setSelectedAge('6');
-          else if (ageNum < 9) setSelectedAge('7-8');
-          else if (ageNum < 12) setSelectedAge('9-12');
-          else setSelectedAge('12+');
-        }
       }
-    } catch (e) {
-      console.error('Failed to load saved data:', e);
     }
   }, [babyProfile]);
 
