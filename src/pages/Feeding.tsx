@@ -473,80 +473,147 @@ const Feeding = () => {
   
   // Food detail view
   if (selectedFood) {
+    const isSaved = savedFoods.includes(selectedFood.id);
+    
     return (
-      <div className="pb-24 min-h-screen bg-slate-50">
-        <div className="bg-white border-b border-slate-100 p-4 sticky top-0 z-10">
+      <div className="pb-24 min-h-screen bg-gradient-to-b from-amber-50 to-white">
+        <div className="bg-white/90 backdrop-blur-sm border-b border-slate-100 p-4 sticky top-0 z-10">
           <button onClick={() => setSelectedFood(null)} className="flex items-center gap-2 text-slate-600">
             <ChevronLeft className="h-5 w-5" />
             <span>Back to foods</span>
           </button>
         </div>
         
+        {/* Food Image */}
+        <div className="relative h-48 w-full overflow-hidden">
+          <img 
+            src={selectedFood.image} 
+            alt={selectedFood.name}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+          <div className="absolute bottom-4 left-4 right-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
+                {selectedFood.category}
+              </span>
+              {selectedFood.allergen && (
+                <span className="bg-amber-500/80 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" />
+                  Allergen
+                </span>
+              )}
+            </div>
+            <h1 className="text-3xl font-bold text-white">{selectedFood.name}</h1>
+          </div>
+        </div>
+        
         <div className="p-4 space-y-4">
-          <div className="text-center py-4">
-            <span className="text-6xl">{selectedFood.emoji}</span>
-            <h1 className="text-2xl font-bold text-slate-800 mt-3">{selectedFood.name}</h1>
+          {/* Age selector */}
+          <div className="bg-white rounded-xl p-4 shadow-sm">
+            <p className="text-sm text-slate-500 mb-2">How to serve at each age:</p>
+            <div className="flex gap-2">
+              {(['6', '7-8', '9-12', '12+'] as AgeGroup[]).map((age) => (
+                <button
+                  key={age}
+                  onClick={() => setSelectedAge(age)}
+                  className={`flex-1 py-2 px-2 rounded-lg text-sm font-medium transition-all ${
+                    selectedAge === age
+                      ? 'bg-amber-500 text-white shadow-md'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {age === '12+' ? '12+ mo' : `${age} mo`}
+                </button>
+              ))}
+            </div>
           </div>
           
-          <Card className="border-none shadow-sm">
-            <CardContent className="p-4 space-y-4">
-              <div>
-                <h3 className="font-semibold text-slate-800 mb-2">When to introduce</h3>
-                <p className="text-slate-600 text-sm">{selectedFood.whenToIntroduce}</p>
+          {/* Serving Guide */}
+          <Card className="border-none shadow-sm bg-amber-50">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-2xl">{selectedFood.emoji}</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-slate-800 mb-2">
+                    At {selectedAge === '12+' ? '12+ months' : `${selectedAge} months`}
+                  </h3>
+                  <p className="text-slate-700 leading-relaxed">
+                    {selectedFood.serving[selectedAge]}
+                  </p>
+                </div>
               </div>
-              
-              <div>
-                <h3 className="font-semibold text-slate-800 mb-2">How to prepare</h3>
-                <p className="text-slate-600 text-sm">{selectedFood.howToPrepare}</p>
-              </div>
-              
-              {selectedFood.allergenInfo && (
-                <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
-                  <div className="flex items-start gap-2">
-                    <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-amber-800 text-sm">Allergen info</p>
-                      <p className="text-amber-700 text-sm">{selectedFood.allergenInfo}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              {selectedFood.nutritionHighlights && (
-                <div>
-                  <h3 className="font-semibold text-slate-800 mb-2">Nutrition highlights</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedFood.nutritionHighlights.map((highlight, i) => (
-                      <span key={i} className="px-2 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-full">
-                        {highlight}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              {selectedFood.tips && (
-                <div>
-                  <h3 className="font-semibold text-slate-800 mb-2">Tips</h3>
-                  <ul className="text-slate-600 text-sm space-y-1">
-                    {selectedFood.tips.map((tip, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <span className="text-emerald-500">•</span>
-                        {tip}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </CardContent>
           </Card>
           
+          {/* Allergen Warning */}
+          {selectedFood.allergen && (
+            <Card className="border-none shadow-sm bg-blue-50">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-2">
+                  <Info className="h-5 w-5 text-blue-500 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-blue-800 text-sm">Allergen Information</p>
+                    <p className="text-blue-700 text-sm mt-1">
+                      This is a common allergen. Introduce early (around 6 months) and continue serving 
+                      regularly. Watch for reactions and consult your doctor if you have concerns.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          
+          {/* Tips */}
+          {selectedFood.tips && selectedFood.tips.length > 0 && (
+            <Card className="border-none shadow-sm">
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                  <Star className="h-5 w-5 text-amber-500" />
+                  Tips
+                </h3>
+                <ul className="space-y-2">
+                  {selectedFood.tips.map((tip, i) => (
+                    <li key={i} className="flex items-start gap-2 text-slate-600">
+                      <span className="text-amber-400 mt-1">•</span>
+                      {tip}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          )}
+          
+          {/* Warnings */}
+          {selectedFood.warnings && selectedFood.warnings.length > 0 && (
+            <Card className="border-none shadow-sm bg-rose-50">
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-rose-800 mb-2 flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5" />
+                  Important
+                </h3>
+                <ul className="space-y-2">
+                  {selectedFood.warnings.map((warning, i) => (
+                    <li key={i} className="text-rose-700 text-sm">
+                      {warning}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          )}
+          
           <Button
             onClick={() => toggleSavedFood(selectedFood.id)}
-            variant={savedFoods.includes(selectedFood.id) ? "default" : "outline"}
+            variant={isSaved ? "default" : "outline"}
             className="w-full"
           >
-            {savedFoods.includes(selectedFood.id) ? (
+            {isSaved ? (
               <><BookmarkCheck className="h-4 w-4 mr-2" /> Saved</>
             ) : (
               <><Bookmark className="h-4 w-4 mr-2" /> Save for later</>
@@ -559,86 +626,146 @@ const Feeding = () => {
   
   // Recipe detail view
   if (selectedRecipe) {
+    const isSaved = savedRecipes.includes(selectedRecipe.id);
+    const totalTime = selectedRecipe.prepTime + selectedRecipe.cookTime;
+    
     return (
-      <div className="pb-24 min-h-screen bg-slate-50">
-        <div className="bg-white border-b border-slate-100 p-4 sticky top-0 z-10">
+      <div className="pb-24 min-h-screen bg-gradient-to-b from-orange-50 to-white">
+        <div className="bg-white/90 backdrop-blur-sm border-b border-slate-100 p-4 sticky top-0 z-10 flex items-center justify-between">
           <button onClick={() => setSelectedRecipe(null)} className="flex items-center gap-2 text-slate-600">
             <ChevronLeft className="h-5 w-5" />
-            <span>Back to recipes</span>
+            <span>Back</span>
+          </button>
+          <button onClick={() => toggleSavedRecipe(selectedRecipe.id)}>
+            {isSaved ? (
+              <BookmarkCheck className="h-6 w-6 text-orange-500 fill-orange-500" />
+            ) : (
+              <Bookmark className="h-6 w-6 text-slate-400" />
+            )}
           </button>
         </div>
         
-        <div className="p-4 space-y-4">
-          <div className="text-center py-4">
+        {/* Recipe Header */}
+        <div className="bg-gradient-to-br from-orange-500 to-amber-500 p-6">
+          <div className="flex items-center gap-3 mb-3">
             <span className="text-5xl">{selectedRecipe.emoji}</span>
-            <h1 className="text-2xl font-bold text-slate-800 mt-3">{selectedRecipe.name}</h1>
-            <div className="flex items-center justify-center gap-4 mt-2 text-sm text-slate-500">
-              <span className="flex items-center gap-1">
-                <Clock className="h-4 w-4" />
-                {selectedRecipe.prepTime}
-              </span>
-              <span className="flex items-center gap-1">
-                <Users className="h-4 w-4" />
-                {selectedRecipe.servings}
-              </span>
-              {selectedRecipe.freezerFriendly && (
-                <span className="flex items-center gap-1 text-blue-500">
-                  <Snowflake className="h-4 w-4" />
-                  Freezer
+            <div>
+              <h1 className="text-2xl font-bold text-white">{selectedRecipe.name}</h1>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full capitalize">
+                  {selectedRecipe.category}
                 </span>
-              )}
+                <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
+                  {selectedRecipe.ageRange} months
+                </span>
+                {selectedRecipe.freezable && (
+                  <span className="bg-blue-500/80 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                    <Snowflake className="h-3 w-3" />
+                    Freezable
+                  </span>
+                )}
+              </div>
             </div>
           </div>
-          
-          <Card className="border-none shadow-sm">
-            <CardContent className="p-4 space-y-4">
-              <div>
-                <h3 className="font-semibold text-slate-800 mb-2">Ingredients</h3>
-                <ul className="text-slate-600 text-sm space-y-1">
-                  {selectedRecipe.ingredients.map((ing, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <span className="text-orange-400">•</span>
-                      {ing}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              <div>
-                <h3 className="font-semibold text-slate-800 mb-2">Instructions</h3>
-                <ol className="text-slate-600 text-sm space-y-2">
-                  {selectedRecipe.instructions.map((step, i) => (
-                    <li key={i} className="flex gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xs font-medium">
-                        {i + 1}
-                      </span>
-                      <span>{step}</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-              
-              {selectedRecipe.tips && (
-                <div className="p-3 bg-orange-50 rounded-lg">
-                  <p className="text-sm text-orange-800">
-                    <strong>Tip:</strong> {selectedRecipe.tips}
+        </div>
+        
+        {/* Quick Info */}
+        <div className="flex justify-around py-4 bg-white border-b">
+          <div className="text-center">
+            <Clock className="h-5 w-5 mx-auto text-orange-500 mb-1" />
+            <p className="text-xs text-slate-500">Prep</p>
+            <p className="font-semibold text-slate-800">{selectedRecipe.prepTime} min</p>
+          </div>
+          <div className="text-center">
+            <ChefHat className="h-5 w-5 mx-auto text-orange-500 mb-1" />
+            <p className="text-xs text-slate-500">Cook</p>
+            <p className="font-semibold text-slate-800">{selectedRecipe.cookTime} min</p>
+          </div>
+          <div className="text-center">
+            <Users className="h-5 w-5 mx-auto text-orange-500 mb-1" />
+            <p className="text-xs text-slate-500">Servings</p>
+            <p className="font-semibold text-slate-800">{selectedRecipe.servings}</p>
+          </div>
+        </div>
+        
+        <div className="p-4 space-y-4">
+          {/* Allergens Warning */}
+          {selectedRecipe.allergens && selectedRecipe.allergens.length > 0 && (
+            <Card className="border-none shadow-sm bg-amber-50">
+              <CardContent className="p-3">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-amber-600" />
+                  <p className="text-sm text-amber-800">
+                    <span className="font-medium">Contains: </span>
+                    {selectedRecipe.allergens.join(', ')}
                   </p>
                 </div>
-              )}
+              </CardContent>
+            </Card>
+          )}
+          
+          {/* Nutrition Highlights */}
+          {selectedRecipe.nutritionHighlights && selectedRecipe.nutritionHighlights.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {selectedRecipe.nutritionHighlights.map((nutrient, i) => (
+                <span key={i} className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">
+                  ✓ {nutrient}
+                </span>
+              ))}
+            </div>
+          )}
+          
+          {/* Ingredients */}
+          <Card className="border-none shadow-sm">
+            <CardContent className="p-4">
+              <h3 className="font-semibold text-slate-800 mb-3 text-lg">Ingredients</h3>
+              <ul className="space-y-2">
+                {selectedRecipe.ingredients.map((ingredient, i) => (
+                  <li key={i} className="flex items-start gap-3 text-slate-700">
+                    <span className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0" />
+                    {ingredient}
+                  </li>
+                ))}
+              </ul>
             </CardContent>
           </Card>
           
-          <Button
-            onClick={() => toggleSavedRecipe(selectedRecipe.id)}
-            variant={savedRecipes.includes(selectedRecipe.id) ? "default" : "outline"}
-            className="w-full"
-          >
-            {savedRecipes.includes(selectedRecipe.id) ? (
-              <><BookmarkCheck className="h-4 w-4 mr-2" /> Saved</>
-            ) : (
-              <><Bookmark className="h-4 w-4 mr-2" /> Save recipe</>
-            )}
-          </Button>
+          {/* Instructions */}
+          <div>
+            <h3 className="font-semibold text-slate-800 mb-3 text-lg">Instructions</h3>
+            <div className="space-y-3">
+              {selectedRecipe.instructions.map((step, i) => (
+                <Card key={i} className="border-none shadow-sm">
+                  <CardContent className="p-4">
+                    <div className="flex gap-3">
+                      <div className="w-7 h-7 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-white text-sm font-bold">{i + 1}</span>
+                      </div>
+                      <p className="text-slate-700 pt-0.5">{step}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+          
+          {/* Tips */}
+          {selectedRecipe.tips && selectedRecipe.tips.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                <Star className="h-5 w-5 text-orange-500" />
+                Tips
+              </h3>
+              <ul className="space-y-2">
+                {selectedRecipe.tips.map((tip, i) => (
+                  <li key={i} className="flex items-start gap-2 text-slate-600">
+                    <span className="text-orange-400 mt-1">💡</span>
+                    {tip}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -1088,9 +1215,9 @@ const Feeding = () => {
                       <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
-                          {recipe.prepTime}
+                          {recipe.prepTime + recipe.cookTime} min
                         </span>
-                        {recipe.freezerFriendly && (
+                        {recipe.freezable && (
                           <span className="flex items-center gap-1 text-blue-400">
                             <Snowflake className="h-3 w-3" />
                             Freezable
