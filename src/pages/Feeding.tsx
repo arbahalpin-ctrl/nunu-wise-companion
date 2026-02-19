@@ -42,8 +42,8 @@ interface FeedLog {
 }
 
 type AgeGroup = '6' | '7-8' | '9-12' | '12+';
-type MainTab = 'nursing' | 'solids' | 'saved';
-type SolidsSubTab = 'foods' | 'recipes';
+type MainTab = 'solids' | 'nursing';
+type SolidsSubTab = 'foods' | 'recipes' | 'saved';
 
 // Simple markdown renderer
 const renderMarkdown = (text: string) => {
@@ -118,7 +118,7 @@ const getLocalDateString = (date: Date = new Date()): string => {
 
 const Feeding = () => {
   // Main tab state
-  const [activeTab, setActiveTab] = useState<MainTab>('nursing');
+  const [activeTab, setActiveTab] = useState<MainTab>('solids');
   const [solidsSubTab, setSolidsSubTab] = useState<SolidsSubTab>('foods');
   
   // ========== NURSING STATE ==========
@@ -231,13 +231,13 @@ const Feeding = () => {
   
   // Load saved chat recipes
   useEffect(() => {
-    if (activeTab === 'saved') {
+    if (activeTab === 'solids' && solidsSubTab === 'saved') {
       try {
         const saved = localStorage.getItem(CHAT_SAVED_KEY);
         if (saved) setSavedChatRecipes(JSON.parse(saved));
       } catch {}
     }
-  }, [activeTab]);
+  }, [activeTab, solidsSubTab]);
   
   // Save recipe chat
   useEffect(() => {
@@ -879,24 +879,21 @@ const Feeding = () => {
         <p className="text-slate-500 text-sm">Track nursing & explore solids</p>
       </div>
       
-      {/* Main tabs */}
+      {/* Main tabs: Solids | Nursing */}
       <div className="bg-white border-b border-slate-100 px-4 sticky top-0 z-10">
         <div className="flex gap-1">
           {[
-            { id: 'nursing', label: '🤱 Nursing', color: 'pink' },
             { id: 'solids', label: '🥄 Solids', color: 'orange' },
-            { id: 'saved', label: '💾 Saved', color: 'slate' }
+            { id: 'nursing', label: '🤱 Nursing', color: 'pink' }
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as MainTab)}
               className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.id
-                  ? tab.id === 'nursing' 
-                    ? 'border-pink-500 text-pink-600'
-                    : tab.id === 'solids'
+                  ? tab.id === 'solids'
                     ? 'border-orange-500 text-orange-600'
-                    : 'border-slate-500 text-slate-600'
+                    : 'border-pink-500 text-pink-600'
                   : 'border-transparent text-slate-400'
               }`}
             >
@@ -1125,32 +1122,65 @@ const Feeding = () => {
       
       {/* ========== SOLIDS TAB ========== */}
       {activeTab === 'solids' && (
-        <div className="p-4 space-y-4">
-          {/* Sub-tabs */}
+        <div className="p-4 space-y-3">
+          {/* Sub-tabs Row 1: Food & Recipes | Saved */}
           <div className="flex gap-2">
             <button
               onClick={() => setSolidsSubTab('foods')}
-              className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors ${
-                solidsSubTab === 'foods' ? 'bg-orange-500 text-white' : 'bg-white text-slate-600'
+              className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-medium transition-colors ${
+                solidsSubTab === 'foods' || solidsSubTab === 'recipes' 
+                  ? 'bg-orange-500 text-white shadow-sm' 
+                  : 'bg-white text-slate-600 border border-slate-200'
               }`}
             >
-              Foods
+              🥕 Food & Recipes
             </button>
             <button
-              onClick={() => setSolidsSubTab('recipes')}
-              className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors ${
-                solidsSubTab === 'recipes' ? 'bg-orange-500 text-white' : 'bg-white text-slate-600'
+              onClick={() => setSolidsSubTab('saved')}
+              className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-1.5 ${
+                solidsSubTab === 'saved' 
+                  ? 'bg-rose-500 text-white shadow-sm' 
+                  : 'bg-white text-slate-600 border border-slate-200'
               }`}
             >
-              Recipes
-            </button>
-            <button
-              onClick={() => setShowRecipeChat(true)}
-              className="py-2 px-4 rounded-full text-sm font-medium bg-orange-100 text-orange-600 flex items-center gap-1"
-            >
-              <Sparkles className="h-4 w-4" /> Ideas
+              <Bookmark className="h-4 w-4" /> Saved
+              {savedChatRecipes.length > 0 && (
+                <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                  solidsSubTab === 'saved' ? 'bg-rose-400' : 'bg-rose-100 text-rose-600'
+                }`}>{savedChatRecipes.length}</span>
+              )}
             </button>
           </div>
+          
+          {/* Row 2: Ideas Button */}
+          <button
+            onClick={() => setShowRecipeChat(true)}
+            className="w-full py-3 px-4 rounded-xl text-sm font-medium bg-gradient-to-r from-orange-400 to-amber-400 text-white shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+          >
+            <Sparkles className="h-4 w-4" /> Get Recipe Ideas from Nunu
+          </button>
+          
+          {/* Food/Recipes toggle (only show when not in Saved) */}
+          {(solidsSubTab === 'foods' || solidsSubTab === 'recipes') && (
+            <div className="flex gap-2 bg-orange-100/50 p-1 rounded-lg">
+              <button
+                onClick={() => setSolidsSubTab('foods')}
+                className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+                  solidsSubTab === 'foods' ? 'bg-orange-500 text-white shadow-sm' : 'text-orange-700'
+                }`}
+              >
+                Foods
+              </button>
+              <button
+                onClick={() => setSolidsSubTab('recipes')}
+                className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+                  solidsSubTab === 'recipes' ? 'bg-orange-500 text-white shadow-sm' : 'text-orange-700'
+                }`}
+              >
+                Recipes
+              </button>
+            </div>
+          )}
           
           {/* Search */}
           <div className="relative">
@@ -1243,93 +1273,94 @@ const Feeding = () => {
               </div>
             </>
           )}
-        </div>
-      )}
-      
-      {/* ========== SAVED TAB ========== */}
-      {activeTab === 'saved' && (
-        <div className="p-4 space-y-4">
-          {/* Saved foods */}
-          {savedFoods.length > 0 && (
-            <div>
-              <h3 className="font-semibold text-slate-800 mb-3">Saved Foods</h3>
-              <div className="grid grid-cols-4 gap-2">
-                {foods.filter(f => savedFoods.includes(f.id)).map((food) => (
-                  <button
-                    key={food.id}
-                    onClick={() => setSelectedFood(food)}
-                    className="p-2 bg-white rounded-xl text-center"
-                  >
-                    <span className="text-2xl">{food.emoji}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
           
-          {/* Saved recipes from library */}
-          {savedRecipes.length > 0 && (
-            <div>
-              <h3 className="font-semibold text-slate-800 mb-3">Saved Recipes</h3>
-              <div className="space-y-2">
-                {recipes.filter(r => savedRecipes.includes(r.id)).map((recipe) => (
-                  <button
-                    key={recipe.id}
-                    onClick={() => setSelectedRecipe(recipe)}
-                    className="w-full p-3 bg-white rounded-xl text-left flex items-center gap-3"
-                  >
-                    <span className="text-2xl">{recipe.emoji}</span>
-                    <span className="font-medium text-slate-700">{recipe.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Saved from chat */}
-          {savedChatRecipes.length > 0 && (
-            <div>
-              <h3 className="font-semibold text-slate-800 mb-3">Saved from Chat</h3>
-              <div className="space-y-2">
-                {savedChatRecipes.map((recipe) => (
-                  <Card key={recipe.id} className="border-none shadow-sm">
-                    <CardContent className="p-3">
+          {/* ========== SAVED (within Solids) ========== */}
+          {/* Saved section */}
+          {solidsSubTab === 'saved' && (
+            <div className="space-y-4">
+              {/* Saved foods */}
+              {savedFoods.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-3">Saved Foods</h3>
+                  <div className="grid grid-cols-4 gap-2">
+                    {foods.filter(f => savedFoods.includes(f.id)).map((food) => (
                       <button
-                        onClick={() => setExpandedSavedId(expandedSavedId === recipe.id ? null : recipe.id)}
-                        className="w-full flex items-center justify-between"
+                        key={food.id}
+                        onClick={() => setSelectedFood(food)}
+                        className="p-2 bg-white rounded-xl text-center"
                       >
-                        <div className="flex items-center gap-2">
-                          <ChefHat className="h-4 w-4 text-orange-500" />
-                          <span className="font-medium text-slate-700">{recipe.title}</span>
-                        </div>
-                        <ChevronLeft className={`h-4 w-4 text-slate-400 transition-transform ${expandedSavedId === recipe.id ? '-rotate-90' : ''}`} />
+                        <span className="text-2xl">{food.emoji}</span>
                       </button>
-                      
-                      {expandedSavedId === recipe.id && (
-                        <div className="mt-3 pt-3 border-t border-slate-100">
-                          <div className="text-sm text-slate-600 whitespace-pre-wrap">
-                            {renderMarkdown(recipe.content)}
-                          </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Saved recipes from library */}
+              {savedRecipes.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-3">Saved Recipes</h3>
+                  <div className="space-y-2">
+                    {recipes.filter(r => savedRecipes.includes(r.id)).map((recipe) => (
+                      <button
+                        key={recipe.id}
+                        onClick={() => setSelectedRecipe(recipe)}
+                        className="w-full p-3 bg-white rounded-xl text-left flex items-center gap-3"
+                      >
+                        <span className="text-2xl">{recipe.emoji}</span>
+                        <span className="font-medium text-slate-700">{recipe.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Saved from chat */}
+              {savedChatRecipes.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-3">Saved from Chat</h3>
+                  <div className="space-y-2">
+                    {savedChatRecipes.map((recipe) => (
+                      <Card key={recipe.id} className="border-none shadow-sm">
+                        <CardContent className="p-3">
                           <button
-                            onClick={() => unsaveRecipeFromChat(recipe.id)}
-                            className="mt-2 text-xs text-red-400 flex items-center gap-1"
+                            onClick={() => setExpandedSavedId(expandedSavedId === recipe.id ? null : recipe.id)}
+                            className="w-full flex items-center justify-between"
                           >
-                            <Trash2 className="h-3 w-3" /> Remove
+                            <div className="flex items-center gap-2">
+                              <ChefHat className="h-4 w-4 text-orange-500" />
+                              <span className="font-medium text-slate-700">{recipe.title}</span>
+                            </div>
+                            <ChevronLeft className={`h-4 w-4 text-slate-400 transition-transform ${expandedSavedId === recipe.id ? '-rotate-90' : ''}`} />
                           </button>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {savedFoods.length === 0 && savedRecipes.length === 0 && savedChatRecipes.length === 0 && (
-            <div className="text-center py-12">
-              <Bookmark className="h-12 w-12 text-slate-200 mx-auto mb-3" />
-              <p className="text-slate-400">No saved items yet</p>
-              <p className="text-slate-300 text-sm">Save foods and recipes to find them here</p>
+                          
+                          {expandedSavedId === recipe.id && (
+                            <div className="mt-3 pt-3 border-t border-slate-100">
+                              <div className="text-sm text-slate-600 whitespace-pre-wrap">
+                                {renderMarkdown(recipe.content)}
+                              </div>
+                              <button
+                                onClick={() => unsaveRecipeFromChat(recipe.id)}
+                                className="mt-2 text-xs text-red-400 flex items-center gap-1"
+                              >
+                                <Trash2 className="h-3 w-3" /> Remove
+                              </button>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {savedFoods.length === 0 && savedRecipes.length === 0 && savedChatRecipes.length === 0 && (
+                <div className="text-center py-12">
+                  <Bookmark className="h-12 w-12 text-slate-200 mx-auto mb-3" />
+                  <p className="text-slate-400">No saved items yet</p>
+                  <p className="text-slate-300 text-sm">Save foods and recipes to find them here</p>
+                </div>
+              )}
             </div>
           )}
         </div>
