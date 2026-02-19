@@ -1,11 +1,25 @@
 import { useState, useEffect, useCallback } from 'react';
-import { MessageCircle, Moon, Heart, Clock, Baby, Lightbulb, Calendar } from 'lucide-react';
+import { MessageCircle, Moon, Heart, Clock, Baby, Lightbulb, Calendar, Sparkles, ChevronRight, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import MoodCalendar from '@/components/MoodCalendar';
 import { useAuth } from '@/contexts/AuthContext';
 import { moodService, sleepService, settingsService, MoodEntry, SleepLog } from '@/lib/database';
 import koalaHero from '@/assets/nunu-logo.svg';
+
+const SLEEP_ASSESSMENT_KEY = 'nunu-sleep-assessment';
+const SLEEP_PROGRAM_KEY = 'nunu-sleep-program';
+
+interface SleepProgramData {
+  startDate: string;
+  methodId: string;
+  currentNight: number;
+  isActive: boolean;
+}
+
+interface SleepAssessmentData {
+  babyName: string;
+}
 
 interface HomeProps {
   onTabChange?: (tab: string) => void;
@@ -116,6 +130,8 @@ const Home = ({ onTabChange }: HomeProps) => {
   const [showBedtimeInput, setShowBedtimeInput] = useState(false);
   const [isCurrentlyNightWake, setIsCurrentlyNightWake] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [sleepProgram, setSleepProgram] = useState<SleepProgramData | null>(null);
+  const [sleepAssessment, setSleepAssessment] = useState<SleepAssessmentData | null>(null);
 
   const moods = [
     { id: 'good', emoji: '😊', label: 'Good', color: 'bg-emerald-100 border-emerald-200' },
@@ -164,6 +180,26 @@ const Home = ({ onTabChange }: HomeProps) => {
   useEffect(() => {
     loadUserData();
   }, [loadUserData]);
+
+  // Load sleep program data from localStorage
+  useEffect(() => {
+    try {
+      const programData = localStorage.getItem(SLEEP_PROGRAM_KEY);
+      const assessmentData = localStorage.getItem(SLEEP_ASSESSMENT_KEY);
+      
+      if (programData) {
+        const parsed = JSON.parse(programData);
+        if (parsed.isActive) {
+          setSleepProgram(parsed);
+        }
+      }
+      if (assessmentData) {
+        setSleepAssessment(JSON.parse(assessmentData));
+      }
+    } catch (e) {
+      console.error('Error loading sleep program:', e);
+    }
+  }, []);
 
   // Load baby profile data
   useEffect(() => {
@@ -403,6 +439,79 @@ const Home = ({ onTabChange }: HomeProps) => {
             )}
           </CardContent>
         </Card>
+        )}
+
+        {/* Sleep Program Progress Widget (when active) */}
+        {sleepProgram?.isActive && (
+          <Card className="border-none shadow-md bg-gradient-to-r from-indigo-500 to-purple-600 text-white overflow-hidden">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                    <Moon className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-white/80 text-xs font-medium">Sleep Training</p>
+                    <p className="text-lg font-bold">Night {sleepProgram.currentNight}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => onTabChange?.('sleep')}
+                  className="flex items-center gap-1 bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg transition-colors"
+                >
+                  <span className="text-sm font-medium">Continue</span>
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+              
+              {/* Progress bar */}
+              <div className="mt-3">
+                <div className="flex justify-between text-xs text-white/70 mb-1">
+                  <span>Progress</span>
+                  <span>{Math.min(sleepProgram.currentNight, 14)} of 14 nights</span>
+                </div>
+                <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-white rounded-full transition-all duration-500"
+                    style={{ width: `${Math.min((sleepProgram.currentNight / 14) * 100, 100)}%` }}
+                  />
+                </div>
+              </div>
+              
+              {sleepProgram.currentNight >= 3 && (
+                <p className="mt-2 text-xs text-white/80 flex items-center gap-1">
+                  <Trophy className="h-3 w-3" />
+                  Keep going! Most families see improvement by night 5-7
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Sleep Training Hero Card (when no active program) */}
+        {!sleepProgram?.isActive && babyAgeMonths !== null && babyAgeMonths >= 4 && (
+          <Card 
+            className="border-none shadow-md bg-gradient-to-br from-indigo-50 to-purple-50 cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => onTabChange?.('sleep')}
+          >
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="h-5 w-5 text-indigo-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-slate-800 mb-1">Struggling with sleep?</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    Get a personalized sleep plan for {babyName || 'your baby'} — gentle methods backed by science.
+                  </p>
+                  <div className="flex items-center gap-1 mt-2 text-indigo-600 text-sm font-medium">
+                    <span>Start free assessment</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Baby Age & Wake Window Card */}

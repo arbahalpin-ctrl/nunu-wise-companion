@@ -1,6 +1,22 @@
 import { supabase } from './supabase';
 
 // Types
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+}
+
+export interface Conversation {
+  id?: string;
+  user_id?: string;
+  title: string;
+  messages: ChatMessage[];
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface MoodEntry {
   id?: string;
   user_id?: string;
@@ -228,6 +244,111 @@ export const recipesService = {
       .select('id')
       .eq('user_id', userId)
       .eq('recipe_id', recipeId)
+      .single();
+    
+    return !!data;
+  }
+};
+
+// Conversations (Chat History)
+export const conversationsService = {
+  async getAll(userId: string): Promise<Conversation[]> {
+    const { data, error } = await supabase
+      .from('conversations')
+      .select('*')
+      .eq('user_id', userId)
+      .order('updated_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching conversations:', error);
+      return [];
+    }
+    return data || [];
+  },
+
+  async save(userId: string, conversation: Conversation): Promise<Conversation | null> {
+    const { data, error } = await supabase
+      .from('conversations')
+      .upsert({
+        id: conversation.id,
+        user_id: userId,
+        title: conversation.title,
+        messages: conversation.messages,
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error saving conversation:', error);
+      return null;
+    }
+    return data;
+  },
+
+  async delete(userId: string, conversationId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('conversations')
+      .delete()
+      .eq('user_id', userId)
+      .eq('id', conversationId);
+    
+    return !error;
+  }
+};
+
+// Saved Chat Messages (tips/advice saved from chat)
+export const savedChatService = {
+  async getAll(userId: string): Promise<{ id: string; title: string; content: string; saved_at: string; conversation_title: string }[]> {
+    const { data, error } = await supabase
+      .from('saved_chat_messages')
+      .select('*')
+      .eq('user_id', userId)
+      .order('saved_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching saved chat messages:', error);
+      return [];
+    }
+    return data || [];
+  },
+
+  async save(userId: string, messageId: string, title: string, content: string, conversationTitle: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('saved_chat_messages')
+      .insert({
+        id: messageId,
+        user_id: userId,
+        title,
+        content,
+        conversation_title: conversationTitle
+      });
+    
+    if (error) {
+      // Might be duplicate
+      if (error.code === '23505') return true;
+      console.error('Error saving chat message:', error);
+      return false;
+    }
+    return true;
+  },
+
+  async remove(userId: string, messageId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('saved_chat_messages')
+      .delete()
+      .eq('user_id', userId)
+      .eq('id', messageId);
+    
+    return !error;
+  },
+
+  async isSaved(userId: string, messageId: string): Promise<boolean> {
+    const { data } = await supabase
+      .from('saved_chat_messages')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('id', messageId)
       .single();
     
     return !!data;

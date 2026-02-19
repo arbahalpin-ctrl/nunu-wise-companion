@@ -1,5 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Bot, User, Clock, Trash2, Plus, MessageSquare, X, Bookmark, Check, ChevronLeft } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { conversationsService, savedChatService } from '@/lib/database';
 
 // Simple markdown renderer for chat messages
 const renderMarkdown = (text: string) => {
@@ -145,25 +147,15 @@ const loadConversations = (): Conversation[] => {
 };
 
 const ChatAssistant = () => {
-  const [conversations, setConversations] = useState<Conversation[]>(loadConversations);
-  const [activeConversationId, setActiveConversationId] = useState<string>(() => {
-    const convos = loadConversations();
-    return convos[0]?.id || '';
-  });
+  const { user } = useAuth();
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<string>('');
   const [showSidebar, setShowSidebar] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [savedMessageIds, setSavedMessageIds] = useState<Set<string>>(() => {
-    try {
-      const saved = localStorage.getItem(CHAT_SAVED_KEY);
-      if (saved) {
-        const recipes: SavedRecipe[] = JSON.parse(saved);
-        return new Set(recipes.map(r => r.id));
-      }
-    } catch (e) {}
-    return new Set();
-  });
+  const [savedMessageIds, setSavedMessageIds] = useState<Set<string>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -174,13 +166,89 @@ const ChatAssistant = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Load conversations on mount or when user changes
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
-    } catch (e) {
-      console.error('Failed to save conversations:', e);
+    const loadData = async () => {
+      setIsLoading(true);
+      
+      if (user?.id) {
+        // Logged in: load from Supabase
+        const [convos, savedMessages] = await Promise.all([
+          conversationsService.getAll(user.id),
+          savedChatService.getAll(user.id)
+        ]);
+        
+        if (convos.length > 0) {
+          // Transform from Supabase format
+          const transformed = convos.map(c => ({
+            id: c.id!,
+            title: c.title,
+            messages: c.messages,
+            createdAt: new Date(c.created_at || Date.now()).getTime(),
+            updatedAt: new Date(c.updated_at || Date.now()).getTime()
+          }));
+          setConversations(transformed);
+          setActiveConversationId(transformed[0].id);
+        } else {
+          // No conversations yet, create one
+          const newConvo = createNewConversation();
+          setConversations([newConvo]);
+          setActiveConversationId(newConvo.id);
+        }
+        
+        // Load saved message IDs
+        setSavedMessageIds(new Set(savedMessages.map(m => m.id)));
+      } else {
+        // Guest: load from localStorage
+        const localConvos = loadConversations();
+        setConversations(localConvos);
+        setActiveConversationId(localConvos[0]?.id || '');
+        
+        // Load saved from localStorage
+        try {
+          const saved = localStorage.getItem(CHAT_SAVED_KEY);
+          if (saved) {
+            const recipes: SavedRecipe[] = JSON.parse(saved);
+            setSavedMessageIds(new Set(recipes.map(r => r.id)));
+          }
+        } catch (e) {}
+      }
+      
+      setIsLoading(false);
+    };
+    
+    loadData();
+  }, [user?.id]);
+
+  // Save conversations when they change
+  const saveConversation = useCallback(async (conversation: Conversation) => {
+    if (user?.id) {
+      // Logged in: save to Supabase
+      await conversationsService.save(user.id, {
+        id: conversation.id,
+        title: conversation.title,
+        messages: conversation.messages
+      });
     }
-  }, [conversations]);
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (isLoading) return;
+    
+    if (user?.id) {
+      // Logged in: save active conversation to Supabase
+      if (activeConversation) {
+        saveConversation(activeConversation);
+      }
+    } else {
+      // Guest: save all to localStorage
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
+      } catch (e) {
+        console.error('Failed to save conversations:', e);
+      }
+    }
+  }, [conversations, user?.id, isLoading, activeConversation, saveConversation]);
 
   // Clear unread count when chat is opened
   useEffect(() => {
@@ -208,8 +276,14 @@ const ChatAssistant = () => {
     setShowSidebar(false);
   };
 
-  const deleteConversation = (id: string, e: React.MouseEvent) => {
+  const deleteConversation = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    // Delete from Supabase if logged in
+    if (user?.id) {
+      await conversationsService.delete(user.id, id);
+    }
+    
     setConversations(prev => {
       const filtered = prev.filter(c => c.id !== id);
       if (id === activeConversationId) {
@@ -307,29 +381,37 @@ const ChatAssistant = () => {
     }
   };
 
-  const saveRecipe = (message: Message) => {
+  const saveRecipe = async (message: Message) => {
+    if (savedMessageIds.has(message.id)) return;
+    
+    // Extract a meaningful title from the message content
+    const title = extractTitle(message.content);
+    const conversationTitle = activeConversation?.title || 'Chat';
+    
     try {
-      const saved = localStorage.getItem(CHAT_SAVED_KEY);
-      const recipes: SavedRecipe[] = saved ? JSON.parse(saved) : [];
+      if (user?.id) {
+        // Logged in: save to Supabase
+        await savedChatService.save(user.id, message.id, title, message.content, conversationTitle);
+      } else {
+        // Guest: save to localStorage
+        const saved = localStorage.getItem(CHAT_SAVED_KEY);
+        const recipes: SavedRecipe[] = saved ? JSON.parse(saved) : [];
+        
+        const newRecipe: SavedRecipe = {
+          id: message.id,
+          title,
+          content: message.content,
+          savedAt: Date.now(),
+          conversationTitle
+        };
+        
+        recipes.unshift(newRecipe);
+        localStorage.setItem(CHAT_SAVED_KEY, JSON.stringify(recipes));
+      }
       
-      if (recipes.some(r => r.id === message.id)) return;
-      
-      // Extract a meaningful title from the message content
-      const title = extractTitle(message.content);
-      
-      const newRecipe: SavedRecipe = {
-        id: message.id,
-        title,
-        content: message.content,
-        savedAt: Date.now(),
-        conversationTitle: activeConversation?.title || 'Chat'
-      };
-      
-      recipes.unshift(newRecipe);
-      localStorage.setItem(CHAT_SAVED_KEY, JSON.stringify(recipes));
       setSavedMessageIds(prev => new Set([...prev, message.id]));
     } catch (e) {
-      console.error('Failed to save recipe:', e);
+      console.error('Failed to save message:', e);
     }
   };
 
@@ -394,6 +476,20 @@ const ChatAssistant = () => {
       </div>
     </>
   );
+
+  // Show loading state while data is being loaded
+  if (isLoading) {
+    return (
+      <div className="h-[calc(100vh-80px)] bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-10 h-10 bg-gradient-to-br from-slate-700 to-slate-900 rounded-full flex items-center justify-center mx-auto mb-3 animate-pulse">
+            <Bot className="h-5 w-5 text-white" />
+          </div>
+          <p className="text-sm text-slate-500">Loading your chats...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-[calc(100vh-80px)] bg-white flex overflow-hidden">
