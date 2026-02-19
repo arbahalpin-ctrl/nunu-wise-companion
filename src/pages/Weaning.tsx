@@ -139,7 +139,9 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
   
   // ============ ALL STATE DECLARATIONS ============
   // Tab state
-  const [activeTab, setActiveTab] = useState<'foods' | 'recipes' | 'saved'>('foods');
+  const [mainTab, setMainTab] = useState<'solids' | 'nursing'>('solids');
+  const [subTab, setSubTab] = useState<'foodRecipes' | 'saved'>('foodRecipes');
+  const [foodRecipesView, setFoodRecipesView] = useState<'foods' | 'recipes'>('foods');
   
   // Search & filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -330,10 +332,10 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
 
   // Reload saved recipes when tab changes to saved
   useEffect(() => {
-    if (activeTab === 'saved') {
+    if (subTab === 'saved') {
       loadSavedRecipes();
     }
-  }, [activeTab, loadSavedRecipes]);
+  }, [subTab, loadSavedRecipes]);
 
   const deleteSavedRecipe = async (id: string) => {
     // Optimistic update
@@ -904,57 +906,120 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white pb-24">
       {/* Header */}
       <div className="p-6 pb-2">
-        <h1 className="text-2xl font-bold text-slate-800">Weaning Guide</h1>
-        <p className="text-slate-500 mt-1">Foods, recipes & serving guides</p>
+        <h1 className="text-2xl font-bold text-slate-800">Feeding</h1>
+        <p className="text-slate-500 mt-1">Solids, nursing & feeding guides</p>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="px-6 mb-4">
+      {/* Main Tab Navigation: Solids | Nursing */}
+      <div className="px-6 mb-3">
         <div className="flex bg-white rounded-xl p-1 shadow-sm">
           <button
-            onClick={() => setActiveTab('foods')}
-            className={`flex-1 py-2.5 px-2 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-1 ${
-              activeTab === 'foods'
+            onClick={() => setMainTab('solids')}
+            className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-all ${
+              mainTab === 'solids'
                 ? 'bg-amber-500 text-white shadow-md'
                 : 'text-slate-600 hover:bg-slate-50'
             }`}
           >
-            🥕 Foods
+            🥄 Solids
           </button>
           <button
-            onClick={() => setActiveTab('recipes')}
-            className={`flex-1 py-2.5 px-2 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-1 ${
-              activeTab === 'recipes'
-                ? 'bg-orange-500 text-white shadow-md'
+            onClick={() => setMainTab('nursing')}
+            className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-all ${
+              mainTab === 'nursing'
+                ? 'bg-pink-500 text-white shadow-md'
                 : 'text-slate-600 hover:bg-slate-50'
             }`}
           >
-            <ChefHat className="h-4 w-4" />
-            Recipes
-          </button>
-          <button
-            onClick={() => setActiveTab('saved')}
-            className={`flex-1 py-2.5 px-2 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-1 ${
-              activeTab === 'saved'
-                ? 'bg-rose-500 text-white shadow-md'
-                : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <Bookmark className="h-4 w-4" />
-            Saved
-            {savedChatRecipes.length > 0 && (
-              <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                activeTab === 'saved' 
-                  ? 'bg-rose-400 text-white' 
-                  : 'bg-rose-100 text-rose-600'
-              }`}>{savedChatRecipes.length}</span>
-            )}
+            🍼 Nursing
           </button>
         </div>
       </div>
 
-      {/* FOODS TAB */}
-      {activeTab === 'foods' && (
+      {/* Solids Section */}
+      {mainTab === 'solids' && (
+        <>
+          {/* Sub-tabs: Food & Recipes | Saved */}
+          <div className="px-6 mb-2">
+            <div className="flex bg-slate-100 rounded-lg p-1">
+              <button
+                onClick={() => setSubTab('foodRecipes')}
+                className={`flex-1 py-2 px-3 rounded-md font-medium text-sm transition-all flex items-center justify-center gap-1.5 ${
+                  subTab === 'foodRecipes'
+                    ? 'bg-white text-slate-800 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                🥕 Food & Recipes
+              </button>
+              <button
+                onClick={() => setSubTab('saved')}
+                className={`flex-1 py-2 px-3 rounded-md font-medium text-sm transition-all flex items-center justify-center gap-1.5 ${
+                  subTab === 'saved'
+                    ? 'bg-white text-slate-800 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                <Bookmark className="h-4 w-4" />
+                Saved
+                {savedChatRecipes.length > 0 && (
+                  <span className="text-xs px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-600">
+                    {savedChatRecipes.length}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Ideas Button Row */}
+          <div className="px-6 mb-4">
+            <button
+              onClick={() => setShowRecipeChat(true)}
+              className="w-full bg-gradient-to-r from-orange-400 to-amber-400 text-white py-3 px-4 rounded-xl font-medium text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+            >
+              <Sparkles className="h-4 w-4" />
+              Get Recipe Ideas from Nunu
+            </button>
+          </div>
+
+          {/* Food & Recipes Content */}
+          {subTab === 'foodRecipes' && (
+            <>
+              {/* Toggle between Foods and Recipes */}
+              <div className="px-6 mb-4">
+                <div className="flex bg-amber-100/50 rounded-lg p-1">
+                  <button
+                    onClick={() => setFoodRecipesView('foods')}
+                    className={`flex-1 py-2 px-3 rounded-md font-medium text-sm transition-all ${
+                      foodRecipesView === 'foods'
+                        ? 'bg-amber-500 text-white shadow-sm'
+                        : 'text-amber-700 hover:bg-amber-100'
+                    }`}
+                  >
+                    Foods
+                  </button>
+                  <button
+                    onClick={() => setFoodRecipesView('recipes')}
+                    className={`flex-1 py-2 px-3 rounded-md font-medium text-sm transition-all ${
+                      foodRecipesView === 'recipes'
+                        ? 'bg-orange-500 text-white shadow-sm'
+                        : 'text-orange-700 hover:bg-orange-100'
+                    }`}
+                  >
+                    <span className="flex items-center justify-center gap-1">
+                      <ChefHat className="h-4 w-4" />
+                      Recipes
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </>
+      )}
+
+      {/* FOODS VIEW */}
+      {mainTab === 'solids' && subTab === 'foodRecipes' && foodRecipesView === 'foods' && (
         <div className="px-6 space-y-4">
           {/* Search Button */}
           <button
@@ -1034,29 +1099,11 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
             </Card>
           </div>
 
-          {/* Chat Inspiration Card */}
-          <button
-            onClick={() => setShowRecipeChat(true)}
-            className="w-full mt-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-5 text-left shadow-md hover:shadow-lg transition-shadow"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <Sparkles className="h-6 w-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-white text-base">Need ideas?</h3>
-                <p className="text-amber-100 text-sm mt-0.5">
-                  Get custom recipes — save your favorites!
-                </p>
-              </div>
-              <MessageCircle className="h-5 w-5 text-white/70" />
-            </div>
-          </button>
         </div>
       )}
 
-      {/* RECIPES TAB */}
-      {activeTab === 'recipes' && (
+      {/* RECIPES VIEW */}
+      {mainTab === 'solids' && subTab === 'foodRecipes' && foodRecipesView === 'recipes' && (
         <div className="px-6 space-y-4">
           {/* Age Filter */}
           <Card className="border-none shadow-sm bg-orange-50">
@@ -1160,30 +1207,11 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
           <p className="text-center text-xs text-slate-400 pt-2">
             {filteredRecipes.length} recipe{filteredRecipes.length !== 1 ? 's' : ''} available for {babyAge}+ months
           </p>
-
-          {/* Chat Inspiration Card */}
-          <button
-            onClick={() => setShowRecipeChat(true)}
-            className="w-full mt-6 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-5 text-left shadow-md hover:shadow-lg transition-shadow"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <Sparkles className="h-6 w-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-white text-base">Looking for inspo?</h3>
-                <p className="text-orange-100 text-sm mt-0.5">
-                  Get custom recipe ideas — save favorites for later!
-                </p>
-              </div>
-              <MessageCircle className="h-5 w-5 text-white/70" />
-            </div>
-          </button>
         </div>
       )}
 
-      {/* SAVED TAB */}
-      {activeTab === 'saved' && (
+      {/* SAVED VIEW */}
+      {mainTab === 'solids' && subTab === 'saved' && (
         <div className="px-6 space-y-4">
           {savedChatRecipes.length === 0 ? (
             <div className="text-center py-12">
@@ -1413,6 +1441,72 @@ const Weaning = ({ onOpenChat }: WeaningProps) => {
             <p className="text-xs text-slate-400 text-center mt-2">
               💡 Save recipes to find them in Settings → Saved from Chat
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* NURSING TAB */}
+      {mainTab === 'nursing' && (
+        <div className="px-6 space-y-4">
+          {/* Coming Soon Card */}
+          <Card className="border-none shadow-sm bg-gradient-to-br from-pink-50 to-rose-50">
+            <CardContent className="p-6 text-center">
+              <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl">🍼</span>
+              </div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-2">Nursing & Bottle Feeding</h3>
+              <p className="text-slate-500 text-sm mb-4">
+                Track feeds, get breastfeeding tips, and find bottle feeding guidance — all in one place.
+              </p>
+              <div className="inline-flex items-center gap-2 bg-pink-100 text-pink-700 px-4 py-2 rounded-full text-sm font-medium">
+                ✨ Coming Soon
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Preview of Features */}
+          <div className="space-y-3">
+            <h4 className="font-medium text-slate-700 px-1">What's coming:</h4>
+            
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex items-start gap-3">
+              <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-lg">⏱️</span>
+              </div>
+              <div>
+                <h5 className="font-medium text-slate-800">Feed Tracking</h5>
+                <p className="text-sm text-slate-500">Log breastfeeding sessions and bottle feeds with easy timers</p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex items-start gap-3">
+              <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-lg">📊</span>
+              </div>
+              <div>
+                <h5 className="font-medium text-slate-800">Feed Patterns</h5>
+                <p className="text-sm text-slate-500">See your baby's feeding patterns and daily intake</p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex items-start gap-3">
+              <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-lg">💡</span>
+              </div>
+              <div>
+                <h5 className="font-medium text-slate-800">Expert Tips</h5>
+                <p className="text-sm text-slate-500">Latch techniques, positions, and troubleshooting</p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex items-start gap-3">
+              <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-lg">🤖</span>
+              </div>
+              <div>
+                <h5 className="font-medium text-slate-800">Ask Nunu</h5>
+                <p className="text-sm text-slate-500">Get personalized feeding advice from our AI companion</p>
+              </div>
+            </div>
           </div>
         </div>
       )}
