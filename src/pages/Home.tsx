@@ -375,11 +375,6 @@ const Home = ({ onTabChange }: HomeProps) => {
     <div className={`min-h-screen flex flex-col pb-24 transition-colors duration-500 ${
       isNightMode ? 'bg-[#1a1a2e]' : 'bg-gradient-to-b from-sky-50 to-white'
     }`}>
-      {/* Night Mode Toggle */}
-      <div className="absolute top-4 right-4 z-10">
-        <NightModeToggle />
-      </div>
-
       {/* Header */}
       <div className="flex flex-col items-center pt-6 pb-3 px-6">
         <div className={`w-16 h-16 rounded-full p-2 shadow-md border-2 mb-2 ${

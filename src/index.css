@@ -173,3 +173,118 @@
     box-shadow: var(--shadow-nurture);
   }
 }
+
+/* ============================================
+   NIGHT MODE - Global overrides
+   Applied when [data-night-mode="true"] is on wrapper
+   ============================================ */
+
+[data-night-mode="true"] {
+  /* Override ALL white/light backgrounds */
+  .bg-white { background-color: #252542 !important; }
+  .bg-slate-50 { background-color: #1e1e38 !important; }
+  .bg-slate-100 { background-color: #1a1a2e !important; }
+  .bg-sky-50 { background-color: rgba(14, 116, 144, 0.15) !important; }
+  .bg-indigo-50 { background-color: rgba(79, 70, 229, 0.15) !important; }
+  .bg-purple-50 { background-color: rgba(126, 34, 206, 0.15) !important; }
+  .bg-amber-50 { background-color: rgba(180, 83, 9, 0.2) !important; }
+  .bg-rose-50 { background-color: rgba(159, 18, 57, 0.15) !important; }
+  .bg-emerald-50 { background-color: rgba(6, 95, 70, 0.15) !important; }
+  .bg-red-50 { background-color: rgba(153, 27, 27, 0.15) !important; }
+  .bg-green-50 { background-color: rgba(6, 95, 70, 0.15) !important; }
+  .bg-blue-50 { background-color: rgba(30, 64, 175, 0.15) !important; }
+  .bg-orange-50 { background-color: rgba(154, 52, 18, 0.15) !important; }
+  .bg-yellow-50 { background-color: rgba(133, 77, 14, 0.15) !important; }
+
+  /* Gradient backgrounds */
+  .bg-gradient-to-b.from-sky-50 { --tw-gradient-from: #1a1a2e !important; }
+  .bg-gradient-to-b.to-white { --tw-gradient-to: #1a1a2e !important; }
+  .bg-gradient-to-b.from-indigo-50 { --tw-gradient-from: #1a1a2e !important; }
+  .bg-gradient-to-br.from-indigo-50 { --tw-gradient-from: rgba(79, 70, 229, 0.15) !important; }
+  .bg-gradient-to-br.to-purple-50 { --tw-gradient-to: rgba(126, 34, 206, 0.15) !important; }
+
+  /* Dark text → bright */
+  .text-slate-800 { color: #fef3c7 !important; } /* amber-50ish */
+  .text-slate-700 { color: #fde68a !important; } /* amber-200ish */
+  .text-slate-600 { color: #fcd34d99 !important; } /* amber-300 with opacity */
+  .text-slate-500 { color: #d4a57499 !important; } /* warm muted */
+  .text-slate-400 { color: #92743a99 !important; }
+  
+  .text-indigo-800 { color: #a5b4fc !important; }
+  .text-indigo-700 { color: #a5b4fc !important; }
+  .text-indigo-600 { color: #818cf8 !important; }
+  .text-purple-800 { color: #c4b5fd !important; }
+  .text-purple-700 { color: #c4b5fd !important; }
+  .text-purple-600 { color: #a78bfa !important; }
+  .text-amber-700 { color: #fbbf24 !important; }
+  .text-amber-600 { color: #fbbf24 !important; }
+  .text-sky-700 { color: #7dd3fc !important; }
+  .text-sky-600 { color: #7dd3fc !important; }
+  .text-rose-700 { color: #fda4af !important; }
+  .text-rose-600 { color: #fda4af !important; }
+  .text-emerald-700 { color: #6ee7b7 !important; }
+  .text-emerald-600 { color: #6ee7b7 !important; }
+  .text-orange-700 { color: #fdba74 !important; }
+  .text-orange-600 { color: #fdba74 !important; }
+  .text-red-700 { color: #fca5a5 !important; }
+  .text-red-600 { color: #fca5a5 !important; }
+
+  /* Borders */
+  .border-slate-100 { border-color: rgba(180, 130, 60, 0.2) !important; }
+  .border-slate-200 { border-color: rgba(180, 130, 60, 0.25) !important; }
+  .border-slate-300 { border-color: rgba(180, 130, 60, 0.3) !important; }
+  .border-indigo-100 { border-color: rgba(79, 70, 229, 0.25) !important; }
+  .border-indigo-200 { border-color: rgba(79, 70, 229, 0.3) !important; }
+  .border-purple-100 { border-color: rgba(126, 34, 206, 0.25) !important; }
+  .border-purple-200 { border-color: rgba(126, 34, 206, 0.3) !important; }
+  .border-amber-100 { border-color: rgba(180, 83, 9, 0.25) !important; }
+  .border-amber-200 { border-color: rgba(180, 83, 9, 0.3) !important; }
+  .border-sky-100 { border-color: rgba(14, 116, 144, 0.25) !important; }
+  .border-orange-200 { border-color: rgba(154, 52, 18, 0.3) !important; }
+  .border-orange-300 { border-color: rgba(154, 52, 18, 0.35) !important; }
+
+  /* Inputs and form elements */
+  input, select, textarea {
+    background-color: #1a1a2e !important;
+    border-color: rgba(180, 130, 60, 0.25) !important;
+    color: #fef3c7 !important;
+  }
+  input::placeholder, textarea::placeholder {
+    color: rgba(253, 230, 138, 0.35) !important;
+  }
+
+  /* Cards with shadows */
+  .shadow-sm, .shadow-md {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* bg-white/80, bg-white/90 etc */
+  [class*="bg-white\\/"] {
+    background-color: rgba(37, 37, 66, 0.9) !important;
+  }
+
+  /* Backdrop blur areas */
+  .backdrop-blur-sm { background-color: rgba(26, 26, 46, 0.9) !important; }
+
+  /* Specific color combos that need overriding */
+  .bg-emerald-100 { background-color: rgba(6, 95, 70, 0.2) !important; }
+  .bg-amber-100 { background-color: rgba(180, 83, 9, 0.2) !important; }
+  .bg-blue-100 { background-color: rgba(30, 64, 175, 0.2) !important; }
+  .bg-purple-100 { background-color: rgba(126, 34, 206, 0.2) !important; }
+  .bg-indigo-100 { background-color: rgba(79, 70, 229, 0.2) !important; }
+  .bg-rose-100 { background-color: rgba(159, 18, 57, 0.2) !important; }
+  .bg-red-100 { background-color: rgba(153, 27, 27, 0.2) !important; }
+  .bg-sky-100 { background-color: rgba(14, 116, 144, 0.2) !important; }
+  .bg-orange-100 { background-color: rgba(154, 52, 18, 0.2) !important; }
+  .bg-green-100 { background-color: rgba(6, 95, 70, 0.2) !important; }
+  .bg-yellow-100 { background-color: rgba(133, 77, 14, 0.2) !important; }
+
+  /* Switch / toggle styling */
+  [role="switch"] {
+    background-color: #1a1a2e !important;
+    border-color: rgba(180, 130, 60, 0.3) !important;
+  }
+  [role="switch"][data-state="checked"] {
+    background-color: #b45309 !important;
+  }
+}

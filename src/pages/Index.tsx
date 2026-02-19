@@ -148,7 +148,7 @@ const Index = () => {
             : 'bg-gradient-to-b from-sky-50 to-white'
           }
         `}
-        style={isNightMode ? { filter: 'sepia(10%) saturate(90%)' } : undefined}
+        data-night-mode={isNightMode ? 'true' : 'false'}
       >
         {renderActiveTab()}
         <Navigation activeTab={activeTab} onTabChange={setActiveTab} />

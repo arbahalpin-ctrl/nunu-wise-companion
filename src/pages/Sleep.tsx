@@ -1319,17 +1319,12 @@ const SleepContent = ({
     >
       {/* Header */}
       <div className="p-6 pb-2">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className={`text-2xl font-bold ${isNightMode ? 'text-amber-50' : 'text-slate-800'}`}>
-              Sleep
-            </h1>
-            <p className={`mt-1 ${isNightMode ? 'text-amber-200/70' : 'text-slate-500'}`}>
-              Learn, track & plan better sleep
-            </p>
-          </div>
-          <NightModeToggle />
-        </div>
+        <h1 className={`text-2xl font-bold ${isNightMode ? 'text-amber-50' : 'text-slate-800'}`}>
+          Sleep
+        </h1>
+        <p className={`mt-1 ${isNightMode ? 'text-amber-200/70' : 'text-slate-500'}`}>
+          Learn, track & plan better sleep
+        </p>
       </div>
 
       {/* Sub-tab Navigation */}

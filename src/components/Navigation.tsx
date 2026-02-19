@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Home, Moon, MessageCircle, Settings, Baby, Heart } from 'lucide-react';
+import { Home, Moon, Sun, MessageCircle, Settings, Baby, Heart } from 'lucide-react';
 import { getUnreadCount } from '@/utils/chatIntegration';
 import { useNightMode } from '@/components/NightMode';
 
@@ -10,7 +10,7 @@ interface NavigationProps {
 
 const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const [unreadCount, setUnreadCount] = useState(0);
-  const { isNightMode } = useNightMode();
+  const { isNightMode, toggleNightMode } = useNightMode();
 
   // Load unread count and listen for updates
   useEffect(() => {
@@ -41,7 +41,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
         ? 'bg-[#1a1a2e] border-amber-900/30' 
         : 'bg-white border-slate-100'
     }`}>
-      <div className="flex items-center justify-around py-3 px-2 max-w-md mx-auto">
+      <div className="flex items-center justify-around py-3 px-1 max-w-md mx-auto">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -52,7 +52,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={`
-                flex flex-col items-center justify-center p-2 rounded-xl transition-all relative
+                flex flex-col items-center justify-center p-1.5 rounded-xl transition-all relative
                 ${isActive 
                   ? isNightMode ? 'text-amber-300' : 'text-slate-800'
                   : isNightMode ? 'text-amber-200/50 hover:text-amber-200/80' : 'text-slate-400 hover:text-slate-600'
@@ -67,10 +67,23 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
                   </span>
                 )}
               </div>
-              <span className={`text-xs mt-1 ${isActive ? 'font-medium' : ''}`}>{tab.label}</span>
+              <span className={`text-[10px] mt-0.5 ${isActive ? 'font-medium' : ''}`}>{tab.label}</span>
             </button>
           );
         })}
+        
+        {/* Night Mode Toggle */}
+        <button
+          onClick={toggleNightMode}
+          className={`
+            flex flex-col items-center justify-center p-1.5 rounded-xl transition-all
+            ${isNightMode ? 'text-amber-400 hover:text-amber-300' : 'text-slate-400 hover:text-slate-600'}
+          `}
+          title={isNightMode ? 'Day mode' : 'Night mode'}
+        >
+          {isNightMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          <span className={`text-[10px] mt-0.5`}>{isNightMode ? 'Day' : 'Night'}</span>
+        </button>
       </div>
     </nav>
   );

@@ -570,20 +570,17 @@ const ChatAssistant = () => {
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <NightModeToggle />
-              <button
-                onClick={startNewConversation}
-                className={`p-2 rounded-lg transition-colors ${
-                  isNightMode 
-                    ? 'text-amber-200/70 hover:text-amber-100 hover:bg-amber-900/30' 
-                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
-                }`}
-                title="New chat"
-              >
-                <Plus className="h-5 w-5" />
-              </button>
-            </div>
+            <button
+              onClick={startNewConversation}
+              className={`p-2 rounded-lg transition-colors ${
+                isNightMode 
+                  ? 'text-amber-200/70 hover:text-amber-100 hover:bg-amber-900/30' 
+                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
+              }`}
+              title="New chat"
+            >
+              <Plus className="h-5 w-5" />
+            </button>
           </div>
         </div>
 
