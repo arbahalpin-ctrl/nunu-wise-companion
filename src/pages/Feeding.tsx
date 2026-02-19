@@ -460,14 +460,14 @@ const Feeding = () => {
     return matchesSearch;
   });
   
+  const recipeCategories = getRecipeCategories();
+  
   const filteredRecipes = recipes.filter(recipe => {
     const matchesSearch = recipe.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       recipe.ingredients.some(i => i.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesCategory = selectedCategory === 'All' || recipe.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
-  
-  const categories = ['All', ...getRecipeCategories()];
 
   // ========== RENDER ==========
   
@@ -1187,17 +1187,27 @@ const Feeding = () => {
             <>
               {/* Category filter */}
               <div className="flex gap-2 overflow-x-auto pb-2">
-                {categories.map((cat) => (
+                <button
+                  onClick={() => setSelectedCategory('All')}
+                  className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${
+                    selectedCategory === 'All' 
+                      ? 'bg-orange-500 text-white' 
+                      : 'bg-white text-slate-600'
+                  }`}
+                >
+                  All
+                </button>
+                {recipeCategories.map((cat) => (
                   <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${
-                      selectedCategory === cat 
+                    key={cat.name}
+                    onClick={() => setSelectedCategory(cat.name)}
+                    className={`px-3 py-1 rounded-full text-sm whitespace-nowrap flex items-center gap-1 ${
+                      selectedCategory === cat.name 
                         ? 'bg-orange-500 text-white' 
                         : 'bg-white text-slate-600'
                     }`}
                   >
-                    {cat}
+                    {cat.emoji} {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
                   </button>
                 ))}
               </div>
