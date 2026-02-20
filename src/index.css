@@ -324,6 +324,23 @@
   /* ---- Ring colors for focus states ---- */
   .ring-slate-200 { --tw-ring-color: rgba(148, 163, 184, 0.2) !important; }
 
+  /* ---- Bright orange/amber toning for feeding section ---- */
+  .bg-orange-500 { background-color: rgba(251, 146, 60, 0.6) !important; }
+  .bg-amber-500 { background-color: rgba(245, 158, 11, 0.6) !important; }
+  [class*="from-orange-500"] { --tw-gradient-from: rgba(234, 88, 12, 0.5) !important; }
+  [class*="to-amber-500"] { --tw-gradient-to: rgba(217, 119, 6, 0.5) !important; }
+  [class*="from-orange-400"] { --tw-gradient-from: rgba(251, 146, 60, 0.5) !important; }
+  [class*="to-amber-400"] { --tw-gradient-to: rgba(245, 158, 11, 0.5) !important; }
+  [class*="from-pink-50"][class*="to-orange-50"] { --tw-gradient-from: #0f172a !important; --tw-gradient-to: #0f172a !important; }
+  .bg-orange-100\/50 { background-color: rgba(251, 146, 60, 0.08) !important; }
+  .bg-orange-50 { background-color: rgba(251, 146, 60, 0.06) !important; }
+  .border-orange-500 { border-color: rgba(251, 146, 60, 0.5) !important; }
+  .text-orange-600 { color: #fb923c !important; }
+  .text-orange-700 { color: #fdba74 !important; }
+  .text-orange-500 { color: rgba(251, 146, 60, 0.8) !important; }
+  .border-orange-100 { border-color: rgba(251, 146, 60, 0.15) !important; }
+  .bg-amber-500\/80 { background-color: rgba(245, 158, 11, 0.4) !important; }
+
   /* ---- Scrollbar ---- */
   ::-webkit-scrollbar { background: #0f172a; }
   ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
