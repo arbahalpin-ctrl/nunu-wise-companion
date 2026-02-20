@@ -971,8 +971,24 @@ const Sleep = ({ onTabChange }: SleepProps) => {
           </Card>
         ) : (
           <div className="space-y-2">
-            {todaysNaps.map((nap, i) => (
-              <Card key={nap.id} className="border-none shadow-sm">
+            {todaysNaps.map((nap, i) => {
+              // Calculate next nap suggestion based on this nap's wake time
+              const napSuggestion = nap.napEnd ? (() => {
+                const suggestedMin = new Date(nap.napEnd + wakeWindow.min * 60000);
+                const suggestedMax = new Date(nap.napEnd + wakeWindow.max * 60000);
+                const now = Date.now();
+                const isUpcoming = now < suggestedMin.getTime();
+                const isNow = now >= suggestedMin.getTime() && now <= suggestedMax.getTime();
+                const isPast = now > suggestedMax.getTime();
+                return { suggestedMin, suggestedMax, isUpcoming, isNow, isPast };
+              })() : null;
+              
+              // Only show suggestion on the most recent nap (i === 0)
+              const showSuggestion = i === 0 && napSuggestion && nap.napEnd;
+              
+              return (
+              <div key={nap.id}>
+              <Card className="border-none shadow-sm">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -1018,7 +1034,34 @@ const Sleep = ({ onTabChange }: SleepProps) => {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+              
+              {/* Next nap suggestion after most recent nap */}
+              {showSuggestion && napSuggestion && (
+                <div className={`ml-6 mt-1 mb-1 pl-4 border-l-2 py-2 ${
+                  napSuggestion.isNow 
+                    ? 'border-emerald-400' 
+                    : napSuggestion.isPast 
+                      ? 'border-red-400' 
+                      : 'border-sky-400'
+                }`}>
+                  <p className={`text-sm font-medium ${
+                    napSuggestion.isNow 
+                      ? 'text-emerald-600' 
+                      : napSuggestion.isPast 
+                        ? 'text-red-500' 
+                        : 'text-sky-600'
+                  }`}>
+                    {napSuggestion.isNow ? '💤 Nap window open now!' : napSuggestion.isPast ? '⚠️ Past nap window' : '⏰ Next nap'}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {napSuggestion.suggestedMin.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} – {napSuggestion.suggestedMax.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {' '}({formatDuration(wakeWindow.min)}–{formatDuration(wakeWindow.max)} wake window)
+                  </p>
+                </div>
+              )}
+              </div>
+              );
+            })}
             
             {/* Daily Summary */}
             <Card className="border-none shadow-sm bg-emerald-50">
