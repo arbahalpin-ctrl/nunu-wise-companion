@@ -4,7 +4,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import koalaFeeding from '@/assets/koala-feeding.svg';
 import { foods, Food } from '@/data/foods';
 import { recipes, Recipe, getRecipeCategories } from '@/data/recipes';
 
@@ -875,12 +874,9 @@ const Feeding = () => {
   return (
     <div className="pb-24 min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="bg-gradient-to-br from-pink-50 to-orange-50 p-6 pb-4 flex items-center gap-3">
-        <img src={koalaFeeding} alt="Nunu eating" className="w-16 h-16" />
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 mb-1">Feeding</h1>
-          <p className="text-slate-500 text-sm">Track nursing & explore solids</p>
-        </div>
+      <div className="bg-gradient-to-br from-pink-50 to-orange-50 p-6 pb-4">
+        <h1 className="text-2xl font-bold text-slate-800 mb-1">Feeding</h1>
+        <p className="text-slate-500 text-sm">Track nursing & explore solids</p>
       </div>
       
       {/* Main tabs: Solids | Nursing */}

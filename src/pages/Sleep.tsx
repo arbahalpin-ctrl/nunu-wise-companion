@@ -6,7 +6,6 @@ import SleepProgram from '@/components/SleepProgram';
 import { injectSleepProgramStartMessage } from '@/utils/chatIntegration';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import koalaSleep from '@/assets/koala-sleep.svg';
 // Night mode handled globally via CSS in index.css
 
 const ASSESSMENT_STORAGE_KEY = 'nunu-sleep-assessment';
@@ -1483,12 +1482,9 @@ const SleepContent = ({
     <div className="min-h-screen pb-20 transition-colors duration-500 bg-gradient-to-b from-indigo-50 to-white">
 
       {/* Header */}
-      <div className="p-6 pb-2 flex items-center gap-3">
-        <img src={koalaSleep} alt="Sleeping Nunu" className="w-16 h-16" />
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Sleep</h1>
-          <p className="text-slate-500 mt-1">Learn, track & plan better sleep</p>
-        </div>
+      <div className="p-6 pb-2">
+        <h1 className="text-2xl font-bold text-slate-800">Sleep</h1>
+        <p className="text-slate-500 mt-1">Learn, track & plan better sleep</p>
       </div>
 
       {/* Sub-tab Navigation */}

@@ -6,7 +6,7 @@ import MoodCalendar from '@/components/MoodCalendar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNightMode, NightModeToggle } from '@/components/NightMode';
 import { moodService, sleepService, settingsService, MoodEntry, SleepLog } from '@/lib/database';
-import koalaHome from '@/assets/koala-home.svg';
+import koalaHero from '@/assets/nunu-logo.svg';
 
 const SLEEP_ASSESSMENT_KEY = 'nunu-sleep-assessment';
 const SLEEP_PROGRAM_KEY = 'nunu-sleep-program';
@@ -377,11 +377,13 @@ const Home = ({ onTabChange }: HomeProps) => {
     }`}>
       {/* Header */}
       <div className="flex flex-col items-center pt-6 pb-3 px-6">
-        <div className="w-28 h-28 mb-1">
+        <div className={`w-16 h-16 rounded-full p-2 shadow-md border-2 mb-2 ${
+          isNightMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-white'
+        }`}>
           <img 
-            src={koalaHome} 
+            src={koalaHero} 
             alt="Nunu" 
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain rounded-full"
           />
         </div>
         <h1 className={`text-xl font-bold ${isNightMode ? 'text-gray-100' : 'text-slate-800'}`}>Nunu</h1>
