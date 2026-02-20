@@ -724,7 +724,7 @@ const SleepPlan = ({ assessment, onStartProgram, onEditAssessment, onOpenChat }:
                 {assessment.currentNapCount !== recommendedNaps && (
                   <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
                     <div className="flex items-start gap-2">
-                      <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5" />
+                      <AlertTriangle className="h-4 w-4 text-slate-1000 mt-0.5" />
                       <p className="text-sm text-amber-700">
                         You mentioned {assessment.currentNapCount} naps, but at {assessment.babyAgeMonths} months, {recommendedNaps} naps is usually better. Try this schedule for a week.
                       </p>

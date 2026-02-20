@@ -327,7 +327,7 @@ const Settings = () => {
               className="w-full flex items-center justify-between"
             >
               <div className="flex items-center gap-3">
-                <Bookmark className="h-5 w-5 text-amber-500" />
+                <Bookmark className="h-5 w-5 text-slate-1000" />
                 <div className="text-left">
                   <h2 className="font-semibold text-slate-800">Saved from Chat</h2>
                   <p className="text-xs text-slate-400">{savedItems.length} saved item{savedItems.length !== 1 ? 's' : ''}</p>

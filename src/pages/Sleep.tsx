@@ -598,9 +598,9 @@ const Sleep = ({ onTabChange }: SleepProps) => {
           {expandedLearnSection === 'wake-windows' && (
             <div className="px-4 pb-4 border-t border-slate-100 pt-4">
               <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-4 text-white mb-4">
-                <p className="text-amber-100 text-xs mb-1">At {babyAgeMonths} months, aim for</p>
+                <p className="text-slate-200 text-xs mb-1">At {babyAgeMonths} months, aim for</p>
                 <p className="text-2xl font-bold">{formatDuration(wakeWindow.min)} – {formatDuration(wakeWindow.max)}</p>
-                <p className="text-amber-100 text-sm mt-1">awake between sleeps</p>
+                <p className="text-slate-200 text-sm mt-1">awake between sleeps</p>
               </div>
               
               <div className="space-y-3 text-sm text-slate-600">

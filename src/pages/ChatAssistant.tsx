@@ -496,14 +496,14 @@ const ChatAssistant = () => {
 
   return (
     <div className={`h-[calc(100vh-80px)] flex overflow-hidden transition-colors duration-500 ${
-      isNightMode ? 'bg-[#1a1a2e]' : 'bg-white'
+      isNightMode ? 'bg-slate-900' : 'bg-white'
     }`}>
       {/* Desktop Sidebar */}
       <div className={`hidden md:flex md:flex-col w-64 border-r flex-shrink-0 transition-colors duration-500 ${
-        isNightMode ? 'bg-[#151525] border-amber-900/30' : 'bg-slate-50 border-slate-200'
+        isNightMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'
       }`}>
-        <div className={`p-4 border-b ${isNightMode ? 'border-amber-900/30' : 'border-slate-100'}`}>
-          <h2 className={`font-semibold ${isNightMode ? 'text-amber-50' : 'text-slate-800'}`}>Chats</h2>
+        <div className={`p-4 border-b ${isNightMode ? 'border-slate-700' : 'border-slate-100'}`}>
+          <h2 className={`font-semibold ${isNightMode ? 'text-slate-100' : 'text-slate-800'}`}>Chats</h2>
         </div>
         <SidebarContent />
       </div>
@@ -521,15 +521,15 @@ const ChatAssistant = () => {
         md:hidden fixed top-0 left-0 h-full w-72 shadow-xl z-50 
         transform transition-transform duration-300 ease-in-out flex flex-col
         ${showSidebar ? 'translate-x-0' : '-translate-x-full'}
-        ${isNightMode ? 'bg-[#1a1a2e]' : 'bg-white'}
+        ${isNightMode ? 'bg-slate-900' : 'bg-white'}
       `}>
         <div className={`p-4 border-b flex items-center justify-between ${
-          isNightMode ? 'border-amber-900/30' : 'border-slate-100'
+          isNightMode ? 'border-slate-700' : 'border-slate-100'
         }`}>
-          <h2 className={`font-semibold ${isNightMode ? 'text-amber-50' : 'text-slate-800'}`}>Your Chats</h2>
+          <h2 className={`font-semibold ${isNightMode ? 'text-slate-100' : 'text-slate-800'}`}>Your Chats</h2>
           <button
             onClick={() => setShowSidebar(false)}
-            className={`p-1 rounded ${isNightMode ? 'text-amber-200/70 hover:text-amber-100' : 'text-slate-400 hover:text-slate-600'}`}
+            className={`p-1 rounded ${isNightMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-400 hover:text-slate-600'}`}
           >
             <X className="h-5 w-5" />
           </button>
@@ -539,11 +539,11 @@ const ChatAssistant = () => {
 
       {/* Main Chat Area */}
       <div className={`flex-1 flex flex-col min-w-0 transition-colors duration-500 ${
-        isNightMode ? 'bg-[#1a1a2e]' : 'bg-gradient-to-b from-sky-50/50 to-white'
+        isNightMode ? 'bg-slate-900' : 'bg-gradient-to-b from-sky-50/50 to-white'
       }`}>
         {/* Header */}
         <div className={`px-4 py-3 flex-shrink-0 border-b backdrop-blur-sm ${
-          isNightMode ? 'border-amber-900/30 bg-[#1a1a2e]/90' : 'border-slate-100 bg-white/90'
+          isNightMode ? 'border-slate-700 bg-slate-900/90' : 'border-slate-100 bg-white/90'
         }`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -552,7 +552,7 @@ const ChatAssistant = () => {
                 onClick={() => setShowSidebar(true)}
                 className={`md:hidden p-2 -ml-2 rounded-lg transition-colors ${
                   isNightMode 
-                    ? 'text-amber-200/70 hover:text-amber-100 hover:bg-amber-900/30' 
+                    ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-700' 
                     : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
                 }`}
                 title="View chats"
@@ -563,8 +563,8 @@ const ChatAssistant = () => {
                 <Bot className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h1 className={`text-base font-semibold ${isNightMode ? 'text-amber-50' : 'text-slate-800'}`}>Nunu</h1>
-                <div className={`flex items-center gap-1.5 text-xs ${isNightMode ? 'text-amber-200/70' : 'text-slate-500'}`}>
+                <h1 className={`text-base font-semibold ${isNightMode ? 'text-slate-100' : 'text-slate-800'}`}>Nunu</h1>
+                <div className={`flex items-center gap-1.5 text-xs ${isNightMode ? 'text-slate-400' : 'text-slate-500'}`}>
                   <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
                   Sleep & wellbeing support
                 </div>
@@ -574,7 +574,7 @@ const ChatAssistant = () => {
               onClick={startNewConversation}
               className={`p-2 rounded-lg transition-colors ${
                 isNightMode 
-                  ? 'text-amber-200/70 hover:text-amber-100 hover:bg-amber-900/30' 
+                  ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-700' 
                   : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
               }`}
               title="New chat"
@@ -602,7 +602,7 @@ const ChatAssistant = () => {
                 ${message.role === 'user' 
                   ? 'bg-slate-800 text-white' 
                   : isNightMode 
-                    ? 'bg-[#252542] shadow-sm border border-amber-900/30 text-amber-50'
+                    ? 'bg-slate-800 shadow-sm border border-slate-700 text-slate-100'
                     : 'bg-white shadow-sm border border-slate-100'
                 }
               `}>
@@ -649,7 +649,7 @@ const ChatAssistant = () => {
                 <Bot className="h-4 w-4 text-white" />
               </div>
               <div className={`shadow-sm border rounded-2xl px-4 py-3 ${
-                isNightMode ? 'bg-[#252542] border-amber-900/30' : 'bg-white border-slate-100'
+                isNightMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'
               }`}>
                 <div className="flex gap-1.5">
                   <div className={`w-2 h-2 rounded-full animate-bounce ${isNightMode ? 'bg-amber-400/50' : 'bg-slate-300'}`} style={{ animationDelay: '0ms' }} />
@@ -683,7 +683,7 @@ const ChatAssistant = () => {
 
         {/* Input */}
         <div className={`p-4 flex-shrink-0 border-t ${
-          isNightMode ? 'border-amber-900/30 bg-[#1a1a2e]' : 'border-slate-100 bg-white'
+          isNightMode ? 'border-slate-700 bg-slate-900' : 'border-slate-100 bg-white'
         }`}>
           <div className="flex gap-2 items-end">
             <Input
@@ -693,7 +693,7 @@ const ChatAssistant = () => {
               placeholder="Type your message..."
               className={`rounded-full py-3 px-4 ${
                 isNightMode 
-                  ? 'bg-[#252542] border-amber-900/30 text-amber-50 placeholder:text-amber-200/40 focus:border-amber-700 focus:bg-[#2a2a4a]' 
+                  ? 'bg-slate-800 border-slate-700 text-slate-100 placeholder:text-slate-500 focus:border-slate-600 focus:bg-slate-700' 
                   : 'bg-slate-50 border-slate-200 focus:border-slate-400 focus:bg-white'
               }`}
               onKeyPress={handleKeyPress}

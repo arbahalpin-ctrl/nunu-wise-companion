@@ -55,7 +55,7 @@ export function NightModeToggle({ className = '' }: { className?: string }) {
       className={`
         p-2 rounded-lg transition-all duration-300
         ${isNightMode 
-          ? 'bg-amber-900/30 text-amber-400 hover:bg-amber-900/50' 
+          ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' 
           : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
         }
         ${className}
@@ -82,15 +82,12 @@ export function NightModeWrapper({
       className={`
         min-h-screen transition-colors duration-500
         ${isNightMode 
-          ? 'bg-[#1a1a2e] text-amber-50' 
+          ? 'bg-slate-900 text-slate-100' 
           : ''
         }
         ${className}
       `}
-      style={isNightMode ? {
-        // Red-shifted colors for night - easier on eyes, won't disrupt melatonin
-        filter: 'sepia(20%) saturate(80%)',
-      } : undefined}
+      style={undefined}
     >
       {children}
     </div>
@@ -100,12 +97,12 @@ export function NightModeWrapper({
 // Night mode card styling
 export function getNightModeCardClass(isNightMode: boolean, baseClass: string = '') {
   return `${baseClass} ${isNightMode 
-    ? 'bg-[#252542] border-amber-900/30 text-amber-50' 
+    ? 'bg-slate-800 border-slate-700 text-slate-100' 
     : ''
   }`;
 }
 
 // Night mode text colors
 export function getNightModeTextClass(isNightMode: boolean, lightClass: string, darkClass: string = '') {
-  return isNightMode ? (darkClass || 'text-amber-100') : lightClass;
+  return isNightMode ? (darkClass || 'text-slate-200') : lightClass;
 }

@@ -137,14 +137,14 @@ const Index = () => {
 
   return (
     <div className={`min-h-screen flex justify-center transition-colors duration-500 ${
-      isNightMode ? 'bg-[#0f0f1a]' : 'bg-slate-100'
+      isNightMode ? 'bg-slate-950' : 'bg-slate-100'
     }`}>
       <div 
         className={`
           w-full min-h-screen shadow-xl relative transition-colors duration-500
           ${isChat ? 'max-w-4xl' : 'max-w-md'}
           ${isNightMode 
-            ? 'bg-[#1a1a2e]' 
+            ? 'bg-slate-900' 
             : 'bg-gradient-to-b from-sky-50 to-white'
           }
         `}

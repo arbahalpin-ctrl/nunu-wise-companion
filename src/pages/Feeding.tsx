@@ -574,13 +574,13 @@ const Feeding = () => {
             <Card className="border-none shadow-sm">
               <CardContent className="p-4">
                 <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
-                  <Star className="h-5 w-5 text-amber-500" />
+                  <Star className="h-5 w-5 text-slate-1000" />
                   Tips
                 </h3>
                 <ul className="space-y-2">
                   {selectedFood.tips.map((tip, i) => (
                     <li key={i} className="flex items-start gap-2 text-slate-600">
-                      <span className="text-amber-400 mt-1">•</span>
+                      <span className="text-slate-300 mt-1">•</span>
                       {tip}
                     </li>
                   ))}

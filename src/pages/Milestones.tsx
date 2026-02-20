@@ -1002,7 +1002,7 @@ const Milestones = () => {
                 </div>
                 <div className="text-xs text-slate-500">Weight</div>
                 {getGrowthTrend('weight') !== null && (
-                  <div className={`text-xs mt-1 ${getGrowthTrend('weight')! >= 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                  <div className={`text-xs mt-1 ${getGrowthTrend('weight')! >= 0 ? 'text-emerald-500' : 'text-slate-1000'}`}>
                     {getGrowthTrend('weight')! >= 0 ? '+' : ''}{getGrowthTrend('weight')!.toFixed(2)} kg
                   </div>
                 )}
@@ -1017,7 +1017,7 @@ const Milestones = () => {
                 </div>
                 <div className="text-xs text-slate-500">Height</div>
                 {getGrowthTrend('height') !== null && (
-                  <div className={`text-xs mt-1 ${getGrowthTrend('height')! >= 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                  <div className={`text-xs mt-1 ${getGrowthTrend('height')! >= 0 ? 'text-emerald-500' : 'text-slate-1000'}`}>
                     {getGrowthTrend('height')! >= 0 ? '+' : ''}{getGrowthTrend('height')!.toFixed(1)} cm
                   </div>
                 )}
@@ -1032,7 +1032,7 @@ const Milestones = () => {
                 </div>
                 <div className="text-xs text-slate-500">Head</div>
                 {getGrowthTrend('headCirc') !== null && (
-                  <div className={`text-xs mt-1 ${getGrowthTrend('headCirc')! >= 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                  <div className={`text-xs mt-1 ${getGrowthTrend('headCirc')! >= 0 ? 'text-emerald-500' : 'text-slate-1000'}`}>
                     {getGrowthTrend('headCirc')! >= 0 ? '+' : ''}{getGrowthTrend('headCirc')!.toFixed(1)} cm
                   </div>
                 )}

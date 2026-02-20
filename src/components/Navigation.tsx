@@ -38,7 +38,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   return (
     <nav className={`fixed bottom-0 left-0 right-0 border-t z-50 transition-colors duration-500 ${
       isNightMode 
-        ? 'bg-[#1a1a2e] border-amber-900/30' 
+        ? 'bg-slate-900 border-slate-800' 
         : 'bg-white border-slate-100'
     }`}>
       <div className="flex items-center justify-around py-3 px-1 max-w-md mx-auto">
@@ -54,8 +54,8 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
               className={`
                 flex flex-col items-center justify-center p-1.5 rounded-xl transition-all relative
                 ${isActive 
-                  ? isNightMode ? 'text-amber-300' : 'text-slate-800'
-                  : isNightMode ? 'text-amber-200/50 hover:text-amber-200/80' : 'text-slate-400 hover:text-slate-600'
+                  ? isNightMode ? 'text-white' : 'text-slate-800'
+                  : isNightMode ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600'
                 }
               `}
             >
@@ -77,7 +77,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
           onClick={toggleNightMode}
           className={`
             flex flex-col items-center justify-center p-1.5 rounded-xl transition-all
-            ${isNightMode ? 'text-amber-400 hover:text-amber-300' : 'text-slate-400 hover:text-slate-600'}
+            ${isNightMode ? 'text-slate-400 hover:text-white' : 'text-slate-400 hover:text-slate-600'}
           `}
           title={isNightMode ? 'Day mode' : 'Night mode'}
         >
