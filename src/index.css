@@ -230,13 +230,13 @@
   [class*="to-purple-50"] { --tw-gradient-to: rgba(192, 132, 252, 0.06) !important; }
 
   /* ---- Dark text → clean light ---- */
+  /* Invert slate text: dark numbers become light in night mode */
+  /* Only affects light-mode classes; night-mode ternaries should use text-white, text-gray-* instead */
   .text-slate-800 { color: #f1f5f9 !important; }
   .text-slate-700 { color: #e2e8f0 !important; }
   .text-slate-600 { color: #cbd5e1 !important; }
   .text-slate-500 { color: #94a3b8 !important; }
-  .text-slate-400 { color: #64748b !important; }
-  .text-slate-300 { color: #475569 !important; }
-  .text-slate-200 { color: #334155 !important; }
+  .text-slate-400 { color: #94a3b8 !important; }
 
   .text-indigo-800, .text-indigo-700 { color: #a5b4fc !important; }
   .text-indigo-600 { color: #818cf8 !important; }

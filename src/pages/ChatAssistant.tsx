@@ -503,7 +503,7 @@ const ChatAssistant = () => {
         isNightMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'
       }`}>
         <div className={`p-4 border-b ${isNightMode ? 'border-slate-700' : 'border-slate-100'}`}>
-          <h2 className={`font-semibold ${isNightMode ? 'text-slate-100' : 'text-slate-800'}`}>Chats</h2>
+          <h2 className={`font-semibold ${isNightMode ? 'text-gray-100' : 'text-slate-800'}`}>Chats</h2>
         </div>
         <SidebarContent />
       </div>
@@ -526,10 +526,10 @@ const ChatAssistant = () => {
         <div className={`p-4 border-b flex items-center justify-between ${
           isNightMode ? 'border-slate-700' : 'border-slate-100'
         }`}>
-          <h2 className={`font-semibold ${isNightMode ? 'text-slate-100' : 'text-slate-800'}`}>Your Chats</h2>
+          <h2 className={`font-semibold ${isNightMode ? 'text-gray-100' : 'text-slate-800'}`}>Your Chats</h2>
           <button
             onClick={() => setShowSidebar(false)}
-            className={`p-1 rounded ${isNightMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-400 hover:text-slate-600'}`}
+            className={`p-1 rounded ${isNightMode ? 'text-gray-400 hover:text-gray-200' : 'text-slate-400 hover:text-slate-600'}`}
           >
             <X className="h-5 w-5" />
           </button>
@@ -563,8 +563,8 @@ const ChatAssistant = () => {
                 <Bot className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h1 className={`text-base font-semibold ${isNightMode ? 'text-slate-100' : 'text-slate-800'}`}>Nunu</h1>
-                <div className={`flex items-center gap-1.5 text-xs ${isNightMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                <h1 className={`text-base font-semibold ${isNightMode ? 'text-gray-100' : 'text-slate-800'}`}>Nunu</h1>
+                <div className={`flex items-center gap-1.5 text-xs ${isNightMode ? 'text-gray-400' : 'text-slate-500'}`}>
                   <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
                   Sleep & wellbeing support
                 </div>

@@ -366,7 +366,7 @@ const Home = ({ onTabChange }: HomeProps) => {
       <div className={`min-h-screen flex items-center justify-center ${
         isNightMode ? 'bg-slate-900' : 'bg-gradient-to-b from-sky-50 to-white'
       }`}>
-        <div className={isNightMode ? 'text-slate-400' : 'text-slate-500'}>Loading...</div>
+        <div className={isNightMode ? 'text-gray-400' : 'text-slate-500'}>Loading...</div>
       </div>
     );
   }
@@ -386,14 +386,14 @@ const Home = ({ onTabChange }: HomeProps) => {
             className="w-full h-full object-contain rounded-full"
           />
         </div>
-        <h1 className={`text-xl font-bold ${isNightMode ? 'text-slate-100' : 'text-slate-800'}`}>Nunu</h1>
-        <p className={`text-sm mb-3 ${isNightMode ? 'text-slate-400' : 'text-slate-500'}`}>
+        <h1 className={`text-xl font-bold ${isNightMode ? 'text-gray-100' : 'text-slate-800'}`}>Nunu</h1>
+        <p className={`text-sm mb-3 ${isNightMode ? 'text-gray-400' : 'text-slate-500'}`}>
           {babyName ? `${babyName}'s companion` : 'The Motherhood Companion'}
         </p>
-        <p className={`text-base font-medium ${isNightMode ? 'text-slate-200' : 'text-slate-700'}`}>
+        <p className={`text-base font-medium ${isNightMode ? 'text-gray-300' : 'text-slate-700'}`}>
           Hey{parentName ? `, ${parentName}` : ''} 💛
         </p>
-        <p className={`text-sm ${isNightMode ? 'text-slate-400' : 'text-slate-500'}`}>How are you feeling?</p>
+        <p className={`text-sm ${isNightMode ? 'text-gray-400' : 'text-slate-500'}`}>How are you feeling?</p>
       </div>
 
       <div className="flex-1 px-6 space-y-4">
@@ -416,7 +416,7 @@ const Home = ({ onTabChange }: HomeProps) => {
                     `}
                   >
                     <div className="text-2xl mb-1">{mood.emoji}</div>
-                    <div className={`text-xs font-medium ${isNightMode ? 'text-slate-200' : 'text-slate-600'}`}>{mood.label}</div>
+                    <div className={`text-xs font-medium ${isNightMode ? 'text-gray-300' : 'text-slate-600'}`}>{mood.label}</div>
                   </button>
                 ))}
               </div>
@@ -425,20 +425,20 @@ const Home = ({ onTabChange }: HomeProps) => {
                 <div className="text-4xl mb-3">
                   {moods.find(m => m.id === selectedMood)?.emoji}
                 </div>
-                <p className={`leading-relaxed max-w-xs mx-auto ${isNightMode ? 'text-slate-200' : 'text-slate-600'}`}>
+                <p className={`leading-relaxed max-w-xs mx-auto ${isNightMode ? 'text-gray-300' : 'text-slate-600'}`}>
                   {getMoodResponse(selectedMood)}
                 </p>
                 <div className="flex gap-3 justify-center mt-4">
                   <button 
                     onClick={() => setSelectedMood(null)}
-                    className={`text-sm ${isNightMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-400 hover:text-slate-600'}`}
+                    className={`text-sm ${isNightMode ? 'text-gray-400 hover:text-gray-200' : 'text-slate-400 hover:text-slate-600'}`}
                   >
                     Check in again
                   </button>
-                  <span className={isNightMode ? 'text-amber-900' : 'text-slate-300'}>•</span>
+                  <span className={isNightMode ? 'text-slate-600' : 'text-slate-300'}>•</span>
                   <button 
                     onClick={() => setShowMoodCalendar(true)}
-                    className={`text-sm flex items-center gap-1 ${isNightMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-400 hover:text-slate-600'}`}
+                    className={`text-sm flex items-center gap-1 ${isNightMode ? 'text-gray-400 hover:text-gray-200' : 'text-slate-400 hover:text-slate-600'}`}
                   >
                     <Calendar className="h-3 w-3" />
                     View history
@@ -513,8 +513,8 @@ const Home = ({ onTabChange }: HomeProps) => {
                   <Sparkles className={`h-5 w-5 ${isNightMode ? 'text-indigo-400' : 'text-indigo-600'}`} />
                 </div>
                 <div className="flex-1">
-                  <h3 className={`font-semibold mb-1 ${isNightMode ? 'text-slate-100' : 'text-slate-800'}`}>Struggling with sleep?</h3>
-                  <p className={`text-sm leading-relaxed ${isNightMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                  <h3 className={`font-semibold mb-1 ${isNightMode ? 'text-gray-100' : 'text-slate-800'}`}>Struggling with sleep?</h3>
+                  <p className={`text-sm leading-relaxed ${isNightMode ? 'text-gray-300' : 'text-slate-600'}`}>
                     Get a personalized sleep plan for {babyName || 'your baby'} — gentle methods backed by science.
                   </p>
                   <div className={`flex items-center gap-1 mt-2 text-sm font-medium ${isNightMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
@@ -532,8 +532,8 @@ const Home = ({ onTabChange }: HomeProps) => {
           <CardContent className="p-4">
             {babyAgeMonths === null || showAgeInput ? (
               <div className="text-center">
-                <Baby className={`h-8 w-8 mx-auto mb-2 ${isNightMode ? 'text-slate-400' : 'text-slate-400'}`} />
-                <p className={`text-sm mb-3 ${isNightMode ? 'text-slate-200' : 'text-slate-600'}`}>
+                <Baby className={`h-8 w-8 mx-auto mb-2 ${isNightMode ? 'text-gray-400' : 'text-slate-400'}`} />
+                <p className={`text-sm mb-3 ${isNightMode ? 'text-gray-300' : 'text-slate-600'}`}>
                   How old is {babyName || 'your baby'}?
                 </p>
                 <div className="flex gap-2 justify-center">
@@ -559,15 +559,15 @@ const Home = ({ onTabChange }: HomeProps) => {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Baby className={`h-5 w-5 ${isNightMode ? 'text-slate-400' : 'text-slate-500'}`} />
-                    <span className={`font-medium ${isNightMode ? 'text-slate-100' : 'text-slate-700'}`}>{getAgeDisplay(babyAgeMonths)}</span>
+                    <Baby className={`h-5 w-5 ${isNightMode ? 'text-gray-400' : 'text-slate-500'}`} />
+                    <span className={`font-medium ${isNightMode ? 'text-gray-100' : 'text-slate-700'}`}>{getAgeDisplay(babyAgeMonths)}</span>
                   </div>
                   <button 
                     onClick={() => {
                       setShowAgeInput(true);
                       setAgeInput(babyAgeMonths.toString());
                     }}
-                    className={`text-xs ${isNightMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-400 hover:text-slate-600'}`}
+                    className={`text-xs ${isNightMode ? 'text-gray-400 hover:text-gray-200' : 'text-slate-400 hover:text-slate-600'}`}
                   >
                     edit
                   </button>
@@ -616,7 +616,7 @@ const Home = ({ onTabChange }: HomeProps) => {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className={`text-xs mb-1 ${isNightMode ? 'text-sky-400' : 'text-slate-500'}`}>Wake window</p>
-                            <p className={`font-semibold ${isNightMode ? 'text-slate-100' : 'text-slate-800'}`}>{wakeWindow.label}</p>
+                            <p className={`font-semibold ${isNightMode ? 'text-gray-100' : 'text-slate-800'}`}>{wakeWindow.label}</p>
                           </div>
                           <Clock className={`h-8 w-8 ${isNightMode ? 'text-sky-400' : 'text-sky-400'}`} />
                         </div>
@@ -626,7 +626,7 @@ const Home = ({ onTabChange }: HomeProps) => {
                             <div className={`mt-3 pt-3 border-t flex items-center justify-between ${isNightMode ? 'border-sky-800/50' : 'border-sky-100'}`}>
                               <div>
                                 <p className={`text-xs ${isNightMode ? 'text-sky-400' : 'text-slate-500'}`}>Last woke up</p>
-                                <p className={`text-sm font-medium ${isNightMode ? 'text-slate-100' : 'text-slate-700'}`}>{timeSinceNap}</p>
+                                <p className={`text-sm font-medium ${isNightMode ? 'text-gray-100' : 'text-slate-700'}`}>{timeSinceNap}</p>
                               </div>
                               <button
                                 onClick={logNapWake}
@@ -718,8 +718,8 @@ const Home = ({ onTabChange }: HomeProps) => {
             }`}
           >
             <Moon className={`h-7 w-7 mb-2 ${isNightMode ? 'text-indigo-400' : 'text-indigo-400'}`} />
-            <p className={`font-medium text-sm ${isNightMode ? 'text-slate-100' : 'text-slate-800'}`}>Sleep help</p>
-            <p className={`text-xs mt-0.5 ${isNightMode ? 'text-amber-200/60' : 'text-slate-500'}`}>Tips & troubleshooting</p>
+            <p className={`font-medium text-sm ${isNightMode ? 'text-gray-100' : 'text-slate-800'}`}>Sleep help</p>
+            <p className={`text-xs mt-0.5 ${isNightMode ? 'text-gray-300' : 'text-slate-500'}`}>Tips & troubleshooting</p>
           </button>
           
           <button
@@ -729,8 +729,8 @@ const Home = ({ onTabChange }: HomeProps) => {
             }`}
           >
             <Heart className={`h-7 w-7 mb-2 ${isNightMode ? 'text-rose-300' : 'text-rose-400'}`} />
-            <p className={`font-medium text-sm ${isNightMode ? 'text-slate-100' : 'text-slate-800'}`}>I need support</p>
-            <p className={`text-xs mt-0.5 ${isNightMode ? 'text-amber-200/60' : 'text-slate-500'}`}>Talk it through</p>
+            <p className={`font-medium text-sm ${isNightMode ? 'text-gray-100' : 'text-slate-800'}`}>I need support</p>
+            <p className={`text-xs mt-0.5 ${isNightMode ? 'text-gray-300' : 'text-slate-500'}`}>Talk it through</p>
           </button>
         </div>
 
@@ -739,7 +739,7 @@ const Home = ({ onTabChange }: HomeProps) => {
           onClick={() => onTabChange?.('chat')}
           size="lg"
           className={`w-full rounded-xl py-6 text-base shadow-md ${
-            isNightMode ? 'bg-amber-700 hover:bg-amber-600 text-slate-100' : 'bg-slate-800 hover:bg-slate-700'
+            isNightMode ? 'bg-indigo-600 hover:bg-indigo-500 text-white' : 'bg-slate-800 hover:bg-slate-700'
           }`}
         >
           <MessageCircle className="h-5 w-5 mr-2" />
@@ -748,13 +748,13 @@ const Home = ({ onTabChange }: HomeProps) => {
 
         {/* Daily Tip */}
         {babyAgeMonths !== null && dailyTip && (
-          <Card className={`border-none shadow-sm ${isNightMode ? 'bg-slate-700' : 'bg-amber-50'}`}>
+          <Card className={`border-none shadow-sm ${isNightMode ? 'bg-slate-800/80' : 'bg-amber-50'}`}>
             <CardContent className="p-4">
               <div className="flex gap-3">
-                <Lightbulb className={`h-5 w-5 flex-shrink-0 mt-0.5 ${isNightMode ? 'text-slate-300' : 'text-slate-1000'}`} />
+                <Lightbulb className={`h-5 w-5 flex-shrink-0 mt-0.5 ${isNightMode ? 'text-gray-300' : 'text-slate-1000'}`} />
                 <div>
                   <p className={`text-xs font-medium mb-1 ${isNightMode ? 'text-white' : 'text-amber-700'}`}>Tip for {getAgeDisplay(babyAgeMonths)}</p>
-                  <p className={`text-sm leading-relaxed ${isNightMode ? 'text-slate-200' : 'text-slate-700'}`}>{dailyTip}</p>
+                  <p className={`text-sm leading-relaxed ${isNightMode ? 'text-gray-300' : 'text-slate-700'}`}>{dailyTip}</p>
                 </div>
               </div>
             </CardContent>
