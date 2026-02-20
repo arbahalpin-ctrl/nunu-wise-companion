@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/contexts/AuthContext';
+import koalaBottleImg from '@/assets/koala-bottle.jpg';
 
 interface SavedItem {
   id: string;
@@ -398,6 +399,7 @@ const Settings = () => {
             <p className="text-sm text-purple-700 mb-4">
               Caring for a baby is hard. It's important to check in with yourself too.
             </p>
+            <img src={koalaBottleImg} alt="" className="w-16 h-16 mx-auto mb-3 opacity-70" />
             
             <div className="space-y-2">
               <Button 

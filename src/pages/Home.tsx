@@ -6,7 +6,8 @@ import MoodCalendar from '@/components/MoodCalendar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNightMode, NightModeToggle } from '@/components/NightMode';
 import { moodService, sleepService, settingsService, MoodEntry, SleepLog } from '@/lib/database';
-import koalaHero from '@/assets/nunu-logo.svg';
+import koalaSitting from '@/assets/koala-sitting.jpg';
+import koalaBottle from '@/assets/koala-bottle.jpg';
 
 const SLEEP_ASSESSMENT_KEY = 'nunu-sleep-assessment';
 const SLEEP_PROGRAM_KEY = 'nunu-sleep-program';
@@ -377,13 +378,11 @@ const Home = ({ onTabChange }: HomeProps) => {
     }`}>
       {/* Header */}
       <div className="flex flex-col items-center pt-6 pb-3 px-6">
-        <div className={`w-16 h-16 rounded-full p-2 shadow-md border-2 mb-2 ${
-          isNightMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-white'
-        }`}>
+        <div className="w-24 h-24 mb-1">
           <img 
-            src={koalaHero} 
+            src={koalaSitting} 
             alt="Nunu" 
-            className="w-full h-full object-contain rounded-full"
+            className="w-full h-full object-contain"
           />
         </div>
         <h1 className={`text-xl font-bold ${isNightMode ? 'text-gray-100' : 'text-slate-800'}`}>Nunu</h1>
@@ -735,16 +734,19 @@ const Home = ({ onTabChange }: HomeProps) => {
         </div>
 
         {/* Main CTA */}
-        <Button 
-          onClick={() => onTabChange?.('chat')}
-          size="lg"
-          className={`w-full rounded-xl py-6 text-base shadow-md ${
-            isNightMode ? 'bg-indigo-600 hover:bg-indigo-500 text-white' : 'bg-slate-800 hover:bg-slate-700'
-          }`}
-        >
-          <MessageCircle className="h-5 w-5 mr-2" />
-          Talk to Nunu
-        </Button>
+        <div className="relative">
+          <Button 
+            onClick={() => onTabChange?.('chat')}
+            size="lg"
+            className={`w-full rounded-xl py-6 text-base shadow-md ${
+              isNightMode ? 'bg-indigo-600 hover:bg-indigo-500 text-white' : 'bg-slate-800 hover:bg-slate-700'
+            }`}
+          >
+            <MessageCircle className="h-5 w-5 mr-2" />
+            Talk to Nunu
+          </Button>
+          <img src={koalaBottle} alt="" className="absolute -top-8 -right-2 w-16 h-16 opacity-80 pointer-events-none" />
+        </div>
 
         {/* Daily Tip */}
         {babyAgeMonths !== null && dailyTip && (

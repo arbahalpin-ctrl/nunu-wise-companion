@@ -6,6 +6,7 @@ import SleepProgram from '@/components/SleepProgram';
 import { injectSleepProgramStartMessage } from '@/utils/chatIntegration';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import koalaSleepImg from '@/assets/koala-sleep.jpg';
 // Night mode handled globally via CSS in index.css
 
 const ASSESSMENT_STORAGE_KEY = 'nunu-sleep-assessment';
@@ -943,7 +944,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
       {/* Chat CTA */}
       <button
         onClick={handleOpenChat}
-        className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl p-4 text-left shadow-md"
+        className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl p-4 text-left shadow-md relative overflow-hidden"
       >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -955,6 +956,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
           </div>
           <ChevronRight className="h-5 w-5 text-white/70" />
         </div>
+        <img src={koalaSleepImg} alt="" className="absolute -bottom-3 -right-2 w-20 h-20 opacity-30 pointer-events-none" />
       </button>
     </div>
   );
@@ -1093,7 +1095,7 @@ const Sleep = ({ onTabChange }: SleepProps) => {
         {todaysNaps.length === 0 ? (
           <Card className="border-none shadow-sm bg-slate-50">
             <CardContent className="p-6 text-center">
-              <Moon className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+              <img src={koalaSleepImg} alt="Sleeping Nunu" className="w-20 h-20 mx-auto mb-2 opacity-80" />
               <p className="text-slate-500">No naps logged yet</p>
               <p className="text-slate-400 text-sm">Tap "Log a Nap" to get started</p>
             </CardContent>
