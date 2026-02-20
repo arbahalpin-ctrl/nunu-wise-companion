@@ -665,14 +665,18 @@ const ChatAssistant = () => {
 
         {/* Quick Prompts - only show for new conversations */}
         {messages.length <= 1 && (
-          <div className="px-4 py-3 flex-shrink-0 bg-white/80">
-            <p className="text-xs text-slate-500 mb-2">Tap to start:</p>
+          <div className={`px-4 py-3 flex-shrink-0 ${isNightMode ? 'bg-slate-900' : 'bg-white/80'}`}>
+            <p className={`text-xs mb-2 ${isNightMode ? 'text-gray-400' : 'text-slate-500'}`}>Tap to start:</p>
             <div className="flex flex-wrap gap-2">
               {quickPrompts.map((prompt, index) => (
                 <button
                   key={index}
                   onClick={() => setNewMessage(prompt)}
-                  className="px-3 py-1.5 text-sm bg-white border border-slate-200 rounded-full text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-colors"
+                  className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+                    isNightMode 
+                      ? 'bg-slate-800 border border-slate-600 text-gray-300 hover:bg-slate-700' 
+                      : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'
+                  }`}
                 >
                   {prompt}
                 </button>
