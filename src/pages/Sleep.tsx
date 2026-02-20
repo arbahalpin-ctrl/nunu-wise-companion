@@ -14,6 +14,7 @@ const BABY_AGE_KEY = 'nunu-baby-age-months';
 const WAKE_TIME_KEY = 'nunu-last-wake-time';
 const NAP_LOG_KEY = 'nunu-nap-log';
 const TIMER_STATE_KEY = 'nunu-timer-state';
+const MORNING_WAKE_KEY = 'nunu-morning-wake';
 
 interface NapLog {
   id: string;
@@ -193,6 +194,23 @@ const Sleep = ({ onTabChange }: SleepProps) => {
   const [newNapStart, setNewNapStart] = useState('');
   const [newNapEnd, setNewNapEnd] = useState('');
   
+  // Morning wake time
+  const [morningWake, setMorningWake] = useState<number | null>(() => {
+    try {
+      const saved = localStorage.getItem(MORNING_WAKE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Only use if from today
+        if (parsed.date === new Date().toISOString().split('T')[0]) {
+          return parsed.time;
+        }
+      }
+    } catch (e) {}
+    return null;
+  });
+  const [showMorningWakeInput, setShowMorningWakeInput] = useState(false);
+  const [morningWakeInput, setMorningWakeInput] = useState('');
+  
   // Learn section state
   const [expandedLearnSection, setExpandedLearnSection] = useState<string | null>('wake-windows');
   
@@ -353,13 +371,50 @@ const Sleep = ({ onTabChange }: SleepProps) => {
   const todaysNaps = napLogs.filter(n => n.date === today);
   const recentNaps = napLogs.slice(0, 10);
 
-  // Calculate next nap time based on last wake
+  // Save morning wake
+  const saveMorningWake = (timeStr: string) => {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const wakeDate = new Date();
+    wakeDate.setHours(hours, minutes, 0, 0);
+    const wakeTimestamp = wakeDate.getTime();
+    setMorningWake(wakeTimestamp);
+    localStorage.setItem(MORNING_WAKE_KEY, JSON.stringify({
+      date: new Date().toISOString().split('T')[0],
+      time: wakeTimestamp
+    }));
+    setShowMorningWakeInput(false);
+    setMorningWakeInput('');
+  };
+
+  const setMorningWakeNow = () => {
+    const now = Date.now();
+    setMorningWake(now);
+    localStorage.setItem(MORNING_WAKE_KEY, JSON.stringify({
+      date: new Date().toISOString().split('T')[0],
+      time: now
+    }));
+    setShowMorningWakeInput(false);
+  };
+
+  const clearMorningWake = () => {
+    setMorningWake(null);
+    localStorage.removeItem(MORNING_WAKE_KEY);
+  };
+
+  // Calculate next nap time based on last wake (nap wake or morning wake)
   const getNextNapWindow = () => {
-    if (todaysNaps.length === 0) return null;
-    const lastNap = todaysNaps[0]; // Most recent
-    if (!lastNap.napEnd) return null;
+    let lastWakeTime: number | null = null;
     
-    const lastWakeTime = lastNap.napEnd;
+    // Use most recent nap wake time if available
+    if (todaysNaps.length > 0 && todaysNaps[0].napEnd) {
+      lastWakeTime = todaysNaps[0].napEnd;
+    }
+    // Fall back to morning wake time
+    else if (morningWake) {
+      lastWakeTime = morningWake;
+    }
+    
+    if (!lastWakeTime) return null;
     const minNapTime = new Date(lastWakeTime + wakeWindow.min * 60000);
     const maxNapTime = new Date(lastWakeTime + wakeWindow.max * 60000);
     
@@ -928,6 +983,80 @@ const Sleep = ({ onTabChange }: SleepProps) => {
           <p className="text-sm text-indigo-600 mt-2">
             Wake window: <strong>{formatDuration(wakeWindow.min)} – {formatDuration(wakeWindow.max)}</strong>
           </p>
+        </CardContent>
+      </Card>
+
+      {/* Morning Wake Time */}
+      <Card className="border-none shadow-sm bg-sky-50">
+        <CardContent className="p-4">
+          {morningWake ? (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-sky-100 rounded-full flex items-center justify-center">
+                  <Sun className="h-5 w-5 text-sky-600" />
+                </div>
+                <div>
+                  <p className="text-xs text-sky-600">Woke up at</p>
+                  <p className="text-lg font-bold text-sky-800">
+                    {new Date(morningWake).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={clearMorningWake}
+                className="text-sky-400 hover:text-sky-600 p-2"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : showMorningWakeInput ? (
+            <div>
+              <p className="text-sm font-medium text-sky-700 mb-3">When did baby wake up?</p>
+              <div className="flex gap-2">
+                <input
+                  type="time"
+                  value={morningWakeInput}
+                  onChange={(e) => setMorningWakeInput(e.target.value)}
+                  className="flex-1 border border-sky-200 rounded-lg px-3 py-2 text-slate-700"
+                />
+                <Button 
+                  onClick={() => morningWakeInput && saveMorningWake(morningWakeInput)}
+                  disabled={!morningWakeInput}
+                  size="sm"
+                  className="bg-sky-500 hover:bg-sky-600"
+                >
+                  <Check className="h-4 w-4" />
+                </Button>
+                <Button 
+                  onClick={() => setShowMorningWakeInput(false)}
+                  variant="outline"
+                  size="sm"
+                  className="border-sky-200"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <button 
+                onClick={setMorningWakeNow}
+                className="text-xs text-sky-500 hover:text-sky-700 mt-2"
+              >
+                Or tap here for "just now"
+              </button>
+            </div>
+          ) : (
+            <button 
+              onClick={() => setShowMorningWakeInput(true)}
+              className="w-full flex items-center gap-3"
+            >
+              <div className="w-10 h-10 bg-sky-100 rounded-full flex items-center justify-center">
+                <Sun className="h-5 w-5 text-sky-600" />
+              </div>
+              <div className="text-left">
+                <p className="font-medium text-sky-800">Baby woke up</p>
+                <p className="text-xs text-sky-600">Tap to log morning wake time</p>
+              </div>
+            </button>
+          )}
         </CardContent>
       </Card>
 
