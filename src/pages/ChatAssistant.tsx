@@ -3,7 +3,7 @@ import { Send, Bot, User, Clock, Trash2, Plus, MessageSquare, X, Bookmark, Check
 import { useAuth } from '@/contexts/AuthContext';
 import { useNightMode, NightModeToggle } from '@/components/NightMode';
 import { conversationsService, savedChatService } from '@/lib/database';
-import koalaSittingImg from '@/assets/koala-sitting.jpg';
+import koalaSittingImg from '@/assets/koala-sitting.png';
 
 // Simple markdown renderer for chat messages
 const renderMarkdown = (text: string) => {

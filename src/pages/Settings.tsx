@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/contexts/AuthContext';
-import koalaBottleImg from '@/assets/koala-bottle.jpg';
+import koalaBottleImg from '@/assets/koala-bottle.png';
 
 interface SavedItem {
   id: string;

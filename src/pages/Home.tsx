@@ -6,8 +6,8 @@ import MoodCalendar from '@/components/MoodCalendar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNightMode, NightModeToggle } from '@/components/NightMode';
 import { moodService, sleepService, settingsService, MoodEntry, SleepLog } from '@/lib/database';
-import koalaSitting from '@/assets/koala-sitting.jpg';
-import koalaBottle from '@/assets/koala-bottle.jpg';
+import koalaSitting from '@/assets/koala-sitting.png';
+import koalaBottle from '@/assets/koala-bottle.png';
 
 const SLEEP_ASSESSMENT_KEY = 'nunu-sleep-assessment';
 const SLEEP_PROGRAM_KEY = 'nunu-sleep-program';

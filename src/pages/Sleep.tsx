@@ -6,7 +6,7 @@ import SleepProgram from '@/components/SleepProgram';
 import { injectSleepProgramStartMessage } from '@/utils/chatIntegration';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import koalaSleepImg from '@/assets/koala-sleep.jpg';
+import koalaSleepImg from '@/assets/koala-sleep.png';
 // Night mode handled globally via CSS in index.css
 
 const ASSESSMENT_STORAGE_KEY = 'nunu-sleep-assessment';

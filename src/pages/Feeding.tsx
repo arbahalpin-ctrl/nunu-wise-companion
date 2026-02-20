@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import koalaFeedingImg from '@/assets/koala-feeding.jpg';
+import koalaFeedingImg from '@/assets/koala-feeding.png';
 import { foods, Food } from '@/data/foods';
 import { recipes, Recipe, getRecipeCategories } from '@/data/recipes';
 
