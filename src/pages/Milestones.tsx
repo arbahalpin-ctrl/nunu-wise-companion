@@ -3,6 +3,7 @@ import { Baby, Heart, Eye, Hand, MessageCircle as Speech, Brain, Footprints, Plu
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import koalaMilestones from '@/assets/koala-milestones.svg';
 
 // Storage keys
 const GROWTH_LOG_KEY = 'nunu-growth-log';
@@ -890,9 +891,7 @@ const Milestones = () => {
       {/* Header */}
       <div className="p-6 pb-4">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-            <Baby className="h-5 w-5 text-purple-600" />
-          </div>
+          <img src={koalaMilestones} alt="Nunu celebrating" className="w-14 h-14" />
           <div>
             <h1 className="text-2xl font-bold text-slate-800">
               {babyName ? `${babyName}'s` : 'Baby'} Development

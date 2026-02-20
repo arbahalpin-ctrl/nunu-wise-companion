@@ -1,0 +1,56 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Koala baby sleeping with nappy - Sleep tab -->
+  
+  <!-- Pillow -->
+  <ellipse cx="100" cy="140" rx="65" ry="20" fill="#e0e7ff" opacity="0.6"/>
+  <ellipse cx="100" cy="138" rx="60" ry="18" fill="#eef2ff"/>
+  
+  <!-- Body lying on side, slightly curled -->
+  <ellipse cx="105" cy="130" rx="32" ry="24" fill="#cbd5e1" transform="rotate(-10, 105, 130)"/>
+  
+  <!-- Nappy -->
+  <path d="M78 128 Q80 152 105 155 Q130 152 132 128 Q118 133 105 133 Q90 133 78 128Z" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="96" y="126" width="14" height="5" rx="2" fill="#93c5fd"/>
+  
+  <!-- Left arm curled up near face -->
+  <ellipse cx="72" cy="110" rx="9" ry="6" fill="#cbd5e1" transform="rotate(-30, 72, 110)"/>
+  
+  <!-- Right arm -->
+  <ellipse cx="132" cy="125" rx="9" ry="6" fill="#cbd5e1" transform="rotate(15, 132, 125)"/>
+  
+  <!-- Feet tucked -->
+  <ellipse cx="88" cy="155" rx="10" ry="7" fill="#94a3b8"/>
+  <ellipse cx="120" cy="155" rx="10" ry="7" fill="#94a3b8"/>
+  
+  <!-- Left ear -->
+  <circle cx="64" cy="58" r="22" fill="#94a3b8"/>
+  <circle cx="64" cy="58" r="14" fill="#f1f5f9"/>
+  
+  <!-- Right ear -->
+  <circle cx="136" cy="58" r="22" fill="#94a3b8"/>
+  <circle cx="136" cy="58" r="14" fill="#f1f5f9"/>
+  
+  <!-- Head tilted slightly -->
+  <circle cx="100" cy="82" r="40" fill="#cbd5e1"/>
+  
+  <!-- Muzzle -->
+  <ellipse cx="100" cy="94" rx="20" ry="16" fill="#f1f5f9"/>
+  
+  <!-- Nose -->
+  <ellipse cx="100" cy="90" rx="11" ry="9" fill="#475569"/>
+  
+  <!-- Closed eyes (sleeping) - curved lines -->
+  <path d="M78 76 Q85 80 92 76" stroke="#1e293b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M108 76 Q115 80 122 76" stroke="#1e293b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  
+  <!-- Peaceful smile -->
+  <path d="M92 100 Q100 105 108 100" stroke="#475569" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  
+  <!-- Zzz -->
+  <text x="145" y="50" font-family="sans-serif" font-weight="bold" font-size="16" fill="#818cf8" opacity="0.8">z</text>
+  <text x="155" y="38" font-family="sans-serif" font-weight="bold" font-size="20" fill="#818cf8" opacity="0.6">z</text>
+  <text x="167" y="24" font-family="sans-serif" font-weight="bold" font-size="24" fill="#818cf8" opacity="0.4">z</text>
+  
+  <!-- Little blanket over body -->
+  <path d="M70 118 Q65 145 75 158 Q90 162 110 160 Q130 158 140 145 Q142 130 135 118 Q110 125 70 118Z" fill="#c7d2fe" opacity="0.4"/>
+</svg>

@@ -3,6 +3,7 @@ import { Send, Bot, User, Clock, Trash2, Plus, MessageSquare, X, Bookmark, Check
 import { useAuth } from '@/contexts/AuthContext';
 import { useNightMode, NightModeToggle } from '@/components/NightMode';
 import { conversationsService, savedChatService } from '@/lib/database';
+import koalaChatImg from '@/assets/koala-chat.svg';
 
 // Simple markdown renderer for chat messages
 const renderMarkdown = (text: string) => {
@@ -559,8 +560,8 @@ const ChatAssistant = () => {
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
-              <div className="w-10 h-10 bg-gradient-to-br from-slate-700 to-slate-900 rounded-full flex items-center justify-center shadow-sm">
-                <Bot className="h-5 w-5 text-white" />
+              <div className="w-10 h-10 rounded-full overflow-hidden shadow-sm bg-sky-50">
+                <img src={koalaChatImg} alt="Nunu" className="w-full h-full object-contain" />
               </div>
               <div>
                 <h1 className={`text-base font-semibold ${isNightMode ? 'text-gray-100' : 'text-slate-800'}`}>Nunu</h1>
