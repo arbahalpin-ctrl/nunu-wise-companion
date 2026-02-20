@@ -3,6 +3,7 @@ import { ArrowRight, Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 import heroImage from '@/assets/nunu-logo.svg';
 
 interface AuthProps {
@@ -18,8 +19,28 @@ const Auth = ({ onComplete }: AuthProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [confirmationSent, setConfirmationSent] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
 
   const { signUp, signIn } = useAuth();
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError('Please enter your email address first');
+      return;
+    }
+    setResetLoading(true);
+    setError('');
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/`,
+    });
+    setResetLoading(false);
+    if (error) {
+      setError(error.message);
+    } else {
+      setResetSent(true);
+    }
+  };
 
   const handleSignUp = async () => {
     if (!email || !password) {
@@ -115,6 +136,44 @@ const Auth = ({ onComplete }: AuthProps) => {
           <p className="text-xs text-slate-400 mt-8 text-center max-w-xs">
             By continuing, you agree to our Terms of Service and Privacy Policy
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Password reset sent
+  if (resetSent) {
+    return (
+      <div className="min-h-screen bg-slate-100 flex justify-center">
+        <div className="w-full max-w-md min-h-screen bg-gradient-to-b from-sky-50 to-white shadow-xl flex flex-col items-center justify-center p-8">
+          
+          <div className="w-20 h-20 bg-sky-100 rounded-full flex items-center justify-center mb-6">
+            <Mail className="h-10 w-10 text-sky-600" />
+          </div>
+
+          <h1 className="text-2xl font-bold text-slate-800 mb-3 text-center">
+            Check your email
+          </h1>
+          <p className="text-slate-500 text-center mb-6 max-w-xs">
+            We sent a password reset link to <strong>{email}</strong>. Click the link to set a new password.
+          </p>
+
+          <div className="w-full space-y-3">
+            <Button 
+              onClick={() => {
+                setResetSent(false);
+                setMode('signin');
+              }}
+              size="lg"
+              className="w-full rounded-2xl py-6 text-base bg-slate-800 hover:bg-slate-700"
+            >
+              Back to sign in
+            </Button>
+            
+            <p className="text-xs text-slate-400 text-center">
+              Didn't receive the email? Check your spam folder
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -245,6 +304,16 @@ const Auth = ({ onComplete }: AuthProps) => {
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
+              {mode === 'signin' && (
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  disabled={resetLoading}
+                  className="text-sm text-slate-500 hover:text-slate-700 mt-1.5 block"
+                >
+                  {resetLoading ? 'Sending...' : 'Forgot password?'}
+                </button>
+              )}
             </div>
 
             {error && (
