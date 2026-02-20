@@ -181,6 +181,18 @@
    ============================================ */
 
 [data-night-mode="true"] {
+  /* ---- CSS variable overrides ---- */
+  --card: 215 25% 15%;
+  --card-foreground: 210 40% 98%;
+  --background: 222 47% 11%;
+  --foreground: 210 40% 98%;
+  --popover: 215 25% 15%;
+  --popover-foreground: 210 40% 98%;
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+  --border: 217 33% 22%;
+  --input: 217 33% 17%;
+
   /* ---- Solid backgrounds ---- */
   .bg-white { background-color: #1e293b !important; }
   .bg-slate-50 { background-color: #0f172a !important; }
