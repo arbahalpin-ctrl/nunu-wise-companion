@@ -8,19 +8,20 @@ import koalaSleepImg from '@/assets/koala-sleep.png';
 import koalaBottleImg from '@/assets/koala-bottle.png';
 import koalaFeedingImg from '@/assets/koala-feeding.png';
 
-// Cute illustrations that appear between milestone categories at certain ages
-const MILESTONE_ILLUSTRATIONS: Record<number, { afterCategory: number; image: string; caption: string }> = {
-  0: { afterCategory: 1, image: 'sleep', caption: 'So much sleeping in these early days! 💤' },
-  2: { afterCategory: 0, image: 'sitting', caption: 'Those first smiles are everything! 😊' },
-  4: { afterCategory: 1, image: 'sitting', caption: 'Look at those little hands reaching! 🤲' },
-  6: { afterCategory: 1, image: 'feeding', caption: 'Time for yummy first foods! 🥄' },
-  8: { afterCategory: 1, image: 'sitting', caption: 'On the move! Nothing is safe now 😄' },
-  9: { afterCategory: 1, image: 'sitting', caption: 'Pulling up and cruising — so brave! 💪' },
-  10: { afterCategory: 1, image: 'sitting', caption: 'Nearly walking! What a superstar ⭐' },
-  12: { afterCategory: 1, image: 'feeding', caption: 'First birthday! They grow so fast 🎂' },
+// Cute koala illustrations between milestone categories at key ages
+const MILESTONE_ILLUSTRATIONS: Record<number, { afterCategory: number; koala: string; caption: string }> = {
+  0: { afterCategory: 1, koala: 'sleep', caption: 'So much sleeping in these early days � totally normal!' },
+  2: { afterCategory: 3, koala: 'sitting', caption: 'Those first real smiles are everything!' },
+  4: { afterCategory: 1, koala: 'sitting', caption: 'Reaching and grabbing everything in sight!' },
+  5: { afterCategory: 1, koala: 'sitting', caption: 'Rolling over � first big move!' },
+  6: { afterCategory: 1, koala: 'feeding', caption: 'Time for yummy first foods!' },
+  8: { afterCategory: 1, koala: 'sitting', caption: 'On the move! Nothing is safe now!' },
+  9: { afterCategory: 1, koala: 'bottle', caption: 'Pulling up and cruising � so brave!' },
+  10: { afterCategory: 1, koala: 'sitting', caption: 'Nearly walking! What a superstar!' },
+  12: { afterCategory: 1, koala: 'feeding', caption: 'First birthday! They grow so fast!' },
 };
 
-const getIllustrationImage = (key: string) => {
+const getKoalaImage = (key: string) => {
   switch(key) {
     case 'sitting': return koalaSittingImg;
     case 'sleep': return koalaSleepImg;
@@ -29,7 +30,6 @@ const getIllustrationImage = (key: string) => {
     default: return koalaSittingImg;
   }
 };
-
 // Storage keys
 const GROWTH_LOG_KEY = 'nunu-growth-log';
 const BABY_NAME_KEY = 'nunu-baby-name';
@@ -1018,15 +1018,15 @@ const Milestones = () => {
                   
                   {showIllustration && (
                     <div className="flex items-center gap-3 py-3 px-2">
-                      <div className="w-14 h-14 flex-shrink-0 animate-nunu-float">
+                      <div className="w-16 h-16 flex-shrink-0 animate-nunu-float rounded-2xl bg-purple-50 flex items-center justify-center overflow-hidden">
                         <img 
-                          src={getIllustrationImage(illustration.image)} 
-                          alt="Nunu" 
-                          className="w-full h-full object-contain drop-shadow-sm"
+                          src={getKoalaImage(illustration.koala)} 
+                          alt="" 
+                          className="w-12 h-12 object-contain"
                         />
                       </div>
-                      <div className="bg-purple-50 rounded-2xl rounded-bl-sm px-3 py-2 shadow-sm border border-purple-100">
-                        <p className="text-xs text-purple-700">{illustration.caption}</p>
+                      <div className="flex-1 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl rounded-bl-sm px-3.5 py-2.5 shadow-sm border border-purple-100/50">
+                        <p className="text-sm text-purple-700 font-medium">{illustration.caption}</p>
                       </div>
                     </div>
                   )}
