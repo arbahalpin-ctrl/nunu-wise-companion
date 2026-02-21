@@ -119,7 +119,11 @@ interface EpdsResult {
   hasCritical: boolean;
 }
 
-const Settings = () => {
+interface SettingsProps {
+  onReplayTutorial?: () => void;
+}
+
+const Settings = ({ onReplayTutorial }: SettingsProps = {}) => {
   const { user, signOut, babyProfile } = useAuth();
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
@@ -507,6 +511,16 @@ const Settings = () => {
                 <HelpCircle className="h-4 w-4 mr-3" />
                 Help & FAQ
               </Button>
+              {onReplayTutorial && (
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-slate-600"
+                  onClick={onReplayTutorial}
+                >
+                  <Baby className="h-4 w-4 mr-3" />
+                  Replay app tour
+                </Button>
+              )}
               <a href="mailto:support@nunu-app.com?subject=Nunu%20App%20Feedback" className="block">
                 <Button variant="ghost" className="w-full justify-start text-slate-600">
                   <Mail className="h-4 w-4 mr-3" />

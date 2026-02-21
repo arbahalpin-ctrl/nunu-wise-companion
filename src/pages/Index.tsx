@@ -12,12 +12,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNightMode } from '@/components/NightMode';
 import { supabase } from '@/lib/supabase';
 import { Loader2 } from 'lucide-react';
+import NunuTutorial, { shouldShowTutorial } from '@/components/NunuTutorial';
 
 const Index = () => {
   const { user, loading, babyProfile, saveBabyProfile, refreshBabyProfile } = useAuth();
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<boolean | null>(null);
   const [activeTab, setActiveTab] = useState('home');
   const [isSavingOnboarding, setIsSavingOnboarding] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   // Check onboarding status based on baby profile
   useEffect(() => {
@@ -56,10 +58,12 @@ const Index = () => {
       await refreshBabyProfile();
       
       setHasCompletedOnboarding(true);
+      // Show tutorial for new users after onboarding
+      setShowTutorial(true);
     } catch (error) {
       console.error('Error saving onboarding data:', error);
-      // Still proceed - they can update later
       setHasCompletedOnboarding(true);
+      setShowTutorial(true);
     } finally {
       setIsSavingOnboarding(false);
     }
@@ -134,7 +138,7 @@ const Index = () => {
       case 'chat':
         return <ChatAssistant />;
       case 'settings':
-        return <Settings />;
+        return <Settings onReplayTutorial={() => setShowTutorial(true)} />;
       default:
         return <Home onTabChange={setActiveTab} />;
     }
@@ -162,6 +166,11 @@ const Index = () => {
         {renderActiveTab()}
         <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
+      
+      {/* Nunu Tutorial Overlay */}
+      {showTutorial && (
+        <NunuTutorial onComplete={() => setShowTutorial(false)} />
+      )}
     </div>
   );
 };
