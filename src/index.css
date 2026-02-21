@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Nunu Guide Animations */
+@keyframes nunu-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes nunu-bounce {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-3px) scale(1.05); }
+}
+.animate-nunu-float {
+  animation: nunu-float 3s ease-in-out infinite;
+}
+.animate-nunu-bounce {
+  animation: nunu-bounce 2s ease-in-out infinite;
+}
+
 @layer base {
   :root {
     /* Base colors - pastel grey azure palette */

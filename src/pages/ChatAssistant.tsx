@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNightMode, NightModeToggle } from '@/components/NightMode';
 import { conversationsService, savedChatService } from '@/lib/database';
 import koalaSittingImg from '@/assets/koala-sitting.png';
+import { NunuPeek } from '@/components/NunuGuide';
 
 // Simple markdown renderer for chat messages
 const renderMarkdown = (text: string) => {

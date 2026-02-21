@@ -6,8 +6,7 @@ import MoodCalendar from '@/components/MoodCalendar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNightMode, NightModeToggle } from '@/components/NightMode';
 import { moodService, sleepService, settingsService, MoodEntry, SleepLog } from '@/lib/database';
-import koalaSitting from '@/assets/koala-sitting.png';
-import koalaBottle from '@/assets/koala-bottle.png';
+import NunuGuide, { NunuPeek } from '@/components/NunuGuide';
 
 const SLEEP_ASSESSMENT_KEY = 'nunu-sleep-assessment';
 const SLEEP_PROGRAM_KEY = 'nunu-sleep-program';
@@ -378,21 +377,13 @@ const Home = ({ onTabChange }: HomeProps) => {
     }`}>
       {/* Header */}
       <div className="flex flex-col items-center pt-6 pb-3 px-6">
-        <div className="w-24 h-24 mb-1">
-          <img 
-            src={koalaSitting} 
-            alt="Nunu" 
-            className="w-full h-full object-contain"
-          />
-        </div>
-        <h1 className={`text-xl font-bold ${isNightMode ? 'text-gray-100' : 'text-slate-800'}`}>Nunu</h1>
-        <p className={`text-sm mb-3 ${isNightMode ? 'text-gray-400' : 'text-slate-500'}`}>
-          {babyName ? `${babyName}'s companion` : 'The Motherhood Companion'}
-        </p>
-        <p className={`text-base font-medium ${isNightMode ? 'text-gray-300' : 'text-slate-700'}`}>
-          Hey{parentName ? `, ${parentName}` : ''} 💛
-        </p>
-        <p className={`text-sm ${isNightMode ? 'text-gray-400' : 'text-slate-500'}`}>How are you feeling?</p>
+        <NunuGuide 
+          message={`Hey${parentName ? ` ${parentName}` : ''} 💛 How are you feeling today?`}
+          variant="sitting"
+          size="lg"
+          dismissible={false}
+          className="mb-2"
+        />
       </div>
 
       <div className="flex-1 px-6 space-y-4">
@@ -734,7 +725,8 @@ const Home = ({ onTabChange }: HomeProps) => {
         </div>
 
         {/* Main CTA */}
-        <div className="relative">
+        <div>
+          <NunuPeek message="I'm always here if you need to talk!" variant="bottle" />
           <Button 
             onClick={() => onTabChange?.('chat')}
             size="lg"
@@ -745,7 +737,6 @@ const Home = ({ onTabChange }: HomeProps) => {
             <MessageCircle className="h-5 w-5 mr-2" />
             Talk to Nunu
           </Button>
-          <img src={koalaBottle} alt="" className="absolute -top-8 -right-2 w-16 h-16 opacity-80 pointer-events-none" />
         </div>
 
         {/* Daily Tip */}

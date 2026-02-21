@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import koalaFeedingImg from '@/assets/koala-feeding.png';
+import NunuGuide, { NunuPeek } from '@/components/NunuGuide';
 import { foods, Food } from '@/data/foods';
 import { recipes, Recipe, getRecipeCategories } from '@/data/recipes';
 
@@ -795,8 +795,13 @@ const Feeding = () => {
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {recipeChatMessages.length === 0 && (
             <div className="text-center py-8">
-              <img src={koalaFeedingImg} alt="Nunu eating" className="w-24 h-24 mx-auto mb-2" />
-              <p className="text-slate-600 font-medium">What should we make?</p>
+              <NunuGuide 
+                message="What should we make today? Ask me for recipe ideas! 🍽️"
+                variant="feeding"
+                size="lg"
+                dismissible={false}
+                className="justify-center mb-2"
+              />
               <p className="text-slate-400 text-sm mt-1">Ask for recipe ideas based on what you have!</p>
               <div className="flex flex-wrap justify-center gap-2 mt-4">
                 {['Quick breakfast ideas', 'Iron-rich recipes', 'Finger food ideas'].map((prompt) => (

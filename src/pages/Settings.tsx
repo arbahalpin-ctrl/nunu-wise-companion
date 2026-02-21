@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/contexts/AuthContext';
-import koalaBottleImg from '@/assets/koala-bottle.png';
+import NunuGuide from '@/components/NunuGuide';
 
 interface SavedItem {
   id: string;
@@ -399,7 +399,13 @@ const Settings = () => {
             <p className="text-sm text-purple-700 mb-4">
               Caring for a baby is hard. It's important to check in with yourself too.
             </p>
-            <img src={koalaBottleImg} alt="" className="w-16 h-16 mx-auto mb-3 opacity-70" />
+            <NunuGuide 
+              message="Looking after yourself matters too. You're doing amazing 💜"
+              variant="bottle"
+              size="sm"
+              storageKey="settings-wellbeing"
+              className="mb-3"
+            />
             
             <div className="space-y-2">
               <Button 
