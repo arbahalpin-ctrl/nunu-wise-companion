@@ -3,6 +3,32 @@ import { Baby, Heart, Eye, Hand, MessageCircle as Speech, Brain, Footprints, Plu
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import koalaSittingImg from '@/assets/koala-sitting.png';
+import koalaSleepImg from '@/assets/koala-sleep.png';
+import koalaBottleImg from '@/assets/koala-bottle.png';
+import koalaFeedingImg from '@/assets/koala-feeding.png';
+
+// Cute illustrations that appear between milestone categories at certain ages
+const MILESTONE_ILLUSTRATIONS: Record<number, { afterCategory: number; image: string; caption: string }> = {
+  0: { afterCategory: 1, image: 'sleep', caption: 'So much sleeping in these early days! 💤' },
+  2: { afterCategory: 0, image: 'sitting', caption: 'Those first smiles are everything! 😊' },
+  4: { afterCategory: 1, image: 'sitting', caption: 'Look at those little hands reaching! 🤲' },
+  6: { afterCategory: 1, image: 'feeding', caption: 'Time for yummy first foods! 🥄' },
+  8: { afterCategory: 1, image: 'sitting', caption: 'On the move! Nothing is safe now 😄' },
+  9: { afterCategory: 1, image: 'sitting', caption: 'Pulling up and cruising — so brave! 💪' },
+  10: { afterCategory: 1, image: 'sitting', caption: 'Nearly walking! What a superstar ⭐' },
+  12: { afterCategory: 1, image: 'feeding', caption: 'First birthday! They grow so fast 🎂' },
+};
+
+const getIllustrationImage = (key: string) => {
+  switch(key) {
+    case 'sitting': return koalaSittingImg;
+    case 'sleep': return koalaSleepImg;
+    case 'bottle': return koalaBottleImg;
+    case 'feeding': return koalaFeedingImg;
+    default: return koalaSittingImg;
+  }
+};
 
 // Storage keys
 const GROWTH_LOG_KEY = 'nunu-growth-log';
@@ -965,26 +991,48 @@ const Milestones = () => {
               {currentMilestones.label}
             </h2>
             
-            {currentMilestones.categories.map((category, index) => (
-              <Card key={index} className="border-none shadow-sm">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
-                      {category.icon}
+            {currentMilestones.categories.map((category, index) => {
+              const illustration = MILESTONE_ILLUSTRATIONS[selectedAge];
+              const showIllustration = illustration && illustration.afterCategory === index;
+              
+              return (
+                <div key={index}>
+                  <Card className="border-none shadow-sm">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
+                          {category.icon}
+                        </div>
+                        <h3 className="font-medium text-slate-800">{category.title}</h3>
+                      </div>
+                      <ul className="space-y-2">
+                        {category.milestones.map((milestone, mIndex) => (
+                          <li key={mIndex} className="flex items-start gap-2 text-sm text-slate-600">
+                            <span className="text-purple-400 mt-1">•</span>
+                            <span>{milestone}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                  
+                  {showIllustration && (
+                    <div className="flex items-center gap-3 py-3 px-2">
+                      <div className="w-14 h-14 flex-shrink-0 animate-nunu-float">
+                        <img 
+                          src={getIllustrationImage(illustration.image)} 
+                          alt="Nunu" 
+                          className="w-full h-full object-contain drop-shadow-sm"
+                        />
+                      </div>
+                      <div className="bg-purple-50 rounded-2xl rounded-bl-sm px-3 py-2 shadow-sm border border-purple-100">
+                        <p className="text-xs text-purple-700">{illustration.caption}</p>
+                      </div>
                     </div>
-                    <h3 className="font-medium text-slate-800">{category.title}</h3>
-                  </div>
-                  <ul className="space-y-2">
-                    {category.milestones.map((milestone, mIndex) => (
-                      <li key={mIndex} className="flex items-start gap-2 text-sm text-slate-600">
-                        <span className="text-purple-400 mt-1">•</span>
-                        <span>{milestone}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
