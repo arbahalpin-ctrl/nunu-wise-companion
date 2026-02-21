@@ -77,6 +77,15 @@ const Index = () => {
     );
   }
 
+  // Wait for auth to finish loading before deciding
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+      </div>
+    );
+  }
+
   // Show auth if not logged in
   if (!user) {
     return <Auth onComplete={() => {}} />;
