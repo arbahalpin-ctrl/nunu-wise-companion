@@ -485,8 +485,7 @@ const ChatAssistant = () => {
     return (
       <div className="h-[calc(100vh-80px)] bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 bg-gradient-to-br from-slate-700 to-slate-900 rounded-full flex items-center justify-center mx-auto mb-3 animate-pulse">
-            <Bot className="h-5 w-5 text-white" />
+          <div className="w-10 h-10 rounded-full overflow-hidden mx-auto mb-3 animate-pulse"><img src={koalaSittingImg} alt="Nunu" className="w-full h-full object-cover" />
           </div>
           <p className="text-sm text-slate-500">Loading your chats...</p>
         </div>
@@ -594,8 +593,7 @@ const ChatAssistant = () => {
               className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {message.role === 'assistant' && (
-                <div className="w-8 h-8 bg-gradient-to-br from-slate-700 to-slate-900 rounded-full flex items-center justify-center flex-shrink-0 mt-1 shadow-sm">
-                  <Bot className="h-4 w-4 text-white" />
+                <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 mt-1 shadow-sm border border-slate-100"><img src={koalaSittingImg} alt="Nunu" className="w-full h-full object-cover" />
                 </div>
               )}
               
@@ -647,8 +645,7 @@ const ChatAssistant = () => {
 
           {isTyping && (
             <div className="flex gap-3 justify-start">
-              <div className="w-8 h-8 bg-gradient-to-br from-slate-700 to-slate-900 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
-                <Bot className="h-4 w-4 text-white" />
+              <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 shadow-sm border border-slate-100"><img src={koalaSittingImg} alt="Nunu" className="w-full h-full object-cover" />
               </div>
               <div className={`shadow-sm border rounded-2xl px-4 py-3 ${
                 isNightMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'
